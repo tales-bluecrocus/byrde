@@ -20,23 +20,29 @@ scss/
 
 ### Color System
 
-#### Primitive Colors (Raw Palette)
+#### Primitive Colors (Base Palette)
 
-Use estas variáveis apenas para criar novos tokens semânticos:
+Use apenas para criar novos tokens semânticos. **Prefira sempre as funções semânticas**.
 
 ```scss
-// Primary Brand
-$primary-color-50   // Lightest
-$primary-color-700  // Default
-$primary-color-950  // Darkest
+// Brand
+$primary-color: #1b67f6;
+$primary-color-hover: #1350e2;
+$primary-color-light: #eef7ff;
 
-// Gray Modern (preferred)
-$gray-modern-50 to $gray-modern-950
+// Neutral
+$white: #fff;
+$black: #000;
+$gray-50, $gray-100, $gray-200, $gray-300
+$gray-500, $gray-700, $gray-900
 
-// Status Colors
-$success-50 to $success-950
-$warning-50 to $warning-950
-$error-50 to $error-950
+// Status
+$success: #17b26a;
+$success-light: #edfcf3;
+$warning: #f78e09;
+$warning-light: #fffaeb;
+$error: #f04438;
+$error-light: #fef3f2;
 ```
 
 #### Semantic Tokens (Use These!)
@@ -44,32 +50,81 @@ $error-50 to $error-950
 **Text Colors** - Use `text-color()`
 
 ```scss
-color: text-color("primary"); // Main text (#1c1c1d)
+color: text-color("primary"); // Main text (#212529)
 color: text-color("secondary"); // Secondary text (#495057)
-color: text-color("tertiary"); // Muted text (#868e96)
-color: text-color("placeholder"); // Placeholder (#adb5bd)
-color: text-color("disabled"); // Disabled state
-color: text-color("inverse"); // White text
-color: text-color("brand"); // Brand color text
+color: text-color("tertiary"); // Muted text (#adb5bd)
+color: text-color("brand"); // Brand color
 color: text-color("success"); // Success message
 color: text-color("warning"); // Warning message
 color: text-color("error"); // Error message
+color: text-color("inverse"); // White text
+```
+
+**Button Colors** - Use `button-color()`
+
+```scss
+// Primary button
+background: button-color("primary-bg");
+color: button-color("primary-text");
+&:hover {
+	background: button-color("primary-hover");
+}
+
+// Secondary button
+background: button-color("secondary-bg");
+color: button-color("secondary-text");
+&:hover {
+	background: button-color("secondary-hover");
+}
+
+// Status buttons (success, warning, error)
+background: button-color("success-bg");
+color: button-color("success-text");
+&:hover {
+	background: button-color("success-hover");
+}
+```
+
+**Form Colors** - Use `form-color()`
+
+```scss
+// Input styles
+border: 1px solid form-color("border");
+background: form-color("bg");
+color: form-color("text");
+
+// States
+&:hover {
+	border-color: form-color("border-hover");
+}
+&:focus {
+	border-color: form-color("border-focus");
+	outline: 2px solid form-color("outline");
+}
+&.error {
+	border-color: form-color("border-error");
+}
+&:disabled {
+	background: form-color("bg-disabled");
+	color: form-color("text-disabled");
+}
+
+// Placeholder
+&::placeholder {
+	color: form-color("placeholder");
+}
 ```
 
 **Background Colors** - Use `bg-color()`
 
 ```scss
-background: bg-color("primary"); // White background
-background: bg-color("secondary"); // Light gray bg
-background: bg-color("tertiary"); // Medium gray bg
-background: bg-color("brand"); // Brand color bg
-background: bg-color("brand-light"); // Light brand tint
-background: bg-color("brand-lighter"); // Lighter brand tint
+background: bg-color("primary"); // White
+background: bg-color("secondary"); // Light gray
+background: bg-color("tertiary"); // Medium gray
+background: bg-color("brand"); // Brand tint
 background: bg-color("success"); // Success bg
 background: bg-color("warning"); // Warning bg
 background: bg-color("error"); // Error bg
-background: bg-color("disabled"); // Disabled bg
-background: bg-color("overlay"); // Modal overlay
 ```
 
 **Border Colors** - Use `border-color()`
@@ -77,12 +132,10 @@ background: bg-color("overlay"); // Modal overlay
 ```scss
 border: 1px solid border-color("primary"); // Main border
 border: 1px solid border-color("secondary"); // Stronger border
-border: 1px solid border-color("tertiary"); // Subtle border
 border: 1px solid border-color("brand"); // Brand border
 border: 1px solid border-color("success"); // Success border
 border: 1px solid border-color("warning"); // Warning border
 border: 1px solid border-color("error"); // Error border
-border: 1px solid border-color("disabled"); // Disabled border
 ```
 
 ### Typography
@@ -97,25 +150,16 @@ font-family: font-family("display"); // Headings (articulat-cf)
 **Font Sizes** - Use `font-size()`
 
 ```scss
-// Text sizes
-font-size: font-size("3xs"); // 0.8rem (8px)
-font-size: font-size("xxs"); // 1.0rem (10px)
 font-size: font-size("xs"); // 1.2rem (12px)
 font-size: font-size("sm"); // 1.4rem (14px)
 font-size: font-size("md"); // 1.6rem (16px) ← Base
 font-size: font-size("lg"); // 1.8rem (18px)
 font-size: font-size("xl"); // 2.0rem (20px)
-
-// Display sizes
-font-size: font-size("d-xs"); // 2.4rem (24px)
-font-size: font-size("d-sm"); // 3.0rem (30px)
-font-size: font-size("d-md"); // 3.6rem (36px)
-font-size: font-size("d-lg"); // 4.0rem (40px)
-font-size: font-size("d-xl"); // 4.8rem (48px)
-
-// Hero sizes
-font-size: font-size("h-md"); // 6.0rem (60px)
-font-size: font-size("h-lg"); // 7.2rem (72px)
+font-size: font-size("2xl"); // 2.4rem (24px)
+font-size: font-size("3xl"); // 3.0rem (30px)
+font-size: font-size("4xl"); // 3.6rem (36px)
+font-size: font-size("5xl"); // 4.8rem (48px)
+font-size: font-size("6xl"); // 6.0rem (60px)
 ```
 
 **Line Heights** - Use `line-height()`
@@ -123,7 +167,8 @@ font-size: font-size("h-lg"); // 7.2rem (72px)
 ```scss
 // Match with font-size keys
 line-height: line-height("md"); // 2.4rem
-line-height: line-height("d-xl"); // 6.0rem
+line-height: line-height("3xl"); // 4.0rem
+line-height: line-height("6xl"); // 7.2rem
 ```
 
 **Example Usage**
@@ -131,8 +176,8 @@ line-height: line-height("d-xl"); // 6.0rem
 ```scss
 .heading {
 	font-family: font-family("display");
-	font-size: font-size("d-lg");
-	line-height: line-height("d-lg");
+	font-size: font-size("4xl");
+	line-height: line-height("4xl");
 	color: text-color("primary");
 }
 
@@ -149,33 +194,26 @@ line-height: line-height("d-xl"); // 6.0rem
 Use `spacing()` para margins, paddings, gaps:
 
 ```scss
-// Progressive scale (2xs → 12xl)
-margin: spacing("2xs"); // 0.2rem (2px)
 margin: spacing("xs"); // 0.4rem (4px)
-margin: spacing("sm"); // 0.6rem (6px)
-margin: spacing("md"); // 0.8rem (8px)
-margin: spacing("lg"); // 1.0rem (10px)
-margin: spacing("xl"); // 1.2rem (12px)
-margin: spacing("2xl"); // 1.6rem (16px)
-margin: spacing("3xl"); // 2.0rem (20px)
-margin: spacing("4xl"); // 2.4rem (24px)
-margin: spacing("5xl"); // 3.2rem (32px)
-margin: spacing("6xl"); // 4.0rem (40px)
-margin: spacing("7xl"); // 4.8rem (48px)
-margin: spacing("8xl"); // 6.4rem (64px)
-margin: spacing("9xl"); // 7.2rem (72px)
-margin: spacing("10xl"); // 8.0rem (80px)
-margin: spacing("11xl"); // 9.6rem (96px)
-margin: spacing("12xl"); // 12.8rem (128px)
+margin: spacing("sm"); // 0.8rem (8px)
+margin: spacing("md"); // 1.6rem (16px)
+margin: spacing("lg"); // 2.4rem (24px)
+margin: spacing("xl"); // 3.2rem (32px)
+margin: spacing("2xl"); // 4.0rem (40px)
+margin: spacing("3xl"); // 4.8rem (48px)
+margin: spacing("4xl"); // 6.4rem (64px)
+margin: spacing("5xl"); // 8.0rem (80px)
+margin: spacing("6xl"); // 9.6rem (96px)
+margin: spacing("7xl"); // 12.8rem (128px)
 ```
 
 **Example**
 
 ```scss
 .card {
-	padding: spacing("6xl");
-	margin-bottom: spacing("4xl");
-	gap: spacing("3xl");
+	padding: spacing("2xl");
+	margin-bottom: spacing("lg");
+	gap: spacing("md");
 }
 ```
 
@@ -185,16 +223,12 @@ Use `radius()`:
 
 ```scss
 border-radius: radius("none"); // 0
-border-radius: radius("2xs"); // 0.2rem
-border-radius: radius("xs"); // 0.4rem
-border-radius: radius("sm"); // 0.6rem
+border-radius: radius("sm"); // 0.4rem
 border-radius: radius("md"); // 0.8rem
-border-radius: radius("lg"); // 1.0rem
-border-radius: radius("xl"); // 1.2rem
-border-radius: radius("2xl"); // 1.6rem
-border-radius: radius("3xl"); // 2.0rem
-border-radius: radius("4xl"); // 2.4rem
-border-radius: radius("infinite"); // 999.9rem (pills)
+border-radius: radius("lg"); // 1.2rem
+border-radius: radius("xl"); // 1.6rem
+border-radius: radius("2xl"); // 2.4rem
+border-radius: radius("full"); // 9999px (circles/pills)
 ```
 
 ## 📱 Responsive Design
@@ -229,26 +263,26 @@ $tablet: 768px; // Tablet and above
 
 ```scss
 .hero {
-	font-size: font-size("h-lg");
-	padding: spacing("12xl");
+	font-size: font-size("6xl");
+	padding: spacing("7xl");
 
 	@include max($mobile) {
-		font-size: font-size("d-xl");
-		padding: spacing("6xl");
+		font-size: font-size("4xl");
+		padding: spacing("4xl");
 	}
 }
 ```
 
 ### Utility Classes
 
-```scss
-// Show only on mobile (<= 767px)
+```html
+<!-- Show only on mobile (<= 767px) -->
 <div class="mobile-only">...</div>
 
-// Show only on tablet (768px - 1024px)
+<!-- Show only on tablet (768px - 1024px) -->
 <div class="tablet-only">...</div>
 
-// Show only on desktop (>= 768px)
+<!-- Show only on desktop (>= 768px) -->
 <div class="desktop-only">...</div>
 ```
 
@@ -256,12 +290,102 @@ $tablet: 768px; // Tablet and above
 
 ```scss
 .container {
-	max-width: 1280px; // Desktop
-	padding: 0 spacing("6xl"); // 40px sides
+	max-width: 1280px;
+	padding: 0 spacing("2xl"); // 40px sides
 	margin: 0 auto;
 
 	@include max($tablet) {
-		padding: 0 spacing("4xl"); // 24px on tablet/mobile
+		padding: 0 spacing("lg"); // 24px on tablet/mobile
+	}
+}
+```
+
+## 🎯 Component Examples
+
+### Button Component
+
+```scss
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: spacing("sm");
+	padding: spacing("sm") spacing("lg");
+	font-family: font-family("body");
+	font-size: font-size("md");
+	line-height: line-height("md");
+	border-radius: radius("md");
+	border: none;
+	cursor: pointer;
+	transition: all 0.2s;
+
+	// Primary variant
+	&--primary {
+		background: button-color("primary-bg");
+		color: button-color("primary-text");
+
+		&:hover {
+			background: button-color("primary-hover");
+		}
+	}
+
+	// Secondary variant
+	&--secondary {
+		background: button-color("secondary-bg");
+		color: button-color("secondary-text");
+
+		&:hover {
+			background: button-color("secondary-hover");
+		}
+	}
+
+	// Success variant
+	&--success {
+		background: button-color("success-bg");
+		color: button-color("success-text");
+
+		&:hover {
+			background: button-color("success-hover");
+		}
+	}
+}
+```
+
+### Form Input Component
+
+```scss
+.input {
+	width: 100%;
+	padding: spacing("sm") spacing("md");
+	font-family: font-family("body");
+	font-size: font-size("md");
+	line-height: line-height("md");
+	color: form-color("text");
+	background: form-color("bg");
+	border: 1px solid form-color("border");
+	border-radius: radius("md");
+	transition: all 0.2s;
+
+	&::placeholder {
+		color: form-color("placeholder");
+	}
+
+	&:hover {
+		border-color: form-color("border-hover");
+	}
+
+	&:focus {
+		outline: 2px solid form-color("outline");
+		border-color: form-color("border-focus");
+	}
+
+	&--error {
+		border-color: form-color("border-error");
+	}
+
+	&:disabled {
+		background: form-color("bg-disabled");
+		color: form-color("text-disabled");
+		cursor: not-allowed;
 	}
 }
 ```
@@ -273,9 +397,9 @@ $tablet: 768px; // Tablet and above
 ```scss
 // Use semantic tokens
 color: text-color("primary");
-background: bg-color("brand-light");
-padding: spacing("4xl");
-border-radius: radius("lg");
+background: button-color("primary-bg");
+padding: spacing("lg");
+border-radius: radius("md");
 
 // Use functions consistently
 font-family: font-family("body");
@@ -283,10 +407,10 @@ font-size: font-size("md");
 
 // Mobile-first approach
 .element {
-	padding: spacing("6xl");
+	padding: spacing("2xl");
 
 	@include max($tablet) {
-		padding: spacing("4xl");
+		padding: spacing("lg");
 	}
 }
 ```
@@ -295,12 +419,12 @@ font-size: font-size("md");
 
 ```scss
 // Don't use primitive colors directly
-color: $gray-modern-700; // ❌
+color: $gray-700; // ❌
 color: text-color("secondary"); // ✅
 
 // Don't use magic numbers
 padding: 2.4rem; // ❌
-padding: spacing("4xl"); // ✅
+padding: spacing("lg"); // ✅
 
 // Don't hardcode breakpoints
 @media (max-width: 768px) {
@@ -310,7 +434,7 @@ padding: spacing("4xl"); // ✅
 
 // Don't mix units
 padding: 24px; // ❌
-padding: spacing("4xl"); // ✅ (rem-based)
+padding: spacing("lg"); // ✅ (rem-based)
 ```
 
 ## 🔧 Configuration
@@ -323,12 +447,6 @@ Base font-size is set to **62.5%** (10px), making rem calculations easy:
 -   `1.6rem = 16px`
 -   `2.4rem = 24px`
 
-### Font Features
-
-```scss
-font-feature-settings: "ss04" on, "ss05" on;
-```
-
 ## 📦 How to Use
 
 ### In Components
@@ -338,55 +456,32 @@ font-feature-settings: "ss04" on, "ss05" on;
 @use "../generic/mixins" as *;
 
 .my-component {
-	padding: spacing("6xl");
+	padding: spacing("2xl");
 	background: bg-color("primary");
 	color: text-color("primary");
 	border: 1px solid border-color("primary");
 	border-radius: radius("lg");
 
 	@include max($tablet) {
-		padding: spacing("4xl");
-	}
-}
-```
-
-### File Organization
-
-```scss
-// components/_button.scss
-@use "../generic/variables" as *;
-@use "../generic/mixins" as *;
-
-.btn {
-	font-family: font-family("body");
-	font-size: font-size("md");
-	padding: spacing("3xl") spacing("5xl");
-	background: bg-color("brand");
-	color: text-color("inverse");
-	border-radius: radius("lg");
-
-	&:hover {
-		background: bg-color("brand-light");
-	}
-
-	@include max($mobile) {
-		width: 100%;
+		padding: spacing("lg");
 	}
 }
 ```
 
 ## 🎯 Quick Reference
 
-| Token Type   | Function              | Example                   |
-| ------------ | --------------------- | ------------------------- |
-| Text Color   | `text-color('key')`   | `text-color('primary')`   |
-| Background   | `bg-color('key')`     | `bg-color('brand')`       |
-| Border Color | `border-color('key')` | `border-color('primary')` |
-| Font Family  | `font-family('key')`  | `font-family('body')`     |
-| Font Size    | `font-size('key')`    | `font-size('md')`         |
-| Line Height  | `line-height('key')`  | `line-height('md')`       |
-| Spacing      | `spacing('key')`      | `spacing('4xl')`          |
-| Radius       | `radius('key')`       | `radius('lg')`            |
+| Token Type   | Function              | Example                      |
+| ------------ | --------------------- | ---------------------------- |
+| Text Color   | `text-color('key')`   | `text-color('primary')`      |
+| Button Color | `button-color('key')` | `button-color('primary-bg')` |
+| Form Color   | `form-color('key')`   | `form-color('border-focus')` |
+| Background   | `bg-color('key')`     | `bg-color('brand')`          |
+| Border Color | `border-color('key')` | `border-color('primary')`    |
+| Font Family  | `font-family('key')`  | `font-family('body')`        |
+| Font Size    | `font-size('key')`    | `font-size('md')`            |
+| Line Height  | `line-height('key')`  | `line-height('md')`          |
+| Spacing      | `spacing('key')`      | `spacing('lg')`              |
+| Radius       | `radius('key')`       | `radius('md')`               |
 
 ## 🚀 Adding New Components
 
