@@ -6,7 +6,7 @@ use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 // Replace these values with your actual repository information
 $updateChecker = PucFactory::buildUpdateChecker(
     'https://github.com/tales-bluecrocus/byrde', // Your GitHub repository URL
-    __DIR__ . '/../functions.php', // Path to the main theme file
+    __DIR__ . '/../style.css', // Path to the main theme file (style.css for themes)
     'byrde', // Theme slug (should match the theme folder name)
 );
 
