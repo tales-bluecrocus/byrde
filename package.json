@@ -5,17 +5,15 @@
 	"type": "module",
 	"scripts": {
 		"build": "npm-run-all clean build:*",
-		"build:assets": "vite build --config .config/vite.assets.config.js",
-		"build:blocks": "vite build --config .config/vite.blocks.config.js",
+		"build:assets": "vite build --config .config/vite.config.js",
 		"preview": "vite preview",
 		"clean": "rimraf dist blocks/**/_dist",
 		"watch": "npm-run-all --parallel watch:*",
-		"watch:assets": "vite build --config .config/vite.assets.config.js --watch",
-		"watch:blocks": "vite build --config .config/vite.blocks.config.js --watch"
+		"watch:assets": "vite build --config .config/vite.config.js --watch"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+ssh://git@github.com:tales-bluecrocus/byrde.git"
+		"url": "git+ssh://git@github.com/tales-bluecrocus/byrde.git"
 	},
 	"keywords": [],
 	"author": "",
