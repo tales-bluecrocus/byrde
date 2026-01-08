@@ -34,7 +34,8 @@
 	"intelephense.environment.includePaths": [
 		"../../../wp-includes",
 		"../../../wp-admin",
-		"../../../wp-content/plugins/advanced-custom-fields-pro"
+		"../../../wp-content/plugins/advanced-custom-fields-pro",
+		"vendor/yahnis-elsts/plugin-update-checker"
 	],
 	"intelephense.stubs": [
 		"apache",
