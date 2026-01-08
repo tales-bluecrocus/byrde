@@ -1,15 +1,12 @@
 <?php
 
-use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+use YahnisElsts\PluginUpdateChecker\v5p4\Theme\UpdateChecker;
 
-// Get the theme slug (folder name)
-$theme_slug = basename(get_template_directory());
-
-// Initialize the theme update checker
-$updateChecker = PucFactory::buildUpdateChecker(
+// Initialize the theme update checker with the correct class for themes
+$updateChecker = new UpdateChecker(
     'https://github.com/tales-bluecrocus/byrde',
-    get_stylesheet_directory() . '/style.css',
-    $theme_slug,
+    __FILE__,
+    'byrde',
 );
 
 // Enable release assets - uses GitHub Releases instead of branch ZIP
