@@ -40,9 +40,10 @@ jobs:
             - name: Copy theme files to distribution
               run: |
                   rsync -av --progress . dist-release/byrde \
-                    --exclude='.git' \
-                    --exclude='.github' \
-                    --exclude='node_modules' \
+                    --exclude='.git/' \
+                    --exclude='.github/' \
+                    --exclude='.vscode/' \
+                    --exclude='node_modules/' \
                     --exclude='dist-release' \
                     --exclude='.gitignore' \
                     --exclude='.gitattributes' \
@@ -51,9 +52,8 @@ jobs:
                     --exclude='composer.json' \
                     --exclude='composer.lock' \
                     --exclude='phpcs.xml' \
-                    --exclude='.config' \
-                    --exclude='assets/js' \
-                    --exclude='assets/scss' \
+                    --exclude='.config/' \
+                    --exclude='assets/' \
                     --exclude='README.md'
 
             - name: Create ZIP file
