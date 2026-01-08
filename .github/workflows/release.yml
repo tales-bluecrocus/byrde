@@ -63,12 +63,12 @@ jobs:
             - name: Create ZIP file
               run: |
                   cd dist-release
-                  zip -r ../byrde-${{ github.ref_name }}.zip byrde
+                  zip -r ../byrde.zip byrde
 
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v1
               with:
-                  files: byrde-${{ github.ref_name }}.zip
+                  files: byrde.zip
                   generate_release_notes: true
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
