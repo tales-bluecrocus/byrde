@@ -7,3 +7,9 @@
     <?php wp_head(); ?>
 </head>
 <body>
+
+
+<header class="header container">
+    <h1><?php bloginfo('name'); ?></h1>
+    <h2>Welcome to the Header</h2>
+</header>
