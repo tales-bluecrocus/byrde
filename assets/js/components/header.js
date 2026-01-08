@@ -6,5 +6,5 @@ function header() {
 	const headerEl = document.querySelector(".header");
 	if (!headerEl) return;
 
-	console.log("Header initialized");
+	console.log("Header initialized!");
 }

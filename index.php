@@ -1,9 +1,7 @@
-<?php
+<?php get_header(); ?>
 
-echo 'Hello, World!';
-echo 'This is a sample PHP file.';
+<header class="header container">
+    <h1>Welcome to the Header</h1>
+</header>
 
-function greet($name)
-{
-    return 'Hello, ' . $name . '!';
-}
+<?php get_footer(); ?>

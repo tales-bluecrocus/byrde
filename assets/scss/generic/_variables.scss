@@ -1,272 +1,221 @@
 @use "sass:map";
 @use "sass:string";
+@use "sass:color";
 
 @use "./fonts";
 
-// Colors
-// Primary Color
+// ============================================
+// BASE COLORS (Primitive Tokens)
+// ============================================
+
+// Brand
 $primary-color: #1b67f6;
-$primary-color-alt: #d9ebff;
-$primary-color-25: #f5f8ff;
-$primary-color-50: #eef7ff;
-$primary-color-100: #d9ebff;
-$primary-color-200: #bcddff;
-$primary-color-400: #57aaff;
-$primary-color-500: #3187ff;
-$primary-color-600: #1b67f6;
-$primary-color-700: #1350e2;
-$primary-color-800: #1641b7;
-$primary-color-900: #183b90;
-$primary-color-950: #142557;
+$primary-color-hover: #1350e2;
+$primary-color-light: #eef7ff;
 
-// Base Colors
-$base-white: #fff;
-$base-black: #000;
+// Neutral
+$white: #fff;
+$black: #000;
+$gray-50: #f8fafc;
+$gray-100: #eef2f6;
+$gray-200: #e3e8ef;
+$gray-300: #d0d5dd;
+$gray-500: #adb5bd;
+$gray-700: #495057;
+$gray-900: #212529;
 
-// Gray Modern
-$gray-modern-25: #fcfcfd;
-$gray-modern-50: #f8fafc;
-$gray-modern-100: #eef2f6;
-$gray-modern-200: #e3e8ef;
-$gray-modern-300: #d0d5dd;
-$gray-modern-400: #ced4da;
-$gray-modern-500: #adb5bd;
-$gray-modern-600: #868e96;
-$gray-modern-700: #495057;
-$gray-modern-700-2: #62646b;
-$gray-modern-800: #343a40;
-$gray-modern-900: #212529;
-$gray-modern-950: #1c1c1d;
-$gray-modern-950-2: #0c111d;
+// Status Colors
+$success: #17b26a;
+$success-light: #edfcf3;
+$warning: #f78e09;
+$warning-light: #fffaeb;
+$error: #f04438;
+$error-light: #fef3f2;
 
-// Gray Scale
-$gray-scale-50: #fafafa;
-$gray-scale-100: #efefef;
-$gray-scale-200: #dcdcdc;
-$gray-scale-300: #bdbdbd;
-$gray-scale-400: #989898;
-$gray-scale-500: #7c7c7c;
-$gray-scale-600: #656565;
-$gray-scale-700: #525252;
-$gray-scale-800: #464646;
-$gray-scale-900: #3d3d3d;
-$gray-scale-950: #292929;
+// ============================================
+// SEMANTIC TOKENS
+// ============================================
 
-// Green Scale
-$success-50: #edfcf3;
-$success-100: #d3f8e0;
-$success-200: #aafcc7;
-$success-300: #73e2a7;
-$success-400: #3bcc84;
-$success-500: #17b26a;
-$success-600: #0b9055;
-$success-700: #097347;
-$success-800: #0a5b39;
-$success-900: #094b31;
-$success-950: #042a1c;
+// Text Colors
+$text-color: (
+	"primary": $gray-900,
+	"secondary": $gray-700,
+	"tertiary": $gray-500,
+	"brand": $primary-color,
+	"success": $success,
+	"warning": $warning,
+	"error": $error,
+	"inverse": $white,
+);
 
-// Orange Scale
-$warning-50: #fffaeb;
-$warning-100: #fffec6;
-$warning-200: #fedf89;
-$warning-300: #fec74b;
-$warning-400: #fdb022;
-$warning-500: #f78e09;
-$warning-600: #db6704;
-$warning-700: #b64607;
-$warning-800: #93360d;
-$warning-900: #792d0e;
-$warning-950: #461502;
+@function text-color($key) {
+	@return map.get($text-color, $key);
+}
 
-// Red Scale
-$error-50: #fef3f2;
-$error-100: #fee4e2;
-$error-200: #ffcdc9;
-$error-300: #fdaaa4;
-$error-400: #f97970;
-$error-500: #f04438;
-$error-600: #de3024;
-$error-700: #bb241a;
-$error-800: #9a221a;
-$error-900: #80231c;
-$error-950: #460d09;
+// Button Colors
+$button-color: (
+	"primary-bg": $primary-color,
+	"primary-text": $white,
+	"primary-hover": $primary-color-hover,
+	"secondary-bg": $gray-100,
+	"secondary-text": $gray-900,
+	"secondary-hover": $gray-200,
+	"success-bg": $success,
+	"success-text": $white,
+	"success-hover": color.adjust($success, $lightness: -8%),
+	"warning-bg": $warning,
+	"warning-text": $white,
+	"warning-hover": color.adjust($warning, $lightness: -8%),
+	"error-bg": $error,
+	"error-text": $white,
+	"error-hover": color.adjust($error, $lightness: -8%),
+);
 
-// Pink Scale
-$pink-50: #fdf2f6;
-$pink-100: #fbe8f0;
-$pink-200: #fad0e2;
-$pink-300: #f6abc9;
-$pink-400: #f076a4;
-$pink-500: #e64980;
-$pink-600: #d52d60;
-$pink-700: #b91d48;
-$pink-800: #991b3c;
-$pink-900: #7f1c36;
-$pink-950: #4e091a;
+@function button-color($key) {
+	@return map.get($button-color, $key);
+}
 
-// Typography
-// Font Families
+// Form Colors
+$form-color: (
+	"border": $gray-300,
+	"border-hover": $gray-500,
+	"border-focus": $primary-color,
+	"border-error": $error,
+	"bg": $white,
+	"bg-disabled": $gray-50,
+	"placeholder": $gray-500,
+	"text": $gray-900,
+	"text-disabled": $gray-500,
+	"outline": rgba($primary-color, 0.25),
+);
+
+@function form-color($key) {
+	@return map.get($form-color, $key);
+}
+
+// Background Colors
+$bg-color: (
+	"primary": $white,
+	"secondary": $gray-50,
+	"tertiary": $gray-100,
+	"brand": $primary-color-light,
+	"success": $success-light,
+	"warning": $warning-light,
+	"error": $error-light,
+);
+
+@function bg-color($key) {
+	@return map.get($bg-color, $key);
+}
+
+// Border Colors
+$border-color: (
+	"primary": $gray-200,
+	"secondary": $gray-300,
+	"brand": $primary-color,
+	"success": $success,
+	"warning": $warning,
+	"error": $error,
+);
+
+@function border-color($key) {
+	@return map.get($border-color, $key);
+}
+
+// ============================================
+// TYPOGRAPHY
+// ============================================
+
 $font-family: (
 	"body": "articulat-cf, sans-serif",
 	"display": "articulat-cf, sans-serif",
 );
 
-// Function to get font-family
 @function font-family($key) {
 	@return string.unquote(map.get($font-family, $key));
 }
 
-// Font Sizes
 $font-size: (
-	"3xs": 0.8rem,
-	"xxs": 1rem,
 	"xs": 1.2rem,
 	"sm": 1.4rem,
 	"md": 1.6rem,
 	"lg": 1.8rem,
 	"xl": 2rem,
-	"d-xs": 2.4rem,
-	"d-sm": 3rem,
-	"d-md": 3.6rem,
-	"d-lg": 4rem,
-	"d-xl": 4.8rem,
-	"h-md": 6rem,
-	"h-lg": 7.2rem,
+	"2xl": 2.4rem,
+	"3xl": 3rem,
+	"4xl": 3.6rem,
+	"5xl": 4.8rem,
+	"6xl": 6rem,
 );
 
-// Function to get font-size
 @function font-size($key) {
 	@return map.get($font-size, $key);
 }
 
-// Line Heights
 $line-height: (
-	"3xs": 1.4rem,
-	"xxs": 1.6rem,
 	"xs": 1.8rem,
 	"sm": 2rem,
 	"md": 2.4rem,
 	"lg": 2.8rem,
 	"xl": 3rem,
-	"d-xs": 3.2rem,
-	"d-sm": 4rem,
-	"d-md": 4.2rem,
-	"d-lg": 4.8rem,
-	"d-xl": 6rem,
-	"h-md": 7.2rem,
-	"h-lg": 9rem,
+	"2xl": 3.2rem,
+	"3xl": 4rem,
+	"4xl": 4.4rem,
+	"5xl": 6rem,
+	"6xl": 7.2rem,
 );
 
 @function line-height($key) {
 	@return map.get($line-height, $key);
 }
 
-// Text Colors (Semantic tokens for typography)
-$text-color-map: (
-	"primary": $gray-modern-950,
-	"secondary": $gray-modern-700,
-	"tertiary": $gray-modern-600,
-	"placeholder": $gray-modern-500,
-	"disabled": $gray-modern-400,
-	"inverse": $base-white,
-	"brand": $primary-color-700,
-	"success": $success-700,
-	"warning": $warning-700,
-	"error": $error-700,
-);
+// ============================================
+// SPACING & SIZING
+// ============================================
 
-// Background Colors (Semantic tokens for surfaces)
-$bg-color: (
-	"primary": $base-white,
-	"secondary": $gray-modern-50,
-	"tertiary": $gray-modern-100,
-	"brand": $primary-color,
-	"brand-light": $primary-color-50,
-	"brand-lighter": $primary-color-25,
-	"success": $success-50,
-	"warning": $warning-50,
-	"error": $error-50,
-	"disabled": $gray-modern-100,
-	"overlay": rgba($base-black, 0.5),
-);
-
-// Function to get text color
-@function text-color($key) {
-	@return map.get($text-color-map, $key);
-}
-
-// Function to get background color
-@function bg-color($key) {
-	@return map.get($bg-color, $key);
-}
-
-// Grid System
-$grid-columns: 12;
-$grid-gutter: 2.4rem; // 24px
-$container-padding: 1.6rem; // 16px
-
-// Spacing System (Progressive scale)
 $spacing: (
 	"none": 0,
-	"2xs": 0.2rem,
 	"xs": 0.4rem,
-	"sm": 0.6rem,
-	"md": 0.8rem,
-	"lg": 1rem,
-	"xl": 1.2rem,
-	"2xl": 1.6rem,
-	"3xl": 2rem,
-	"4xl": 2.4rem,
-	"5xl": 3.2rem,
-	"6xl": 4rem,
-	"7xl": 4.8rem,
-	"8xl": 6.4rem,
-	"9xl": 7.2rem,
-	"10xl": 8rem,
-	"11xl": 9.6rem,
-	"12xl": 12.8rem,
+	"sm": 0.8rem,
+	"md": 1.6rem,
+	"lg": 2.4rem,
+	"xl": 3.2rem,
+	"2xl": 4rem,
+	"3xl": 4.8rem,
+	"4xl": 6.4rem,
+	"5xl": 8rem,
+	"6xl": 9.6rem,
+	"7xl": 12.8rem,
 );
 
-// Function to get spacing value
 @function spacing($key) {
 	@return map.get($spacing, $key);
 }
 
 $radius: (
 	"none": 0,
-	"xxs": 0.2rem,
-	"xs": 0.4rem,
-	"sm": 0.6rem,
+	"sm": 0.4rem,
 	"md": 0.8rem,
-	"lg": 1rem,
-	"xl": 1.2rem,
-	"xxl": 1.6rem,
-	"3xl": 2rem,
-	"4xl": 2.4rem,
-	"infinite": 999.9rem,
+	"lg": 1.2rem,
+	"xl": 1.6rem,
+	"2xl": 2.4rem,
+	"full": 9999px,
 );
 
-// Function to get radius value
 @function radius($key) {
 	@return map.get($radius, $key);
 }
 
-$border-color: (
-	"primary": $gray-modern-200,
-	"secondary": $gray-modern-300,
-	"tertiary": $gray-modern-100,
-	"brand": $primary-color,
-	"brand-light": $primary-color-200,
-	"success": $success-300,
-	"warning": $warning-300,
-	"error": $error-300,
-	"disabled": $gray-modern-200,
-);
+// ============================================
+// GRID SYSTEM
+// ============================================
 
-// Function to get border color
-@function border-color($key) {
-	@return map.get($border-color, $key);
-}
+$grid-columns: 12;
+$grid-gutter: 2.4rem;
+$container-padding: 1.6rem;
 
-// Base HTML font-size (62.5% of 16px = 10px)
-$html-font-size: 62.5%;
+// ============================================
+// BASE CONFIG
+// ============================================
+
+$html-font-size: 62.5%; // 1rem = 10px

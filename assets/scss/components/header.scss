@@ -1,0 +1,10 @@
+@use "../generic/variables" as *;
+@use "../generic/mixins" as *;
+
+.header {
+	background-color: bg-color("brand");
+	padding: spacing("2xl") spacing("4xl");
+	border-radius: radius("md");
+	margin-top: spacing("lg");
+	color: text-color("primary");
+}
