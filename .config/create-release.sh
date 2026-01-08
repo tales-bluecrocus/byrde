@@ -92,10 +92,14 @@ fi
 
 echo -e "${GREEN}✓ Versão atualizada: $CURRENT_VERSION → $VERSION${NC}\n"
 
-# Commit version bump
+# Commit version bump (only if there are changes)
 echo -e "${GREEN}📦 Commitando mudança de versão...${NC}"
 git add style.css
-git commit -m "chore: bump version to $VERSION"
+if git diff --staged --quiet; then
+    echo -e "${YELLOW}⚠️  Sem mudanças na versão (já está em $VERSION)${NC}\n"
+else
+    git commit -m "chore: bump version to $VERSION"
+fi
 
 # Create annotated tag
 echo -e "${GREEN}🏷️  Criando tag $TAG...${NC}"
