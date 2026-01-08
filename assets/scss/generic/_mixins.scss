@@ -1,0 +1,30 @@
+@use "./_variables.scss" as *;
+@use "sass:meta";
+@use "sass:string";
+
+$tablet: 768; // Default breakpoint for tablet
+$mobile: 767; // Default breakpoint for mobile
+
+@mixin max($breakpoint) {
+	@media (max-width: #{$breakpoint}px) {
+		@content;
+	}
+}
+
+@mixin min($breakpoint) {
+	@media (min-width: #{$breakpoint}px) {
+		@content;
+	}
+}
+
+@mixin between($min, $max) {
+	@media (min-width: #{$min}px) and (max-width: #{$max}px) {
+		@content;
+	}
+}
+
+// Usage examples:
+// @include max($tablet) { ... }   // Tablet and below
+// @include max($mobile) { ... }   // Mobile and below
+// @include min(1024) { ... }  // Desktop and above
+// @include min(1440) { ... }  // Large desktop and above

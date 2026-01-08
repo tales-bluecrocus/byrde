@@ -1,0 +1,44 @@
+{
+	"name": "theme-byrde",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "npm-run-all clean build:*",
+		"build:assets": "vite build --config .config/vite.assets.config.js",
+		"build:blocks": "vite build --config .config/vite.blocks.config.js",
+		"preview": "vite preview",
+		"clean": "rimraf dist blocks/**/_dist",
+		"watch": "npm-run-all --parallel watch:*",
+		"watch:assets": "vite build --config .config/vite.assets.config.js --watch",
+		"watch:blocks": "vite build --config .config/vite.blocks.config.js --watch"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com:tales-bluecrocus/byrde.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/tales-bluecrocus/byrde/issues"
+	},
+	"homepage": "https://github.com/tales-bluecrocus/byrde#readme",
+	"dependencies": {
+		"dotenv": "^16.4.7",
+		"jquery": "^3.7.1",
+		"smooth-scrollbar": "^8.8.4"
+	},
+	"devDependencies": {
+		"npm-run-all": "^4.1.5",
+		"rimraf": "^5.0.5",
+		"rollup": "^4.40.0",
+		"sass": "^1.84.0",
+		"vite": "^6.3.1"
+	},
+	"browserslist": [
+		"> 1%",
+		"last 2 versions",
+		"not dead"
+	]
+}

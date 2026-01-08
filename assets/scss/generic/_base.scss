@@ -1,0 +1,37 @@
+@use "variables" as *;
+
+html {
+	font-size: $html-font-size; // Makes 1rem = 10px
+	font-feature-settings: 'ss04' on, 'ss05' on;
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
+	scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-size: inherit;
+	margin: 0;
+	padding: 0;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+strong {
+	font-weight: 700;
+}
