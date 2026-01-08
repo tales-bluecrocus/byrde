@@ -3,18 +3,14 @@
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 // Initialize the theme update checker
-// Replace these values with your actual repository information
 $updateChecker = PucFactory::buildUpdateChecker(
-    'https://github.com/tales-bluecrocus/byrde', // Your GitHub repository URL
-    __DIR__ . '/../style.css', // Path to the main theme file (style.css for themes)
-    'byrde', // Theme slug (should match the theme folder name)
+    'https://github.com/tales-bluecrocus/byrde',
+    get_template_directory() . '/style.css',
+    'byrde',
 );
-
-// Optional: Set the branch to check for updates (default is 'main' or 'master')
-$updateChecker->setBranch('main');
-
-// Optional: If your repository is private, you need to set an access token
-// $updateChecker->setAuthentication('your-github-token-here');
 
 // Enable release assets - uses GitHub Releases instead of branch ZIP
 $updateChecker->getVcsApi()->enableReleaseAssets();
+
+// Set the expected folder name in the ZIP (must match the theme directory name)
+$updateChecker->getVcsApi()->setDirectoryName('byrde');
