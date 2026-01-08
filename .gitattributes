@@ -1,0 +1,14 @@
+# Exclude development files from GitHub exports
+.github export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
+node_modules export-ignore
+.config export-ignore
+package.json export-ignore
+package-lock.json export-ignore
+composer.json export-ignore
+composer.lock export-ignore
+phpcs.xml export-ignore
+assets/js export-ignore
+assets/scss export-ignore
+README.md export-ignore

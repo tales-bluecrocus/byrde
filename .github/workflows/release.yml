@@ -1,0 +1,70 @@
+name: Create Release
+
+on:
+    push:
+        tags:
+            - "v*" # Triggers on version tags like v1.0.0, v1.2.3, etc.
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: "npm"
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.3"
+                  tools: composer
+
+            - name: Install Node dependencies
+              run: npm ci
+
+            - name: Install Composer dependencies (production only)
+              run: composer install --no-dev --optimize-autoloader
+
+            - name: Build assets
+              run: npm run build
+
+            - name: Create distribution directory
+              run: mkdir -p dist-release
+
+            - name: Copy theme files to distribution
+              run: |
+                  rsync -av --progress . dist-release/byrde \
+                    --exclude='.git' \
+                    --exclude='.github' \
+                    --exclude='node_modules' \
+                    --exclude='dist-release' \
+                    --exclude='.gitignore' \
+                    --exclude='.gitattributes' \
+                    --exclude='package.json' \
+                    --exclude='package-lock.json' \
+                    --exclude='composer.json' \
+                    --exclude='composer.lock' \
+                    --exclude='phpcs.xml' \
+                    --exclude='.config' \
+                    --exclude='assets/js' \
+                    --exclude='assets/scss' \
+                    --exclude='README.md'
+
+            - name: Create ZIP file
+              run: |
+                  cd dist-release
+                  zip -r ../byrde-${{ github.ref_name }}.zip byrde
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  files: byrde-${{ github.ref_name }}.zip
+                  generate_release_notes: true
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
