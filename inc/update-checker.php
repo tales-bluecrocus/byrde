@@ -5,7 +5,7 @@ use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 // Initialize the update checker for GitHub
 $myUpdateChecker = PucFactory::buildUpdateChecker(
     'https://github.com/tales-bluecrocus/byrde/',
-    get_template_directory() . '/functions.php',
+    get_stylesheet_directory() . '/style.css',
     'byrde',
 );
 
