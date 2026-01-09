@@ -30,6 +30,19 @@ function enqueue_theme_assets()
             $version,
             true,
         );
+        
+        // Pass tracking settings to JavaScript
+        wp_localize_script(
+            'bryde-scripts',
+            'byrdeTracking',
+            [
+                'gtmId' => get_option('byrde_gtm_id', ''),
+                'gaId' => get_option('byrde_ga_id', ''),
+                'googleAdsId' => get_option('byrde_google_ads_id', ''),
+                'metaPixelId' => get_option('byrde_meta_pixel_id', ''),
+                'nonce' => wp_create_nonce('byrde_tracking_nonce'),
+            ]
+        );
     }
 }
 add_action('wp_enqueue_scripts', 'enqueue_theme_assets');

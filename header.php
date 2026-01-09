@@ -6,7 +6,7 @@
     <title><?php bloginfo('name'); ?> | <?php bloginfo('description'); ?></title>
     <?php wp_head(); ?>
 </head>
-<body>
+<body <?php body_class(); ?>>
 
 
 <header class="header container">
