@@ -13,7 +13,15 @@ if (!defined('ABSPATH')) {
 }
 
 // Include the TGM Plugin Activation class
-require_once get_template_directory() . '/vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php';
+$tgm_path = get_template_directory() . '/vendor/tgmpa/tgm-plugin-activation/class-tgm-plugin-activation.php';
+
+if (!file_exists($tgm_path)) {
+    // Log error and return silently - plugin management will not be available
+    error_log('Byrde Theme: TGM Plugin Activation not found at ' . $tgm_path);
+    return;
+}
+
+require_once $tgm_path;
 
 /**
  * Register the required plugins for this theme

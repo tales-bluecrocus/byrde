@@ -53,8 +53,6 @@ jobs:
                     --exclude='.gitattributes' \
                     --exclude='package.json' \
                     --exclude='package-lock.json' \
-                    --exclude='composer.json' \
-                    --exclude='composer.lock' \
                     --exclude='phpcs.xml' \
                     --exclude='.config/' \
                     --exclude='assets/' \
