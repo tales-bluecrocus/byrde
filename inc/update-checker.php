@@ -5,7 +5,7 @@ use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 // Initialize the update checker for GitHub
 $myUpdateChecker = PucFactory::buildUpdateChecker(
     'https://github.com/tales-bluecrocus/byrde/',
-    __FILE__,
+    get_template_directory() . '/style.css',
     'byrde'
 );
 
@@ -14,9 +14,6 @@ $myUpdateChecker->setBranch('main');
 
 // Enable release assets - uses GitHub Releases instead of branch ZIP
 $myUpdateChecker->getVcsApi()->enableReleaseAssets();
-
-// Set the proper slug for the theme
-$myUpdateChecker->setSlug('byrde');
 
 // Fix the folder name during update installation
 add_filter('upgrader_source_selection', function($source, $remote_source, $upgrader, $hook_extra) {

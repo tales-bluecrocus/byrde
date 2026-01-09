@@ -79,7 +79,7 @@ rsync -a --progress "$THEME_DIR/" "$BUILD_DIR/$THEME_NAME" \
 # Create ZIP
 echo -e "${GREEN}🗜️  Criando arquivo ZIP...${NC}"
 cd "$BUILD_DIR"
-zip -r -q "../$ZIP_NAME" "$THEME_NAME"
+zip -r -q "../../$ZIP_NAME" "$THEME_NAME"
 cd ..
 
 # Cleanup
@@ -93,7 +93,7 @@ if [ -f "composer.json" ]; then
 fi
 
 # Show result
-FILE_SIZE=$(du -h "$ZIP_NAME" | cut -f1)
+FILE_SIZE=$(du -h "../../$ZIP_NAME" | cut -f1)
 echo ""
 echo -e "${GREEN}✅ ZIP criado com sucesso!${NC}"
 echo -e "${BLUE}📦 Arquivo: ${ZIP_NAME}${NC}"
