@@ -4,12 +4,13 @@
 function enqueue_theme_assets()
 {
     // Get theme version for cache busting
-    // In development: use time() for instant updates
-    // In production: use theme version from style.css
     $theme = wp_get_theme();
-    $version = (wp_get_environment_type() === 'development')
-        ? time()
-        : $theme->get('Version');
+    $version = $theme->get('Version');
+
+    // In development, use time() for instant cache busting
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        $version = time();
+    }
 
     // Main CSS
     if (file_exists(get_template_directory() . '/dist/style.min.css')) {
@@ -30,7 +31,7 @@ function enqueue_theme_assets()
             $version,
             true,
         );
-        
+
         // Pass tracking settings to JavaScript
         wp_localize_script(
             'bryde-scripts',
@@ -41,7 +42,7 @@ function enqueue_theme_assets()
                 'googleAdsId' => get_option('byrde_google_ads_id', ''),
                 'metaPixelId' => get_option('byrde_meta_pixel_id', ''),
                 'nonce' => wp_create_nonce('byrde_tracking_nonce'),
-            ]
+            ],
         );
     }
 }
