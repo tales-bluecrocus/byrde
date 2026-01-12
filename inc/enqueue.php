@@ -12,12 +12,20 @@ function enqueue_theme_assets()
         $version = time();
     }
 
+    // Google Fonts - Urbanist
+    wp_enqueue_style(
+        'byrde-google-fonts',
+        'https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap',
+        [],
+        null,
+    );
+
     // Main CSS
     if (file_exists(get_template_directory() . '/dist/style.min.css')) {
         wp_enqueue_style(
             'bryde-styles',
             get_template_directory_uri() . '/dist/style.min.css',
-            [],
+            ['byrde-google-fonts'],
             $version,
         );
     }
@@ -47,3 +55,21 @@ function enqueue_theme_assets()
     }
 }
 add_action('wp_enqueue_scripts', 'enqueue_theme_assets');
+
+// Add preconnect for Google Fonts
+function byrde_add_resource_hints($urls, $relation_type)
+{
+    if ('preconnect' === $relation_type) {
+        $urls[] = [
+            'href' => 'https://fonts.googleapis.com',
+            'crossorigin' => 'anonymous',
+        ];
+        $urls[] = [
+            'href' => 'https://fonts.gstatic.com',
+            'crossorigin' => 'anonymous',
+        ];
+    }
+
+    return $urls;
+}
+add_filter('wp_resource_hints', 'byrde_add_resource_hints', 10, 2);
