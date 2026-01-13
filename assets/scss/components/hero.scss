@@ -1,0 +1,118 @@
+@use "../generic/variables" as *;
+@use "../generic/mixins" as *;
+
+.hero {
+	position: relative;
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: bg-color("cta");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	padding: 120px spacing("xl") spacing("4xl");
+
+	@media (max-width: 768px) {
+		padding: 80px spacing("md") spacing("3xl");
+	}
+
+	// Overlay for better text readability
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(
+			135deg,
+			rgba(15, 23, 42, 0.85) 0%,
+			rgba(15, 23, 42, 0.65) 100%
+		);
+		z-index: 1;
+	}
+
+	// Container for two-column layout
+	&__container {
+		position: relative;
+		z-index: 2;
+		max-width: 1200px;
+		width: 100%;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: spacing("4xl");
+		align-items: center;
+
+		@media (max-width: 968px) {
+			grid-template-columns: 1fr;
+			gap: spacing("3xl");
+		}
+	}
+
+	// Content container
+	&__content {
+		text-align: left;
+		color: text-color("inverse");
+	}
+
+	// Heading
+	&__title {
+		font-family: font-family("heading");
+		font-size: font-size("5xl");
+		line-height: line-height("5xl");
+		font-weight: 700;
+		color: text-color("inverse");
+		margin-bottom: spacing("lg");
+
+		@media (max-width: 768px) {
+			font-size: font-size("4xl");
+			line-height: line-height("4xl");
+		}
+	}
+
+	// Subtitle/Description
+	&__subtitle {
+		font-family: font-family("body");
+		font-size: font-size("lg");
+		line-height: line-height("lg");
+		color: text-color("inverse");
+		opacity: 0.9;
+		margin-bottom: spacing("2xl");
+
+		@media (max-width: 768px) {
+			font-size: font-size("md");
+			line-height: line-height("md");
+		}
+	}
+
+	// Features list
+	&__features {
+		display: flex;
+		flex-direction: column;
+		gap: spacing("md");
+	}
+
+	&__feature {
+		display: flex;
+		align-items: center;
+		gap: spacing("sm");
+		color: text-color("inverse");
+
+		i {
+			font-size: 2.4rem;
+			color: button-color("primary-bg");
+			flex-shrink: 0;
+		}
+
+		span {
+			font-size: font-size("md");
+			line-height: line-height("md");
+		}
+	}
+
+	// CTA wrapper
+	&__cta {
+		margin-bottom: spacing("xl");
+	}
+}

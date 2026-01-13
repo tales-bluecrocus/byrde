@@ -1,0 +1,192 @@
+@use "../generic/variables" as *;
+@use "../generic/mixins" as *;
+
+// Google Reviews Badge
+.google-reviews-badge {
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+	gap: spacing("sm");
+	background-color: #ffffff;
+	padding: spacing("xs") spacing("md");
+	border-radius: radius("sm");
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	transition: all 0.2s ease;
+	text-decoration: none;
+	color: inherit;
+
+	&:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	}
+
+	&__logo {
+		width: 70px;
+		height: 24px;
+		flex-shrink: 0;
+		object-fit: contain;
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 2px;
+		text-align: left;
+	}
+
+	&__rating {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	&__score {
+		font-family: font-family("heading");
+		font-size: font-size("lg");
+		font-weight: 700;
+		color: text-color("heading");
+		line-height: 1;
+	}
+
+	&__stars {
+		display: flex;
+		align-items: center;
+		gap: 2px;
+		color: #fbbc04; // Google yellow
+
+		.material-symbols-outlined {
+			font-size: 1.6rem;
+			line-height: 1;
+			font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+		}
+	}
+
+	&__reviews {
+		font-size: font-size("xs");
+		color: text-color("body");
+		opacity: 0.7;
+		line-height: 1.2;
+
+		strong {
+			font-weight: 600;
+		}
+	}
+
+	// Compact variant
+	&--compact {
+		padding: spacing("xs") spacing("sm");
+		gap: spacing("xs");
+
+		.badge-google__logo {
+			width: 20px;
+			height: 20px;
+		}
+
+		.badge-google__score {
+			font-size: font-size("lg");
+		}
+
+		.badge-google__stars .material-symbols-outlined {
+			font-size: 1.6rem;
+		}
+	}
+
+	// Large variant
+	&--lg {
+		padding: spacing("md") spacing("lg");
+		gap: spacing("md");
+
+		.badge-google__logo {
+			width: 32px;
+			height: 32px;
+		}
+
+		.badge-google__score {
+			font-size: font-size("2xl");
+		}
+
+		.badge-google__stars .material-symbols-outlined {
+			font-size: 2.4rem;
+		}
+
+		.badge-google__text {
+			font-size: font-size("sm");
+		}
+	}
+
+	// Dark variant (for dark backgrounds)
+	&--dark {
+		background-color: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(10px);
+
+		.badge-google__score,
+		.badge-google__text {
+			color: text-color("inverse");
+		}
+
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.15);
+		}
+	}
+}
+
+// Generic Badge Component
+.badge {
+	display: inline-flex;
+	align-items: center;
+	gap: spacing("xs");
+	padding: spacing("xs") spacing("sm");
+	border-radius: radius("sm");
+	font-size: font-size("xs");
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+
+	// Color variants
+	&--primary {
+		background-color: button-color("primary-bg");
+		color: button-color("primary-text");
+	}
+
+	&--secondary {
+		background-color: button-color("secondary-bg");
+		color: button-color("secondary-text");
+	}
+
+	&--success {
+		background-color: validation-color("success");
+		color: #ffffff;
+	}
+
+	&--error {
+		background-color: validation-color("error");
+		color: #ffffff;
+	}
+
+	&--warning {
+		background-color: validation-color("warning");
+		color: text-color("heading");
+	}
+
+	&--light {
+		background-color: rgba(255, 255, 255, 0.15);
+		color: text-color("inverse");
+	}
+
+	// Size variants
+	&--sm {
+		padding: 4px spacing("xs");
+		font-size: 1rem;
+	}
+
+	&--lg {
+		padding: spacing("sm") spacing("md");
+		font-size: font-size("sm");
+	}
+
+	// With icon
+	i {
+		font-size: 1.4rem;
+		line-height: 1;
+	}
+}

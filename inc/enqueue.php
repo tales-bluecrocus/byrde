@@ -12,12 +12,44 @@ function enqueue_theme_assets()
         $version = time();
     }
 
-    // Google Fonts - Urbanist
+    // Google Fonts - Lato (Headings) & Nunito (Body)
     wp_enqueue_style(
         'byrde-google-fonts',
-        'https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap',
+        'https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Nunito:wght@300;400;500;600;700&display=swap',
         [],
         null,
+    );
+
+    // Material Symbols - For star ratings
+    wp_enqueue_style(
+        'byrde-material-symbols',
+        'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=star',
+        [],
+        null,
+    );
+
+    // Phosphor Icons - Regular
+    wp_enqueue_style(
+        'byrde-phosphor-icons',
+        get_template_directory_uri() . '/node_modules/@phosphor-icons/web/src/regular/style.css',
+        [],
+        $version,
+    );
+
+    // Phosphor Icons - Bold
+    wp_enqueue_style(
+        'byrde-phosphor-icons-bold',
+        get_template_directory_uri() . '/node_modules/@phosphor-icons/web/src/bold/style.css',
+        [],
+        $version,
+    );
+
+    // Phosphor Icons - Fill
+    wp_enqueue_style(
+        'byrde-phosphor-icons-fill',
+        get_template_directory_uri() . '/node_modules/@phosphor-icons/web/src/fill/style.css',
+        [],
+        $version,
     );
 
     // Main CSS
@@ -25,7 +57,7 @@ function enqueue_theme_assets()
         wp_enqueue_style(
             'bryde-styles',
             get_template_directory_uri() . '/dist/style.min.css',
-            ['byrde-google-fonts'],
+            ['byrde-google-fonts', 'byrde-phosphor-icons', 'byrde-phosphor-icons-bold', 'byrde-phosphor-icons-fill'],
             $version,
         );
     }

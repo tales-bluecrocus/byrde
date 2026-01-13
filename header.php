@@ -11,71 +11,38 @@
 
 <body <?php body_class(); ?>>
 
-    <!-- Header Variation 1: Logo Left | Phone Center-Right | CTA Right -->
-    <header class="header header--variation-1 container">
+    <header class="header header--variation-1">
         <div class="header__logo">
             <a
                 href="<?php echo esc_url(home_url('/')); ?>">
-                <?php if (has_custom_logo()) :
-                    the_custom_logo();
-                else : ?>
-                <span
-                    class="header__logo-text"><?php bloginfo('name'); ?></span>
-                <?php endif; ?>
+                <?php byrde_the_logo(); ?>
             </a>
         </div>
 
         <div class="header__phone">
-            <a href="tel:1231231234">(123) 123-1234</a>
-        </div>
-
-        <div class="header__cta">
-            <a href="#contact" class="btn btn--primary">contact us</a>
-        </div>
-    </header>
-
-    <!-- Header Variation 2: Phone Left | Logo Center | Google Reviews Right -->
-    <header class="header header--variation-2 container">
-        <div class="header__phone">
-            <a href="tel:1231231234">(123) 123-1234</a>
-        </div>
-
-        <div class="header__logo header__logo--center">
-            <a
-                href="<?php echo esc_url(home_url('/')); ?>">
-                <?php if (has_custom_logo()) :
-                    the_custom_logo();
-                else : ?>
-                <span
-                    class="header__logo-text"><?php bloginfo('name'); ?></span>
-                <?php endif; ?>
+            <a href="tel:1231231234" class="btn btn--transparent btn--icon-left">
+                <i class="ph-bold ph-phone"></i>
+                (123) 123-1234
             </a>
         </div>
 
         <div class="header__cta">
-            <a href="#reviews" class="btn btn--secondary">Google reviews</a>
-        </div>
-    </header>
-
-    <!-- Header Variation 3: Google Reviews Left | Logo Center | Phone Right -->
-    <header class="header header--variation-3 container">
-        <div class="header__cta">
-            <a href="#reviews" class="btn btn--secondary">Google reviews</a>
-        </div>
-
-        <div class="header__logo header__logo--center">
-            <a
-                href="<?php echo esc_url(home_url('/')); ?>">
-                <?php if (has_custom_logo()) :
-                    the_custom_logo();
-                else : ?>
-                <span
-                    class="header__logo-text"><?php bloginfo('name'); ?></span>
-                <?php endif; ?>
+            <a href="https://www.google.com/maps" target="_blank" rel="noopener" class="google-reviews-badge">
+                <img src="<?php echo get_template_directory_uri(); ?>/assets/images/logo-google.svg" alt="Google" class="google-reviews-badge__logo">
+                <div class="google-reviews-badge__content">
+                    <div class="google-reviews-badge__rating">
+                        <span class="google-reviews-badge__score">4.9</span>
+                        <div class="google-reviews-badge__stars">
+                            <span class="material-symbols-outlined">star</span>
+                            <span class="material-symbols-outlined">star</span>
+                            <span class="material-symbols-outlined">star</span>
+                            <span class="material-symbols-outlined">star</span>
+                            <span class="material-symbols-outlined">star</span>
+                        </div>
+                    </div>
+                    <div class="google-reviews-badge__reviews">Based on <strong>127 reviews</strong></div>
+                </div>
             </a>
         </div>
-
-        <div class="header__phone">
-            <a href="tel:1231231234">(123) 123-1234</a>
-        </div>
     </header>
+

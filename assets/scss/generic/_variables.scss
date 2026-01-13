@@ -8,29 +8,34 @@
 // BASE COLORS (Primitive Tokens)
 // ============================================
 
-// Brand
-$primary-color: #1b67f6;
-$primary-color-hover: #1350e2;
-$primary-color-light: #eef7ff;
+// Brand/Action Colors
+$primary-color: #f97316; // Botão Principal - Destaque Máximo (Orange)
+$primary-color-hover: color.adjust(#f97316, $lightness: -8%);
+$primary-color-light: color.adjust(#f97316, $lightness: 45%);
+
+$secondary-color: #3b82f6; // Ações Secundárias - Guia Visual (Blue)
+$secondary-color-hover: color.adjust(#3b82f6, $lightness: -8%);
+$secondary-color-light: color.adjust(#3b82f6, $lightness: 45%);
+
+// Backgrounds
+$bg-global: #f9fafb; // Fundo Global - Neutro
+$bg-cta-form: #0f172a; // Fundo CTA/Form - Dominante (Dark Slate)
+
+// Text Colors
+$text-heading: #1e293b; // Títulos - Forte (Slate)
+$text-body: #475569; // Parágrafos - Suave (Slate Gray)
 
 // Neutral
 $white: #fff;
 $black: #000;
-$gray-50: #f8fafc;
-$gray-100: #eef2f6;
-$gray-200: #e3e8ef;
-$gray-300: #d0d5dd;
-$gray-500: #adb5bd;
-$gray-700: #495057;
-$gray-900: #212529;
 
-// Status Colors
-$success: #17b26a;
-$success-light: #edfcf3;
-$warning: #f78e09;
-$warning-light: #fffaeb;
-$error: #f04438;
-$error-light: #fef3f2;
+// Status/Validation Colors
+$success: #10b981;
+$success-light: #d1fae5;
+$error: #ef4444;
+$error-light: #fee2e2;
+$warning: #f59e0b;
+$warning-light: #fef3c7;
 
 // ============================================
 // SEMANTIC TOKENS
@@ -38,13 +43,17 @@ $error-light: #fef3f2;
 
 // Text Colors
 $text-color: (
-	"primary": $gray-900,
-	"secondary": $gray-700,
-	"tertiary": $gray-500,
-	"brand": $primary-color,
+	"heading": $text-heading,
+	// Títulos
+	"body": $text-body,
+	// Parágrafos
+	"primary": $text-heading,
+	"secondary": $text-body,
+	"brand-primary": $primary-color,
+	"brand-secondary": $secondary-color,
 	"success": $success,
-	"warning": $warning,
 	"error": $error,
+	"warning": $warning,
 	"inverse": $white,
 );
 
@@ -55,20 +64,25 @@ $text-color: (
 // Button Colors
 $button-color: (
 	"primary-bg": $primary-color,
+	// Botão Principal
 	"primary-text": $white,
 	"primary-hover": $primary-color-hover,
-	"secondary-bg": $gray-100,
-	"secondary-text": $gray-900,
-	"secondary-hover": $gray-200,
+	"secondary-bg": $secondary-color,
+	// Ações Secundárias
+	"secondary-text": $white,
+	"secondary-hover": $secondary-color-hover,
+	"tertiary-bg": $bg-global,
+	"tertiary-text": $text-heading,
+	"tertiary-hover": color.adjust($bg-global, $lightness: -3%),
 	"success-bg": $success,
 	"success-text": $white,
 	"success-hover": color.adjust($success, $lightness: -8%),
-	"warning-bg": $warning,
-	"warning-text": $white,
-	"warning-hover": color.adjust($warning, $lightness: -8%),
 	"error-bg": $error,
 	"error-text": $white,
 	"error-hover": color.adjust($error, $lightness: -8%),
+	"warning-bg": $warning,
+	"warning-text": $white,
+	"warning-hover": color.adjust($warning, $lightness: -8%),
 );
 
 @function button-color($key) {
@@ -77,16 +91,20 @@ $button-color: (
 
 // Form Colors
 $form-color: (
-	"border": $gray-300,
-	"border-hover": $gray-500,
-	"border-focus": $primary-color,
+	"border": color.adjust($bg-global, $lightness: -15%),
+	"border-hover": color.adjust($bg-global, $lightness: -25%),
+	"border-focus": $secondary-color,
 	"border-error": $error,
+	"border-success": $success,
 	"bg": $white,
-	"bg-disabled": $gray-50,
-	"placeholder": $gray-500,
-	"text": $gray-900,
-	"text-disabled": $gray-500,
-	"outline": rgba($primary-color, 0.25),
+	"bg-dark": $bg-cta-form,
+	// Fundo CTA/Form
+	"bg-disabled": $bg-global,
+	"placeholder": color.adjust($text-body, $lightness: 15%),
+	"text": $text-body,
+	"text-disabled": color.adjust($text-body, $lightness: 20%),
+	"text-inverse": $white,
+	"outline": rgba($secondary-color, 0.25),
 );
 
 @function form-color($key) {
@@ -95,13 +113,17 @@ $form-color: (
 
 // Background Colors
 $bg-color: (
+	"global": $bg-global,
+	// Fundo Global
+	"cta": $bg-cta-form,
+	// Fundo CTA/Form
 	"primary": $white,
-	"secondary": $gray-50,
-	"tertiary": $gray-100,
-	"brand": $primary-color-light,
+	"secondary": $bg-global,
+	"brand-primary": $primary-color-light,
+	"brand-secondary": $secondary-color-light,
 	"success": $success-light,
-	"warning": $warning-light,
 	"error": $error-light,
+	"warning": $warning-light,
 );
 
 @function bg-color($key) {
@@ -110,12 +132,13 @@ $bg-color: (
 
 // Border Colors
 $border-color: (
-	"primary": $gray-200,
-	"secondary": $gray-300,
-	"brand": $primary-color,
+	"primary": color.adjust($bg-global, $lightness: -10%),
+	"secondary": color.adjust($bg-global, $lightness: -15%),
+	"brand-primary": $primary-color,
+	"brand-secondary": $secondary-color,
 	"success": $success,
-	"warning": $warning,
 	"error": $error,
+	"warning": $warning,
 );
 
 @function border-color($key) {
@@ -127,8 +150,8 @@ $border-color: (
 // ============================================
 
 $font-family: (
-	"body": "articulat-cf, sans-serif",
-	"display": "articulat-cf, sans-serif",
+	"body": "Nunito, sans-serif",
+	"heading": "Lato, sans-serif",
 );
 
 @function font-family($key) {
@@ -175,17 +198,28 @@ $line-height: (
 
 $spacing: (
 	"none": 0,
-	"xs": 0.4rem,
-	"sm": 0.8rem,
-	"md": 1.6rem,
-	"lg": 2.4rem,
-	"xl": 3.2rem,
-	"2xl": 4rem,
-	"3xl": 4.8rem,
+	"xs": 0.8rem,
+	// 8px
+	"sm": 1.6rem,
+	// 16px
+	"md": 2.4rem,
+	// 24px
+	"lg": 3.2rem,
+	// 32px
+	"xl": 4rem,
+	// 40px
+	"2xl": 4.8rem,
+	// 48px
+	"3xl": 5.6rem,
+	// 56px
 	"4xl": 6.4rem,
+	// 64px
 	"5xl": 8rem,
+	// 80px
 	"6xl": 9.6rem,
+	// 96px
 	"7xl": 12.8rem,
+	// 128px
 );
 
 @function spacing($key) {
@@ -194,11 +228,16 @@ $spacing: (
 
 $radius: (
 	"none": 0,
-	"sm": 0.4rem,
-	"md": 0.8rem,
-	"lg": 1.2rem,
-	"xl": 1.6rem,
-	"2xl": 2.4rem,
+	"sm": 0.8rem,
+	// 8px
+	"md": 1.6rem,
+	// 16px
+	"lg": 2.4rem,
+	// 24px
+	"xl": 3.2rem,
+	// 32px
+	"2xl": 4.8rem,
+	// 48px
 	"full": 9999px,
 );
 
@@ -211,8 +250,8 @@ $radius: (
 // ============================================
 
 $grid-columns: 12;
-$grid-gutter: 2.4rem;
-$container-padding: 1.6rem;
+$grid-gutter: 2.4rem; // 24px
+$container-padding: 1.6rem; // 16px
 
 // ============================================
 // BASE CONFIG

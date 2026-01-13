@@ -1,0 +1,65 @@
+@use "../generic/variables" as *;
+@use "../generic/mixins" as *;
+
+// Hero Form Wrapper
+.hero__form-wrapper {
+	background-color: rgba(255, 255, 255, 0.98);
+	padding: spacing("2xl");
+	border-radius: radius("lg");
+	box-shadow: 0 8px 32px rgba(15, 23, 42, 0.2);
+}
+
+.hero__form-title {
+	font-family: font-family("heading");
+	font-size: font-size("2xl");
+	line-height: line-height("2xl");
+	font-weight: 700;
+	color: text-color("heading");
+	margin-bottom: spacing("xs");
+}
+
+.hero__form-subtitle {
+	font-size: font-size("sm");
+	line-height: line-height("sm");
+	color: text-color("body");
+	margin-bottom: spacing("xl");
+}
+
+// Lead Form Component
+.lead-form {
+	&__group {
+		margin-bottom: spacing("md");
+	}
+
+	&__input {
+		width: 100%;
+		padding: spacing("sm") spacing("md");
+		border: 2px solid rgba(15, 23, 42, 0.1);
+		border-radius: radius("sm");
+		font-family: font-family("body");
+		font-size: font-size("md");
+		line-height: line-height("md");
+		color: text-color("body");
+		background-color: #ffffff;
+		transition: all 0.2s ease;
+
+		&::placeholder {
+			color: rgba(71, 85, 105, 0.5);
+		}
+
+		&:focus {
+			outline: none;
+			border-color: button-color("primary-bg");
+			box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+		}
+
+		&:hover:not(:focus) {
+			border-color: rgba(15, 23, 42, 0.2);
+		}
+	}
+
+	&__textarea {
+		resize: vertical;
+		min-height: 100px;
+	}
+}

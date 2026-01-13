@@ -10,9 +10,14 @@ html {
 }
 
 body {
-	font-family: $font-family-primary;
+	font-family: font-family("body");
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+
+	// Compensate for fixed header
+	@media (max-width: 768px) {
+		padding-top: 60px; // Approximate mobile header height
+	}
 }
 
 *,
@@ -29,6 +34,8 @@ h3,
 h4,
 h5,
 h6 {
+	font-family: font-family("heading");
+	font-weight: 700;
 	font-size: inherit;
 	margin: 0;
 	padding: 0;

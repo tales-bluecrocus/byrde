@@ -1,6 +1,7 @@
 import "../scss/load.scss";
 import { initHeader } from "./components//general/header";
 import { initFooter } from "./components//general/footer";
+import { initAnimations } from "./components/general/animations";
 
 // Tracking imports
 import { initTracking, initGTM, initGA } from "./components/tracking/tracking";
@@ -39,4 +40,5 @@ document.addEventListener("DOMContentLoaded", () => {
 	// Always initialize core components
 	initHeader();
 	initFooter();
+	initAnimations();
 });

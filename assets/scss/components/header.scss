@@ -2,15 +2,32 @@
 @use "../generic/mixins" as *;
 
 .header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 1000;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: spacing("lg");
-	background-color: bg-color("brand");
-	padding: spacing("2xl") spacing("4xl");
-	border-radius: radius("md");
-	margin-top: spacing("lg");
-	color: text-color("primary");
+	background-color: bg-color("cta");
+	color: text-color("inverse");
+	box-shadow: 0 4px 24px rgba(15, 23, 42, 0.12);
+	padding: spacing("sm") spacing("md");
+	border-radius: 0;
+	gap: spacing("sm");
+
+	// Desktop styles - override mobile defaults
+	@media (min-width: 769px) {
+		top: spacing("md");
+		left: 50%;
+		transform: translateX(-50%);
+		width: calc(100% - spacing("lg") * 2);
+		max-width: 1200px;
+		gap: spacing("lg");
+		padding: spacing("md") spacing("xl");
+		border-radius: radius("md");
+	}
 
 	// Logo area
 	&__logo {
@@ -31,10 +48,30 @@
 			font-weight: font-weight("bold");
 		}
 
-		img {
-			max-height: 60px;
+		&-img {
+			max-height: 40px;
 			width: auto;
 			display: block;
+
+			@media (min-width: 769px) {
+				max-height: 48px;
+			}
+
+			&--desktop {
+				display: block;
+
+				@media (max-width: 768px) {
+					display: none;
+				}
+			}
+
+			&--mobile {
+				display: none;
+
+				@media (max-width: 768px) {
+					display: block;
+				}
+			}
 		}
 	}
 
@@ -43,14 +80,17 @@
 		flex-shrink: 0;
 
 		a {
+			display: flex;
+			align-items: center;
+			gap: spacing("xs");
 			text-decoration: none;
-			color: inherit;
+			color: text-color("inverse");
 			font-size: font-size("lg");
-			font-weight: font-weight("semibold");
-			transition: opacity 0.2s ease;
+			font-weight: 700;
+			transition: all 0.2s ease;
 
 			&:hover {
-				opacity: 0.8;
+				all: 0.85;
 			}
 		}
 	}
@@ -58,36 +98,6 @@
 	// CTA button
 	&__cta {
 		flex-shrink: 0;
-
-		.btn {
-			display: inline-block;
-			padding: spacing("sm") spacing("xl");
-			border-radius: radius("sm");
-			text-decoration: none;
-			font-weight: font-weight("semibold");
-			text-transform: lowercase;
-			transition: all 0.2s ease;
-			cursor: pointer;
-
-			&--primary {
-				background-color: button-color("primary-bg");
-				color: button-color("primary-text");
-
-				&:hover {
-					background-color: button-color("primary-hover");
-				}
-			}
-
-			&--secondary {
-				background-color: transparent;
-				color: text-color("primary");
-				border: 2px solid currentColor;
-
-				&:hover {
-					background-color: rgba(255, 255, 255, 0.1);
-				}
-			}
-		}
 	}
 
 	// Variation 1: Logo Left | Phone Center-Right | CTA Right
@@ -153,18 +163,10 @@
 		position: relative;
 	}
 
-	// Responsive adjustments
-	@include max($tablet) {
-		flex-wrap: wrap;
-		justify-content: center;
-		text-align: center;
-		padding: spacing("lg") spacing("md");
-
-		&__logo,
-		&__phone,
-		&__cta {
-			flex: 1 1 100%;
-			margin: spacing("sm") 0;
+	// Hide phone on mobile
+	@media (max-width: 768px) {
+		&__phone {
+			display: none;
 		}
 
 		&--variation-2,

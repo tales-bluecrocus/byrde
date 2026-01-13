@@ -23,7 +23,9 @@
 	},
 	"homepage": "https://github.com/tales-bluecrocus/byrde#readme",
 	"dependencies": {
+		"@phosphor-icons/web": "^2.1.2",
 		"dotenv": "^16.4.7",
+		"gsap": "^3.14.2",
 		"jquery": "^3.7.1",
 		"smooth-scrollbar": "^8.8.4"
 	},
