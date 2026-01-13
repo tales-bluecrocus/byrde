@@ -1,5 +1,6 @@
 @use "variables" as *;
 @use "fonts" as *;
+@use "mixins" as *;
 
 html {
 	font-size: $html-font-size; // Makes 1rem = 10px
@@ -15,7 +16,7 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 
 	// Compensate for fixed header
-	@media (max-width: 768px) {
+	@include max($tablet) {
 		padding-top: 60px; // Approximate mobile header height
 	}
 }

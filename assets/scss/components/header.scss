@@ -18,7 +18,7 @@
 	gap: spacing("sm");
 
 	// Desktop styles - override mobile defaults
-	@media (min-width: 769px) {
+	@include min(769) {
 		top: spacing("md");
 		left: 50%;
 		transform: translateX(-50%);
@@ -53,14 +53,14 @@
 			width: auto;
 			display: block;
 
-			@media (min-width: 769px) {
+			@include min(769) {
 				max-height: 48px;
 			}
 
 			&--desktop {
 				display: block;
 
-				@media (max-width: 768px) {
+				@include max($tablet) {
 					display: none;
 				}
 			}
@@ -68,7 +68,7 @@
 			&--mobile {
 				display: none;
 
-				@media (max-width: 768px) {
+				@include max($tablet) {
 					display: block;
 				}
 			}
@@ -90,7 +90,40 @@
 			transition: all 0.2s ease;
 
 			&:hover {
-				all: 0.85;
+				opacity: 0.85;
+			}
+		}
+
+		// Mobile floating action button
+		@include max($tablet) {
+			position: fixed;
+			bottom: 2.4rem;
+			right: 1.6rem;
+			z-index: 9999;
+
+			a {
+				width: 5.6rem;
+				height: 5.6rem;
+				border-radius: 50%;
+				background-color: button-color("primary-bg");
+				box-shadow: 0 4px 16px rgba(249, 115, 22, 0.4);
+				justify-content: center;
+				padding: 0;
+				gap: 0;
+
+				i {
+					font-size: 2.4rem;
+				}
+
+				// Hide text on mobile
+				.header__phone-text {
+					display: none;
+				}
+
+				&:hover {
+					transform: scale(1.05);
+					box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+				}
 			}
 		}
 	}
@@ -109,7 +142,7 @@
 		.header__phone {
 			order: 2;
 			margin-left: auto;
-			margin-right: spacing("xl");
+			margin-right: spacing("md");
 		}
 
 		.header__cta {
@@ -164,10 +197,11 @@
 	}
 
 	// Hide phone on mobile
-	@media (max-width: 768px) {
-		&__phone {
-			display: none;
-		}
+	@include max($tablet) {
+		// Phone is now floating, don't hide it
+		// &__phone {
+		// 	display: none;
+		// }
 
 		&--variation-2,
 		&--variation-3 {

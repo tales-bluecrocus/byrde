@@ -22,25 +22,27 @@ export function initAnimations() {
  * Google Reviews Badge stars animation
  */
 function initBadgeAnimation() {
-	const badge = document.querySelector(".google-reviews-badge");
-	if (!badge) return;
+	const badges = document.querySelectorAll(".google-reviews-badge");
+	if (!badges.length) return;
 
-	const stars = badge.querySelectorAll(
-		".google-reviews-badge__stars .material-symbols-outlined"
-	);
-	if (!stars.length) return;
+	badges.forEach((badge) => {
+		const stars = badge.querySelectorAll(
+			".google-reviews-badge__stars .material-symbols-outlined"
+		);
+		if (!stars.length) return;
 
-	// Set initial state
-	gsap.set(stars, { scale: 0, opacity: 0 });
+		// Set initial state
+		gsap.set(stars, { scale: 0, opacity: 0 });
 
-	// Animate stars with stagger
-	gsap.to(stars, {
-		scale: 1,
-		opacity: 1,
-		duration: 0.4,
-		stagger: 0.1,
-		ease: "back.out(1.7)",
-		delay: 0.5,
+		// Animate stars with stagger
+		gsap.to(stars, {
+			scale: 1,
+			opacity: 1,
+			duration: 0.4,
+			stagger: 0.1,
+			ease: "back.out(1.7)",
+			delay: 0.5,
+		});
 	});
 }
 

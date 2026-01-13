@@ -30,14 +30,14 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 2px;
+		gap: 0.4rem;
 		text-align: left;
 	}
 
 	&__rating {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 0.4rem;
 	}
 
 	&__score {
@@ -51,7 +51,7 @@
 	&__stars {
 		display: flex;
 		align-items: center;
-		gap: 2px;
+		gap: 0.2rem;
 		color: #fbbc04; // Google yellow
 
 		.material-symbols-outlined {
@@ -175,7 +175,7 @@
 
 	// Size variants
 	&--sm {
-		padding: 4px spacing("xs");
+		padding: 0.4rem spacing("xs");
 		font-size: 1rem;
 	}
 

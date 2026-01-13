@@ -22,7 +22,7 @@
         <div class="header__phone">
             <a href="tel:1231231234" class="btn btn--transparent btn--icon-left">
                 <i class="ph-bold ph-phone"></i>
-                (123) 123-1234
+                <span class="header__phone-text">(123) 123-1234</span>
             </a>
         </div>
 

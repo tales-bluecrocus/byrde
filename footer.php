@@ -23,7 +23,7 @@
 
 			<!-- Column 2: Quick Links -->
 			<div class="footer__column">
-				<h3 class="footer__title">Quick Links</h3>
+				<h3 class="footer__title"><i class="ph-bold ph-list-bullets"></i> Quick Links</h3>
 				<ul class="footer__menu">
 					<li><a href="#about" class="btn btn--transparent btn--icon-left"><i class="ph-bold ph-arrow-right"></i> About Us</a></li>
 					<li><a href="#services" class="btn btn--transparent btn--icon-left"><i class="ph-bold ph-arrow-right"></i> Services</a></li>
@@ -35,7 +35,7 @@
 
 			<!-- Column 3: Contact Info -->
 			<div class="footer__column">
-				<h3 class="footer__title">Contact Us</h3>
+				<h3 class="footer__title"><i class="ph-bold ph-chats-circle"></i> Contact Us</h3>
 				<div class="footer__contact">
 					<div class="footer__contact-item">
 						<a href="tel:1231231234" class="btn btn--transparent btn--icon-left">

@@ -11,10 +11,10 @@
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	padding: 120px spacing("xl") spacing("4xl");
+	padding: 12.8rem spacing("xl") spacing("4xl");
 
-	@media (max-width: 768px) {
-		padding: 80px spacing("md") spacing("3xl");
+	@include max($tablet) {
+		padding: 8rem spacing("md") spacing("3xl");
 	}
 
 	// Overlay for better text readability
@@ -43,17 +43,46 @@
 		grid-template-columns: 1fr 1fr;
 		gap: spacing("4xl");
 		align-items: center;
+		overflow: hidden; // Prevent background from leaking
 
-		@media (max-width: 968px) {
+		@include max(968) {
 			grid-template-columns: 1fr;
-			gap: spacing("3xl");
+			gap: spacing("lg");
 		}
 	}
 
 	// Content container
 	&__content {
+		position: relative;
 		text-align: left;
 		color: text-color("inverse");
+		background-color: rgba(15, 23, 42, 0.7);
+		padding: spacing("xl");
+		border-radius: radius("lg") 0 0 radius("lg");
+		backdrop-filter: blur(8px);
+		z-index: 1;
+
+		// Extended background behind form (reaches 50% of form)
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: calc(-100% - spacing("4xl") / 2); // Extend to 50% of form
+			bottom: 0;
+			background-color: rgba(15, 23, 42);
+			border-radius: radius("lg");
+			backdrop-filter: blur(8px);
+			z-index: -1;
+		}
+
+		@include max(968) {
+			border-radius: radius("lg");
+
+			&::after {
+				display: none;
+			}
+		}
 	}
 
 	// Heading
@@ -65,7 +94,7 @@
 		color: text-color("inverse");
 		margin-bottom: spacing("lg");
 
-		@media (max-width: 768px) {
+		@include max($tablet) {
 			font-size: font-size("4xl");
 			line-height: line-height("4xl");
 		}
@@ -78,9 +107,9 @@
 		line-height: line-height("lg");
 		color: text-color("inverse");
 		opacity: 0.9;
-		margin-bottom: spacing("2xl");
+		margin-bottom: spacing("lg");
 
-		@media (max-width: 768px) {
+		@include max($tablet) {
 			font-size: font-size("md");
 			line-height: line-height("md");
 		}
@@ -91,6 +120,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: spacing("md");
+		margin-bottom: spacing("xl");
 	}
 
 	&__feature {
@@ -106,13 +136,41 @@
 		}
 
 		span {
-			font-size: font-size("md");
-			line-height: line-height("md");
+			font-size: font-size("lg");
+			line-height: line-height("lg");
+			font-weight: 700;
+		}
+	}
+
+	// Badge wrapper
+	&__badge {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+
+		@include max($tablet) {
+			justify-content: center;
+		}
+
+		// Larger badge variant for hero
+		.google-reviews-badge {
+			&__stars {
+				.material-symbols-outlined {
+					font-size: 2rem; // Increased from 1.6rem
+				}
+			}
+
+			&__score {
+				font-size: font-size("xl"); // Increased from lg
+			}
 		}
 	}
 
 	// CTA wrapper
 	&__cta {
 		margin-bottom: spacing("xl");
+	}
+	&__form {
+		z-index: 1;
 	}
 }

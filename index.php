@@ -19,6 +19,24 @@
                     <span>Feature three benefit</span>
                 </div>
             </div>
+			<div class="hero__badge">
+				<a href="https://www.google.com/maps" target="_blank" rel="noopener" class="google-reviews-badge">
+					<img src="<?php echo get_template_directory_uri(); ?>/assets/images/logo-google.svg" alt="Google" class="google-reviews-badge__logo">
+					<div class="google-reviews-badge__content">
+						<div class="google-reviews-badge__rating">
+							<span class="google-reviews-badge__score">4.9</span>
+							<div class="google-reviews-badge__stars">
+								<span class="material-symbols-outlined">star</span>
+								<span class="material-symbols-outlined">star</span>
+								<span class="material-symbols-outlined">star</span>
+								<span class="material-symbols-outlined">star</span>
+								<span class="material-symbols-outlined">star</span>
+							</div>
+						</div>
+						<div class="google-reviews-badge__reviews">Based on <strong>127 reviews</strong></div>
+					</div>
+				</a>
+			</div>
         </div>
         
         <div class="hero__form">

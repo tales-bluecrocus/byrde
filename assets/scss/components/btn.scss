@@ -36,8 +36,8 @@
 	}
 
 	// Mobile adjustments
-	@media (max-width: 768px) {
-		gap: 1.2rem; // 12px on mobile
+	@include max($tablet) {
+		gap: 0.8rem; // 8px on mobile
 
 		&--mobile-stack {
 			flex-direction: column;
@@ -279,7 +279,7 @@
 	}
 
 	// Mobile adjustments
-	@media (max-width: 768px) {
+	@include max($tablet) {
 		font-size: font-size("sm");
 
 		&--lg {
