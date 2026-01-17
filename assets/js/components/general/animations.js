@@ -8,14 +8,7 @@ gsap.registerPlugin(ScrollTrigger);
  * Initialize GSAP scroll animations
  */
 export function initAnimations() {
-	// Google Reviews Badge animation
-	initBadgeAnimation();
-
-	// Hero animations
-	initHeroAnimations();
-
-	// General scroll animations
-	initScrollAnimations();
+	initServicesAnimation();
 }
 
 /**
@@ -27,7 +20,7 @@ function initBadgeAnimation() {
 
 	badges.forEach((badge) => {
 		const stars = badge.querySelectorAll(
-			".google-reviews-badge__stars .material-symbols-outlined"
+			".google-reviews-badge__stars .material-symbols-outlined",
 		);
 		if (!stars.length) return;
 
@@ -85,7 +78,7 @@ function initHeroAnimations() {
 				y: 0,
 				duration: 0.8,
 			},
-			"-=0.6"
+			"-=0.6",
 		);
 	}
 
@@ -101,7 +94,7 @@ function initHeroAnimations() {
 				duration: 0.6,
 				stagger: 0.15,
 			},
-			"-=0.4"
+			"-=0.4",
 		);
 	}
 
@@ -115,7 +108,7 @@ function initHeroAnimations() {
 				y: 0,
 				duration: 0.8,
 			},
-			"-=0.6"
+			"-=0.6",
 		);
 	}
 }
@@ -126,7 +119,7 @@ function initHeroAnimations() {
 function initScrollAnimations() {
 	// Fade in elements
 	const fadeElements = document.querySelectorAll(
-		"[data-animate='fade'], .fade-in"
+		"[data-animate='fade'], .fade-in",
 	);
 	fadeElements.forEach((element) => {
 		gsap.from(element, {
@@ -145,7 +138,7 @@ function initScrollAnimations() {
 
 	// Slide from left
 	const slideLeftElements = document.querySelectorAll(
-		"[data-animate='slide-left']"
+		"[data-animate='slide-left']",
 	);
 	slideLeftElements.forEach((element) => {
 		gsap.from(element, {
@@ -163,7 +156,7 @@ function initScrollAnimations() {
 
 	// Slide from right
 	const slideRightElements = document.querySelectorAll(
-		"[data-animate='slide-right']"
+		"[data-animate='slide-right']",
 	);
 	slideRightElements.forEach((element) => {
 		gsap.from(element, {
@@ -215,7 +208,7 @@ function initScrollAnimations() {
 
 	// Parallax effect
 	const parallaxElements = document.querySelectorAll(
-		"[data-animate='parallax']"
+		"[data-animate='parallax']",
 	);
 	parallaxElements.forEach((element) => {
 		gsap.to(element, {
@@ -228,6 +221,34 @@ function initScrollAnimations() {
 				scrub: 1,
 			},
 		});
+	});
+}
+
+/**
+ * Services section cards animation
+ */
+function initServicesAnimation() {
+	const section = document.querySelector(".services-overview");
+	const cards = document.querySelectorAll(".services-overview__item");
+	if (!section || !cards.length) return;
+
+	// Inicialmente esconde os cards
+	gsap.set(cards, { y: 40, opacity: 0 });
+
+	// Animação de entrada com ScrollTrigger
+	ScrollTrigger.create({
+		trigger: section,
+		start: "top top", // anima quando o topo da section encostar no topo da viewport
+		onEnter: () => {
+			gsap.to(cards, {
+				y: 0,
+				opacity: 1,
+				duration: 0.7,
+				stagger: 0.12,
+				ease: "power2.out",
+			});
+		},
+		once: true,
 	});
 }
 

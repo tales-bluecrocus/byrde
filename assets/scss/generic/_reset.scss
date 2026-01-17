@@ -3,8 +3,8 @@
 
 body {
 	font-family: font-family("body");
-	font-size: font-size("md");
-	line-height: line-height("md");
+	font-size: font-size("md"); // 1rem = 16px (Tailwind base)
+	line-height: line-height("normal"); // 1.5 (Tailwind default)
 	background-color: bg-color("primary");
 	color: text-color("primary");
 	-webkit-font-smoothing: antialiased;

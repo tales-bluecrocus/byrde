@@ -28,26 +28,24 @@ function enqueue_theme_assets()
         null,
     );
 
-    // Phosphor Icons - Regular
+    // Phosphor Icons - Local files for better performance
     wp_enqueue_style(
         'byrde-phosphor-icons',
-        get_template_directory_uri() . '/node_modules/@phosphor-icons/web/src/regular/style.css',
+        get_template_directory_uri() . '/assets/fonts/phosphor-icons/regular/style.css',
         [],
         $version,
     );
 
-    // Phosphor Icons - Bold
     wp_enqueue_style(
         'byrde-phosphor-icons-bold',
-        get_template_directory_uri() . '/node_modules/@phosphor-icons/web/src/bold/style.css',
+        get_template_directory_uri() . '/assets/fonts/phosphor-icons/bold/style.css',
         [],
         $version,
     );
 
-    // Phosphor Icons - Fill
     wp_enqueue_style(
         'byrde-phosphor-icons-fill',
-        get_template_directory_uri() . '/node_modules/@phosphor-icons/web/src/fill/style.css',
+        get_template_directory_uri() . '/assets/fonts/phosphor-icons/fill/style.css',
         [],
         $version,
     );

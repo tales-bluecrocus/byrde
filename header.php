@@ -12,6 +12,7 @@
 <body <?php body_class(); ?>>
 
     <header class="header header--variation-1">
+        <div class="header__container">
         <div class="header__logo">
             <a
                 href="<?php echo esc_url(home_url('/')); ?>">
@@ -27,22 +28,8 @@
         </div>
 
         <div class="header__cta">
-            <a href="https://www.google.com/maps" target="_blank" rel="noopener" class="google-reviews-badge">
-                <img src="<?php echo get_template_directory_uri(); ?>/assets/images/logo-google.svg" alt="Google" class="google-reviews-badge__logo">
-                <div class="google-reviews-badge__content">
-                    <div class="google-reviews-badge__rating">
-                        <span class="google-reviews-badge__score">4.9</span>
-                        <div class="google-reviews-badge__stars">
-                            <span class="material-symbols-outlined">star</span>
-                            <span class="material-symbols-outlined">star</span>
-                            <span class="material-symbols-outlined">star</span>
-                            <span class="material-symbols-outlined">star</span>
-                            <span class="material-symbols-outlined">star</span>
-                        </div>
-                    </div>
-                    <div class="google-reviews-badge__reviews">Based on <strong>127 reviews</strong></div>
-                </div>
-            </a>
+            <?php get_template_part('template-parts/components/google-reviews-badge'); ?>
+        </div>
         </div>
     </header>
 

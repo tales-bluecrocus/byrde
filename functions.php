@@ -5,7 +5,14 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 
-// Auto-load all PHP files in the "inc" directory (recursively)
+/**
+ * Auto-load PHP files from inc/ directory
+ *
+ * NOTE: Only functional PHP files (classes, functions, hooks) should be in inc/.
+ * Template parts and HTML components belong in template-parts/ directory.
+ *
+ * @param string $directory Directory to scan for PHP files
+ */
 function theme_autoload_includes($directory)
 {
     // Get all PHP files in the current directory

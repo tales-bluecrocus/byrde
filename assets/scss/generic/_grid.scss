@@ -1,6 +1,7 @@
 @use "variables" as *;
 @use "mixins" as *;
 
+[class*="_container"],
 .container {
 	max-width: 1280px;
 	width: 100%;

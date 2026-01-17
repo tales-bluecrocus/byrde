@@ -72,9 +72,14 @@ rsync -a --progress "$THEME_DIR/" "$BUILD_DIR/$THEME_NAME" \
     --exclude='composer.lock' \
     --exclude='phpcs.xml' \
     --exclude='.config/' \
-    --exclude='assets/' \
     --exclude='README.md' \
     --exclude='*.zip'
+
+# Remove development source files from root assets/ (keep compiled & inc/admin/assets/)
+echo -e "${GREEN}🧹 Removendo arquivos fonte (SCSS/JS)...${NC}"
+rm -rf "$BUILD_DIR/$THEME_NAME/assets/scss"
+rm -rf "$BUILD_DIR/$THEME_NAME/assets/js"
+find "$BUILD_DIR/$THEME_NAME/assets/css" -name "*.map" -delete 2>/dev/null || true
 
 # Create ZIP
 echo -e "${GREEN}🗜️  Criando arquivo ZIP...${NC}"

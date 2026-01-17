@@ -1,8 +1,12 @@
 @use "./generic/load";
 @use "./components/btn";
 @use "./components/header";
-@use "./components/hero";
 @use "./components/forms";
 @use "./components/badges";
-@use "./components/footer";
+
+@use "./sections/hero";
+@use "./sections/highlight-testimonial";
+@use "./sections/services";
+@use "./sections/cta-section";
 //
+@use "./components/footer";

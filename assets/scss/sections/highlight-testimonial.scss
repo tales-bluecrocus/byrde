@@ -1,0 +1,129 @@
+@use "../generic/variables" as *;
+@use "../generic/mixins" as *;
+
+.highlight-testimonial {
+	padding: spacing("3xl") spacing("md");
+	background-color: bg-color("global");
+
+	&__container {
+		background-color: #fff;
+		padding: spacing("sm");
+		border-radius: radius("lg");
+		border: 1px solid #ececec;
+
+		&-group {
+			display: flex;
+			gap: spacing("lg");
+			background-color: $bg-global;
+			padding: spacing("xl");
+			border-radius: radius("lg");
+		}
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: spacing("lg");
+		padding: 0 spacing("md");
+	}
+
+	&__quote {
+		margin: 0;
+		font-size: font-size("lg");
+		line-height: line-height("relaxed");
+		color: text-color("body");
+		font-weight: 400;
+		position: relative;
+
+		@include min(769) {
+			font-size: font-size("xl");
+		}
+
+		&::before {
+			content: "“";
+			position: absolute;
+			top: -4rem;
+			left: -3rem;
+			font-size: 22rem;
+			line-height: 1;
+			color: button-color("primary-bg");
+			opacity: 0.1;
+			font-family: Georgia, serif;
+		}
+	}
+
+	&__author {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		flex-direction: column;
+		gap: spacing("xs");
+		align-items: flex-start;
+		padding: spacing("sm");
+		background: linear-gradient(
+			to top,
+			rgba(0, 0, 0, 0.7) 0%,
+			rgba(0, 0, 0, 0.4) 50%,
+			transparent 100%
+		);
+		.google-reviews-badge {
+			width: 100%;
+		}
+	}
+
+	&__name {
+		font-size: font-size("lg"); // 18px
+		font-weight: 700;
+		color: #fff;
+		font-family: font-family("heading");
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+		@include min(769) {
+			font-size: font-size("xl"); // 20px
+		}
+	}
+
+	&__image {
+		position: relative;
+		border-radius: radius("lg");
+		overflow: hidden;
+		aspect-ratio: 4 / 3;
+		width: 100%;
+
+		@include min(769) {
+			aspect-ratio: 1 / 1;
+			max-width: 300px;
+		}
+
+		> img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: block;
+		}
+	}
+
+	// Mobile: imagem no topo
+	@include max($tablet) {
+		&__container {
+			grid-template-areas:
+				"image"
+				"content";
+		}
+
+		&__content {
+			grid-area: content;
+		}
+
+		&__image {
+			grid-area: image;
+		}
+	}
+}
