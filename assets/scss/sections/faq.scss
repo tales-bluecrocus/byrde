@@ -1,0 +1,212 @@
+@use "sass:color";
+@use "../generic/variables" as *;
+@use "../generic/mixins" as *;
+
+.faq-section {
+	background: #f7f7f8;
+	padding: spacing("4xl") 0;
+
+	&__content {
+		display: flex;
+		gap: spacing("3xl");
+		margin: 0 auto;
+		padding: 0 spacing("md");
+	}
+
+	&__left {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: spacing("lg");
+	}
+
+	&__call-card {
+		background: #fff;
+		border-radius: radius("xl");
+		box-shadow: 0 4px 32px 0 rgba(255, 90, 31, 0.1);
+		padding: spacing("xl") spacing("lg");
+		display: flex;
+		align-items: center;
+		gap: spacing("lg");
+		margin-top: spacing("md");
+		min-width: 0;
+		min-height: 180px;
+		position: relative;
+		z-index: 1;
+	}
+
+	&__call-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: spacing("sm");
+	}
+
+	&__call-title {
+		font-size: font-size("xl");
+		font-weight: 700;
+		margin-bottom: spacing("xs");
+		color: text-color("heading");
+	}
+
+	&__call-desc {
+		font-size: font-size("md");
+		color: text-color("body");
+		opacity: 0.85;
+		margin-bottom: spacing("sm");
+	}
+
+	&__right {
+		display: flex;
+		flex-direction: column;
+		gap: spacing("lg");
+	}
+
+	&__accordion {
+		display: flex;
+		flex-direction: column;
+		gap: spacing("md");
+	}
+
+	&__item {
+		background: #fff;
+		border-radius: radius("lg");
+		box-shadow: 0 2px 12px 0 rgba(30, 41, 59, 0.06);
+		overflow: hidden;
+		transition: box-shadow 0.2s;
+		position: relative;
+		&--open {
+			box-shadow: 0 4px 24px 0 rgba(30, 41, 59, 0.1);
+			.faq-section__answer {
+				display: block;
+			}
+			.faq-section__question {
+				font-weight: 700;
+				color: #ff5a1f;
+			}
+			.faq-section__toggle .faq-section__icon {
+				transform: rotate(45deg);
+			}
+		}
+	}
+
+	&__question-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		position: relative;
+		padding: spacing("md");
+		gap: spacing("xs");
+		&:hover {
+			background: #f9fafb;
+			cursor: pointer;
+		}
+	}
+
+	&__question {
+		background: none;
+		border: none;
+		outline: none;
+		font-size: font-size("lg");
+		font-family: font-family("heading");
+		font-weight: 600;
+		color: text-color("heading");
+		text-align: left;
+		cursor: pointer;
+		flex: 1 1 auto;
+		display: block;
+		transition: color 0.2s;
+		padding: 0;
+	}
+
+	&__toggle {
+		background: none;
+		border: none;
+		padding: 0;
+		margin-left: spacing("md");
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 50%;
+		font-size: 1.5em;
+		color: #ff5a1f;
+		transition:
+			background 0.18s,
+			color 0.18s;
+		z-index: 2;
+		line-height: 1;
+		position: relative;
+		outline: none;
+		box-shadow: none;
+		&:hover,
+		&:focus {
+			background: rgba(255, 90, 31, 0.08);
+			color: #ff5a1f;
+		}
+		&:active {
+			background: rgba(255, 90, 31, 0.16);
+		}
+	}
+
+	&__icon {
+		font-size: 1.5em;
+		color: inherit;
+		font-weight: 700;
+		display: inline-block;
+		transition: transform 0.2s;
+		pointer-events: none;
+		user-select: none;
+	}
+
+	&__answer {
+		display: none;
+		font-size: font-size("md");
+		color: text-color("body");
+		padding: spacing("md");
+		border-top: 1px solid #f3f4f6;
+		background: #fff;
+		position: relative;
+		z-index: 1;
+		margin-top: -8px;
+	}
+
+	@include max($tablet) {
+		&__container {
+			flex-direction: column;
+			gap: spacing("2xl");
+			align-items: stretch;
+		}
+		&__left,
+		&__right {
+			max-width: 100%;
+		}
+		&__call-card {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: spacing("md");
+		}
+		&__question-row {
+			padding: spacing("md") spacing("md") spacing("md") spacing("sm");
+		}
+		&__answer {
+			font-size: font-size("sm");
+			padding: 0 spacing("md") spacing("md") spacing("sm");
+		}
+	}
+
+	@include max($mobile) {
+		&__container {
+			padding: 0 spacing("xs");
+		}
+		&__call-card {
+			padding: spacing("lg") spacing("sm");
+		}
+		&__question-row {
+			padding: spacing("sm") spacing("sm") spacing("sm") spacing("xs");
+		}
+	}
+}

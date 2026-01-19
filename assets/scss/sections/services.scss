@@ -34,11 +34,13 @@
 	}
 
 	&__items {
-		display: flex;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
 		gap: spacing("lg");
-		justify-content: center;
+		justify-items: center;
+		align-items: stretch;
 		margin-bottom: spacing("lg");
-		flex-wrap: wrap;
+		width: 100%;
 	}
 
 	&__item {
@@ -96,14 +98,19 @@
 
 	@include max($tablet) {
 		&__items {
-			flex-direction: column;
+			grid-template-columns: repeat(2, 1fr);
 			gap: spacing("md");
-			align-items: center;
 		}
 		&__item {
 			width: 100%;
 			min-width: 0;
 			max-width: 400px;
+		}
+	}
+
+	@include max($mobile) {
+		&__items {
+			grid-template-columns: 1fr;
 		}
 	}
 }

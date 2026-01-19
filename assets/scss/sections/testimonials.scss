@@ -1,0 +1,145 @@
+@use "../generic/variables" as *;
+@use "../generic/mixins" as *;
+
+.testimonials {
+	background: #f8fafc;
+	padding: spacing("4xl") 0;
+
+	&__container {
+		max-width: 900px;
+		margin: 0 auto;
+		padding: 0 spacing("md");
+		text-align: center;
+	}
+
+	&__title {
+		font-family: font-family("heading");
+		font-size: font-size("4xl");
+		font-weight: 700;
+		color: text-color("heading");
+	}
+
+	&__description {
+		font-size: font-size("lg");
+		color: text-color("body");
+		margin-left: auto;
+		margin-right: auto;
+		opacity: 0.92;
+		line-height: 1.7;
+		padding: spacing("md") spacing("lg");
+		display: inline-block;
+	}
+
+	&__carousel {
+		width: 100%;
+		overflow-x: hidden;
+		overflow-y: visible;
+		position: relative;
+		margin: 0 auto;
+		padding: spacing("md") 0;
+		background: transparent;
+	}
+
+	&__track {
+		display: flex;
+		gap: spacing("xl");
+		width: max-content;
+		align-items: center;
+	}
+
+	&__card {
+		background: #fff;
+		border-radius: radius("lg");
+		box-shadow: 0 2px 16px 0 rgba(30, 41, 59, 0.08);
+		padding: spacing("xl") spacing("lg");
+		display: flex;
+		flex-direction: column;
+		gap: spacing("sm");
+		transition:
+			box-shadow 0.2s,
+			transform 0.2s,
+			border 0.2s;
+		border: 2px solid #efefef;
+		cursor: pointer;
+		min-width: 320px;
+		max-width: 340px;
+		flex: 0 0 auto;
+		position: relative;
+		will-change: transform;
+
+		.google-reviews-badge {
+			box-shadow: none;
+			padding: 0;
+		}
+	}
+
+	&__card:hover {
+		border: 2px solid button-color("primary-bg");
+		z-index: 2;
+	}
+
+	&__quote {
+		font-size: font-size("2xl");
+		color: button-color("primary-bg");
+		font-family: Georgia, serif;
+		opacity: 0.7;
+		margin-bottom: spacing("xs");
+	}
+
+	&__text {
+		font-size: font-size("md");
+		color: text-color("body");
+		font-family: font-family("body");
+		flex: 1;
+	}
+
+	&__author {
+		display: flex;
+		align-items: center;
+		gap: spacing("md");
+	}
+
+	&__avatar {
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		object-fit: cover;
+		box-shadow: 0 2px 8px 0 rgba(30, 41, 59, 0.1);
+		border: 2px solid #e5e7eb;
+		background: #f3f4f6;
+	}
+
+	&__name {
+		font-family: font-family("heading");
+		font-size: font-size("md");
+		font-weight: 700;
+		color: text-color("heading");
+	}
+
+	&__role {
+		font-size: font-size("sm");
+		color: text-color("body");
+		opacity: 0.7;
+	}
+
+	@include max($tablet) {
+		&__card {
+			min-width: 260px;
+			max-width: 280px;
+			padding: spacing("md") spacing("sm");
+		}
+		&__title {
+			font-size: font-size("2xl");
+		}
+		&__description {
+			font-size: font-size("md");
+			padding: spacing("sm") spacing("md");
+		}
+		&__carousel {
+			padding: spacing("sm") 0;
+		}
+		&__track {
+			gap: spacing("md");
+		}
+	}
+}

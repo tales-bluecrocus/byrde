@@ -8,7 +8,60 @@ gsap.registerPlugin(ScrollTrigger);
  * Initialize GSAP scroll animations
  */
 export function initAnimations() {
+	initHeroAnimations();
+	initScrollAnimations();
+	initBadgeAnimation();
 	initServicesAnimation();
+	initTestimonialsAnimation();
+}
+
+// Testimonials: carrossel infinito e hover
+function initTestimonialsAnimation() {
+	const section = document.querySelector(".testimonials--carousel");
+	const track = section
+		? section.querySelector(".testimonials__track")
+		: null;
+	const cards = track ? track.querySelectorAll(".testimonials__card") : [];
+	if (!section || !track || !cards.length) return;
+
+	// Duplicar cards para efeito infinito
+	const minCards = 14; // garantir que tenha cards suficientes para o loop
+	while (track.children.length < minCards) {
+		for (let i = 0; i < cards.length; i++) {
+			track.appendChild(cards[i].cloneNode(true));
+		}
+	}
+
+	// Calcular largura total
+	const cardWidth =
+		cards[0].offsetWidth + parseInt(getComputedStyle(track).gap || 24);
+	const totalCards = track.children.length;
+	const totalWidth = cardWidth * totalCards;
+
+	// Reset posição
+	gsap.set(track, { x: 0 });
+
+	// Animação infinita
+	const sliderTween = gsap.to(track, {
+		x: -totalWidth / 2,
+		duration: 60,
+		ease: "linear",
+		repeat: -1,
+		modifiers: {
+			x: gsap.utils.unitize((x) => parseFloat(x) % (totalWidth / 2)),
+		},
+	});
+
+	// Hover nos cards e pausa do slider apenas no hover do card
+	const allCards = track.querySelectorAll(".testimonials__card");
+	allCards.forEach((card) => {
+		card.addEventListener("mouseenter", () => {
+			sliderTween.pause();
+		});
+		card.addEventListener("mouseleave", () => {
+			sliderTween.resume();
+		});
+	});
 }
 
 /**

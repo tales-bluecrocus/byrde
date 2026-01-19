@@ -8,4 +8,10 @@
 
 <?php echo get_template_part('sections/cta-section'); ?>
 
+<?php echo get_template_part('sections/areas-we-serve'); ?>
+
+<?php echo get_template_part('sections/testimonials'); ?>
+
+<?php echo get_template_part('sections/faq'); ?>
+
 <?php get_footer(); ?>

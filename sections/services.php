@@ -24,8 +24,6 @@
                 <h3 class="services-overview__item-title">Garage Cleanouts</h3>
                 <p class="services-overview__item-description">Clear years of junk with full service pickup and disposal.</p>
             </div>
-        </div>
-        <div class="services-overview__items">
             <div class="services-overview__item">
                 <div class="services-overview__item-icon">
                     <img src="https://placehold.co/100x100" alt="Basement & Estate Cleanouts icon" width="64" height="64" loading="lazy" />
