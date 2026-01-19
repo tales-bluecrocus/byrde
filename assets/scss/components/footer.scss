@@ -2,22 +2,19 @@
 @use "../generic/mixins" as *;
 
 .footer {
+	@include section-theme("primary");
 	position: relative;
-	background-color: bg-color("cta");
-	color: text-color("inverse");
 	padding: spacing("4xl") 0 spacing("2xl");
 
-	// Footer container
 	&__container {
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 0 spacing("xl");
+		padding: 0 spacing("md");
 	}
 
-	// Main footer content
 	&__main {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 		gap: spacing("3xl");
 		padding-bottom: spacing("3xl");
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -29,12 +26,10 @@
 		}
 	}
 
-	// Footer column
 	&__column {
 		&--logo {
 			.footer__logo {
 				margin-bottom: spacing("md");
-
 				img {
 					max-height: 48px;
 					width: auto;
@@ -43,10 +38,10 @@
 			}
 
 			.footer__description {
-				color: text-color("inverse");
+				color: text-color("white");
 				opacity: 0.8;
 				font-size: font-size("sm");
-				line-height: line-height("md");
+				line-height: line-height("normal");
 				margin-bottom: spacing("lg");
 			}
 
@@ -63,15 +58,14 @@
 					border-radius: radius("md");
 					background: rgba(255, 255, 255, 0.1);
 					color: text-color("inverse");
-					text-decoration: none;
-					transition: all 0.2s ease;
+					transition: all 0.3s ease;
 
 					i {
-						font-size: 2rem;
+						font-size: 1.5rem;
 					}
 
 					&:hover {
-						background: button-color("primary-bg");
+						background: $primary-bg;
 						transform: translateY(-2px);
 					}
 				}
@@ -79,25 +73,21 @@
 		}
 	}
 
-	// Footer title
 	&__title {
 		display: flex;
 		align-items: center;
 		gap: spacing("xs");
-		font-family: font-family("heading");
+		font-family: font-family("primary");
 		font-size: font-size("lg");
 		font-weight: 700;
-		color: text-color("inverse");
-		margin-bottom: spacing("sm");
-		padding-left: spacing("sm");
+		margin-bottom: spacing("md");
 
 		i {
-			font-size: 2rem;
-			color: button-color("primary-bg");
+			color: text-color("secondary");
+			font-size: 1.5rem;
 		}
 	}
 
-	// Footer menu
 	&__menu {
 		list-style: none;
 		padding: 0;
@@ -105,35 +95,25 @@
 
 		li {
 			margin-bottom: spacing("xs");
-
-			&:last-child {
-				margin-bottom: 0;
-			}
 		}
 
 		a {
 			color: text-color("inverse");
 			opacity: 0.8;
-			text-decoration: none;
 			font-size: font-size("sm");
-			transition: all 0.2s ease;
+			transition: all 0.3s ease;
 			display: inline-flex;
 			align-items: center;
 			gap: spacing("xs");
 
-			i {
-				font-size: 1.6rem;
-			}
-
 			&:hover {
+				color: text-color("secondary");
 				opacity: 1;
-				color: button-color("primary-bg");
-				transform: translateX(4px);
+				transform: translateX(2px);
 			}
 		}
 	}
 
-	// Footer contact info
 	&__contact {
 		.footer__contact-item {
 			display: flex;
@@ -145,25 +125,22 @@
 			font-size: font-size("sm");
 
 			i {
-				font-size: 2rem;
-				flex-shrink: 0;
-				margin-top: 2px;
+				font-size: 1.5rem;
+				color: $primary-bg;
 			}
 
 			a {
 				color: inherit;
-				text-decoration: none;
-				transition: opacity 0.2s ease;
+				transition: all 0.2s ease;
 
 				&:hover {
 					opacity: 1;
-					color: button-color("primary-bg");
+					color: text-color("secondary");
 				}
 			}
 		}
 	}
 
-	// Footer bottom
 	&__bottom {
 		display: flex;
 		justify-content: space-between;
@@ -177,25 +154,21 @@
 		}
 	}
 
-	// Copyright
 	&__copyright {
 		color: text-color("inverse");
 		opacity: 0.7;
-		font-size: font-size("sm");
+		font-size: font-size("xs");
 
 		a {
 			color: inherit;
-			text-decoration: none;
-			transition: opacity 0.2s ease;
+			transition: color 0.2s ease;
 
 			&:hover {
-				opacity: 1;
-				color: button-color("primary-bg");
+				color: $primary-bg;
 			}
 		}
 	}
 
-	// Footer nav (privacy, terms)
 	&__nav {
 		display: flex;
 		gap: spacing("lg");
@@ -211,69 +184,12 @@
 		a {
 			color: text-color("inverse");
 			opacity: 0.7;
-			text-decoration: none;
-			font-size: font-size("sm");
+			font-size: font-size("xs");
 			transition: all 0.2s ease;
 
 			&:hover {
 				opacity: 1;
-				color: button-color("primary-bg");
-			}
-		}
-	}
-
-	// Newsletter signup
-	&__newsletter {
-		.footer__newsletter-form {
-			display: flex;
-			gap: spacing("sm");
-			margin-top: spacing("md");
-
-			@include max($tablet) {
-				flex-direction: column;
-			}
-
-			input[type="email"] {
-				flex: 1;
-				padding: spacing("sm") spacing("md");
-				border: 1px solid rgba(255, 255, 255, 0.2);
-				border-radius: radius("md");
-				background: rgba(255, 255, 255, 0.05);
-				color: text-color("inverse");
-				font-size: font-size("sm");
-				transition: all 0.2s ease;
-
-				&::placeholder {
-					color: text-color("inverse");
-					opacity: 0.5;
-				}
-
-				&:focus {
-					outline: none;
-					border-color: button-color("primary-bg");
-					background: rgba(255, 255, 255, 0.1);
-				}
-			}
-
-			button {
-				padding: spacing("sm") spacing("lg");
-				border: none;
-				border-radius: radius("md");
-				background: button-color("primary-bg");
-				color: button-color("primary-text");
-				font-size: font-size("sm");
-				font-weight: font-weight("semibold");
-				text-transform: uppercase;
-				letter-spacing: 0.05em;
-				cursor: pointer;
-				transition: all 0.2s ease;
-				white-space: nowrap;
-
-				&:hover {
-					background: button-color("primary-hover");
-					transform: translateY(-2px);
-					box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-				}
+				color: $primary-bg;
 			}
 		}
 	}

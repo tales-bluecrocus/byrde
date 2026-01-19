@@ -3,6 +3,7 @@ import { initHeader } from "./components//general/header";
 import { initFooter } from "./components//general/footer";
 import { initAnimations } from "./components/general/animations";
 import { initFaq } from "./components/general/faq";
+import { initHero } from "./components/general/hero";
 
 // Tracking imports
 import { initTracking, initGTM, initGA } from "./components/tracking/tracking";
@@ -42,8 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	initHeader();
 	initFooter();
 	initAnimations();
-	initHeader();
-	initFooter();
-	initAnimations();
 	initFaq();
+	initHero();
 });

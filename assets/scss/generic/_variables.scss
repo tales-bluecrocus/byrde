@@ -1,148 +1,117 @@
 @use "sass:map";
 @use "sass:string";
 @use "sass:color";
+@use "sass:math";
 
-@use "./fonts";
-
-// ============================================
-// BASE COLORS (Primitive Tokens)
-// ============================================
-
-// Brand/Action Colors
-$primary-color: #f97316; // Botão Principal - Destaque Máximo (Orange)
-$primary-color-hover: color.adjust(#f97316, $lightness: -8%);
-$primary-color-light: color.adjust(#f97316, $lightness: 45%);
-
-$secondary-color: #3b82f6; // Ações Secundárias - Guia Visual (Blue)
-$secondary-color-hover: color.adjust(#3b82f6, $lightness: -8%);
-$secondary-color-light: color.adjust(#3b82f6, $lightness: 45%);
-
-// Backgrounds
-$bg-global: #f9fafb; // Fundo Global - Neutro
-$bg-cta-form: #0f172a; // Fundo CTA/Form - Dominante (Dark Slate)
-
-// Text Colors
-$text-heading: #1e293b; // Títulos - Forte (Slate)
-$text-body: #475569; // Parágrafos - Suave (Slate Gray)
-
-// Neutral
-$white: #fff;
-$black: #000;
-
-// Status/Validation Colors
-$success: #10b981;
-$success-light: #d1fae5;
-$error: #ef4444;
-$error-light: #fee2e2;
-$warning: #f59e0b;
-$warning-light: #fef3c7;
+@use "fonts";
 
 // ============================================
-// SEMANTIC TOKENS
+// CSS DESIGNS TOKENS (Configurable via PHP)
 // ============================================
 
-// Text Colors
+:root {
+	// Global Theme Colors
+	--primary-color: #0f172a;
+	--primary-text: #ffffff;
+	
+	--secondary-color: #f97316;
+	--secondary-text: #ffffff;
+	
+	--alternative-color: #3b82f6;
+	--alternative-text: #ffffff;
+
+	// Specific Button Colors
+	--btn-primary-bg: #0f172a;
+	--btn-primary-text: #ffffff;
+	
+	--btn-secondary-bg: #f97316;
+	--btn-secondary-text: #ffffff;
+	
+	--btn-alternative-bg: #3b82f6;
+	--btn-alternative-text: #ffffff;
+	
+	// Layout Colors
+	--bg-gray: #f9fafb;
+	--bg-white: #ffffff;
+	
+	// Text Colors
+	--text-main: #1e293b;
+	--text-muted: #475569;
+}
+
+// ============================================
+// SASS VARIABLES (Pointing to CSS Variables)
+// ============================================
+
+$primary-bg: var(--primary-color);
+$primary-text: var(--primary-text);
+
+$secondary-bg: var(--secondary-color);
+$secondary-text: var(--secondary-text);
+
+$alternative-bg: var(--alternative-color);
+$alternative-text: var(--alternative-text);
+
+// Specific Button Sass Variables
+$btn-primary-bg: var(--btn-primary-bg);
+$btn-primary-text: var(--btn-primary-text);
+
+$btn-secondary-bg: var(--btn-secondary-bg);
+$btn-secondary-text: var(--btn-secondary-text);
+
+$btn-alternative-bg: var(--btn-alternative-bg);
+$btn-alternative-text: var(--btn-alternative-text);
+
+// Link Colors
+$link-color: var(--secondary-color);
+$link-color-hover: var(--primary-color);
+
+// ============================================
+// UTILITIES (Fluid Typography)
+// ============================================
+
+$container-max-width: 1280;
+$mobile-breakpoint: 375;
+
+@function fluid($min-size, $max-size, $min-breakpoint: $mobile-breakpoint, $max-breakpoint: $container-max-width) {
+	$slope: math.div($max-size - $min-size, $max-breakpoint - $min-breakpoint);
+	$y-axis-intersection: -$min-breakpoint * $slope + $min-size;
+	
+	$min-size-rem: math.div($min-size, 16) * 1rem;
+	$max-size-rem: math.div($max-size, 16) * 1rem;
+	$slope-vw: $slope * 100;
+	$intercept-rem: math.div($y-axis-intersection, 16) * 1rem;
+
+	@return clamp(#{$min-size-rem}, #{$slope-vw}vw + #{$intercept-rem}, #{$max-size-rem});
+}
+
+// ============================================
+// SEMANTIC TOKENS (Helpers)
+// ============================================
+
 $text-color: (
-	"heading": $text-heading,
-	// Títulos
-	"body": $text-body,
-	// Parágrafos
-	"primary": $text-heading,
-	"secondary": $text-body,
-	"brand-primary": $primary-color,
-	"brand-secondary": $secondary-color,
-	"success": $success,
-	"error": $error,
-	"warning": $warning,
-	"inverse": $white,
+	"heading": var(--text-main),
+	"body": var(--text-muted),
+	"primary": $primary-bg,
+	"secondary": $secondary-bg,
+	"alternative": $alternative-bg,
+	"inverse": #ffffff,
 );
 
 @function text-color($key) {
 	@return map.get($text-color, $key);
 }
 
-// Button Colors
-$button-color: (
-	"primary-bg": $primary-color,
-	// Botão Principal
-	"primary-text": $white,
-	"primary-hover": $primary-color-hover,
-	"secondary-bg": $secondary-color,
-	// Ações Secundárias
-	"secondary-text": $white,
-	"secondary-hover": $secondary-color-hover,
-	"tertiary-bg": $bg-global,
-	"tertiary-text": $text-heading,
-	"tertiary-hover": color.adjust($bg-global, $lightness: -3%),
-	"success-bg": $success,
-	"success-text": $white,
-	"success-hover": color.adjust($success, $lightness: -8%),
-	"error-bg": $error,
-	"error-text": $white,
-	"error-hover": color.adjust($error, $lightness: -8%),
-	"warning-bg": $warning,
-	"warning-text": $white,
-	"warning-hover": color.adjust($warning, $lightness: -8%),
-);
-
-@function button-color($key) {
-	@return map.get($button-color, $key);
-}
-
-// Form Colors
-$form-color: (
-	"border": color.adjust($bg-global, $lightness: -15%),
-	"border-hover": color.adjust($bg-global, $lightness: -25%),
-	"border-focus": $secondary-color,
-	"border-error": $error,
-	"border-success": $success,
-	"bg": $white,
-	"bg-dark": $bg-cta-form,
-	// Fundo CTA/Form
-	"bg-disabled": $bg-global,
-	"placeholder": color.adjust($text-body, $lightness: 15%),
-	"text": $text-body,
-	"text-disabled": color.adjust($text-body, $lightness: 20%),
-	"text-inverse": $white,
-	"outline": rgba($secondary-color, 0.25),
-);
-
-@function form-color($key) {
-	@return map.get($form-color, $key);
-}
-
-// Background Colors
 $bg-color: (
-	"global": $bg-global,
-	// Fundo Global
-	"cta": $bg-cta-form,
-	// Fundo CTA/Form
-	"primary": $white,
-	"secondary": $bg-global,
-	"brand-primary": $primary-color-light,
-	"brand-secondary": $secondary-color-light,
-	"success": $success-light,
-	"error": $error-light,
-	"warning": $warning-light,
+	"primary": $primary-bg,
+	"secondary": $secondary-bg,
+	"alternative": $alternative-bg,
+	"white": var(--bg-white),
+	"gray": var(--bg-gray),
 );
 
 @function bg-color($key) {
 	@return map.get($bg-color, $key);
-}
-
-// Border Colors
-$border-color: (
-	"primary": color.adjust($bg-global, $lightness: -10%),
-	"secondary": color.adjust($bg-global, $lightness: -15%),
-	"brand-primary": $primary-color,
-	"brand-secondary": $secondary-color,
-	"success": $success,
-	"error": $error,
-	"warning": $warning,
-);
-
-@function border-color($key) {
-	@return map.get($border-color, $key);
 }
 
 // ============================================
@@ -150,40 +119,28 @@ $border-color: (
 // ============================================
 
 $font-family: (
-	"body": "Nunito, sans-serif",
-	"heading": "Lato, sans-serif",
+	"primary": fonts.$font-family-primary,
+	"secondary": fonts.$font-family-secondary,
+	"heading": fonts.$font-family-primary,
+	"body": fonts.$font-family-secondary,
 );
 
 @function font-family($key) {
-	@return string.unquote(map.get($font-family, $key));
+	@return map.get($font-family, $key);
 }
 
 $font-size: (
-	"xs": 0.75rem,
-	// 12px (Tailwind xs)
-	"sm": 0.875rem,
-	// 14px (Tailwind sm)
-	"md": 1rem,
-	// 16px (Tailwind base)
-	"lg": 1.125rem,
-	// 18px (Tailwind lg)
-	"xl": 1.25rem,
-	// 20px (Tailwind xl)
-	"2xl": 1.5rem,
-	// 24px (Tailwind 2xl)
-	"3xl": 1.875rem,
-	// 30px (Tailwind 3xl)
-	"4xl": 2.25rem,
-	// 36px (Tailwind 4xl)
-	"5xl": 3rem,
-	// 48px (Tailwind 5xl)
-	"6xl": 3.75rem,
-	// 60px (Tailwind 6xl)
-	"7xl": 4.5rem,
-	// 72px (Tailwind 7xl)
-	"8xl": 6rem,
-	// 96px (Tailwind 8xl)
-	"9xl": 8rem, // 128px (Tailwind 9xl)
+	"xs": fluid(10, 12),
+	"sm": fluid(12, 14),
+	"md": fluid(14, 16),
+	"lg": fluid(16, 18),
+	"xl": fluid(18, 20),
+	"2xl": fluid(20, 24),
+	"3xl": fluid(24, 30),
+	"4xl": fluid(30, 36),
+	"5xl": fluid(36, 48),
+	"6xl": fluid(42, 60),
+	"7xl": fluid(48, 72),
 );
 
 @function font-size($key) {
@@ -192,30 +149,11 @@ $font-size: (
 
 $line-height: (
 	"none": 1,
-	"tight": 1.25,
+	"tight": 1.2,
 	"snug": 1.375,
 	"normal": 1.5,
 	"relaxed": 1.625,
 	"loose": 2,
-	"xs": 1rem,
-	// 16px
-	"sm": 1.25rem,
-	// 20px
-	"md": 1.5rem,
-	// 24px
-	"lg": 1.75rem,
-	// 28px
-	"xl": 1.75rem,
-	// 28px
-	"2xl": 2rem,
-	// 32px
-	"3xl": 2.25rem,
-	// 36px
-	"4xl": 2.5rem,
-	// 40px
-	"5xl": 1,
-	// relative
-	"6xl": 1, // relative
 );
 
 @function line-height($key) {
@@ -229,22 +167,13 @@ $line-height: (
 $spacing: (
 	"none": 0,
 	"xs": 0.5rem,
-	// 8px (Tailwind 2)
 	"sm": 1rem,
-	// 16px (Tailwind 4)
 	"md": 1.5rem,
-	// 24px (Tailwind 6)
 	"lg": 2rem,
-	// 32px (Tailwind 8)
 	"xl": 3rem,
-	// 48px (Tailwind 12)
 	"2xl": 4rem,
-	// 64px (Tailwind 16)
 	"3xl": 5rem,
-	// 80px (Tailwind 20)
 	"4xl": 6rem,
-	// 96px (Tailwind 24)
-	"5xl": 8rem, // 128px (Tailwind 32)
 );
 
 @function spacing($key) {
@@ -254,17 +183,9 @@ $spacing: (
 $radius: (
 	"none": 0,
 	"sm": 0.125rem,
-	// 2px (Tailwind sm)
 	"md": 0.375rem,
-	// 6px (Tailwind DEFAULT)
 	"lg": 0.5rem,
-	// 8px (Tailwind lg)
 	"xl": 0.75rem,
-	// 12px (Tailwind xl)
-	"2xl": 1rem,
-	// 16px (Tailwind 2xl)
-	"3xl": 1.5rem,
-	// 24px (Tailwind 3xl)
 	"full": 9999px,
 );
 
@@ -277,10 +198,7 @@ $radius: (
 // ============================================
 
 $grid-columns: 12;
-$grid-gutter: 1.5rem; // 24px (Tailwind 6)
-$container-padding: 1rem; // 16px (Tailwind 4)
-
-// ============================================
-// BASE CONFIG (Tailwind Compatible)
-// ============================================
-// No html font-size override needed - using browser default (16px)
+$grid-gutter: 1.5rem;
+$container-padding: 1rem;
+$tablet: 768px;
+$mobile: 576px;

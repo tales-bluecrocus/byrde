@@ -1,16 +1,15 @@
 // ============================================
-// FONT FAMILIES (Tailwind Compatible)
+// FONT FAMILIES
 // ============================================
-// Google Fonts: Lato (Headings) & Nunito (Body) loaded via enqueue.php
-// Using browser default base size (16px = 1rem) for Tailwind compatibility
 
-$font-family-heading:
+$font-family-primary:
 	"Lato",
 	-apple-system,
 	BlinkMacSystemFont,
 	"Segoe UI",
 	sans-serif;
-$font-family-body:
+
+$font-family-secondary:
 	"Nunito",
 	-apple-system,
 	BlinkMacSystemFont,
@@ -19,4 +18,5 @@ $font-family-body:
 	"Helvetica Neue",
 	Arial,
 	sans-serif;
+
 $font-family-monospace: "Courier New", Courier, monospace;

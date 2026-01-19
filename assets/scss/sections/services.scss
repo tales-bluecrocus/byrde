@@ -2,11 +2,10 @@
 @use "../generic/mixins" as *;
 
 .services-overview {
-	background: bg-color("cta");
+	@include section-theme("primary");
 	padding: spacing("4xl") 0;
 
 	&__container {
-		color: text-color("inverse");
 		max-width: 1200px;
 		margin: 0 auto;
 		padding: 0 spacing("md");
@@ -16,9 +15,7 @@
 	}
 
 	&__title {
-		font-family: font-family("heading");
-		font-size: font-size("6xl");
-		font-weight: 700;
+		@include h2;
 		text-align: center;
 		margin-bottom: spacing("lg");
 	}
@@ -26,91 +23,63 @@
 	&__description {
 		font-size: font-size("md");
 		text-align: center;
-		margin-bottom: spacing("2xl");
-		max-width: 600px;
-		margin-left: auto;
-		margin-right: auto;
-		color: text-color("inverse");
+		margin-bottom: spacing("3xl");
+		max-width: 700px;
+		opacity: 0.9;
 	}
 
 	&__items {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		gap: spacing("lg");
-		justify-items: center;
-		align-items: stretch;
-		margin-bottom: spacing("lg");
+		gap: spacing("xl");
 		width: 100%;
+
+		@include max($tablet) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include max($mobile) {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	&__item {
-		color: text-color("body");
-		background: #fff;
+		@include section-theme("gray");
+
 		border-radius: radius("xl");
-		box-shadow: 0 4px 24px 0 rgba(30, 41, 59, 0.06);
-		border: 2px solid transparent;
-		transition: border 0.2s;
-		padding: spacing("xl") spacing("lg");
-		width: 320px;
-		min-height: 260px;
+		padding: spacing("2xl") spacing("xl");
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
-		position: relative;
-		text-align: left;
-		gap: spacing("sm");
+		gap: spacing("md");
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		border-bottom: 4px solid transparent;
 
 		&:hover {
-			border: 2px solid #e5e7eb; // Tailwind gray-200
-			box-shadow: none;
+			@include section-theme("secondary");
+
+			transform: translateY(-8px);
+			border-bottom-color: $secondary-bg;
+			box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 		}
 	}
 
 	&__item-icon {
-		width: 64px;
-		height: 64px;
+		width: 60px;
+		height: 60px;
 		border-radius: radius("lg");
-		background: #f3f4f6;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		overflow: hidden;
-		transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-	}
-
-	&__item:hover &__item-icon {
-		transform: scale(1.12);
+		font-size: 2rem;
 	}
 
 	&__item-title {
-		font-family: font-family("heading");
-		font-size: font-size("xl");
-		font-weight: 700;
-		margin-bottom: spacing("xs");
-		color: text-color("heading");
+		@include h4;
+		margin: 0;
 	}
 
 	&__item-description {
 		font-size: font-size("md");
-		color: text-color("body");
-		opacity: 0.85;
-	}
-
-	@include max($tablet) {
-		&__items {
-			grid-template-columns: repeat(2, 1fr);
-			gap: spacing("md");
-		}
-		&__item {
-			width: 100%;
-			min-width: 0;
-			max-width: 400px;
-		}
-	}
-
-	@include max($mobile) {
-		&__items {
-			grid-template-columns: 1fr;
-		}
+		line-height: 1.6;
 	}
 }

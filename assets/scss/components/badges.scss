@@ -1,15 +1,14 @@
 @use "../generic/variables" as *;
 @use "../generic/mixins" as *;
 
-// Google Reviews Badge - PADRÃO ÚNICO
 .google-reviews-badge {
 	display: inline-flex;
 	flex-direction: row;
 	align-items: center;
-	gap: 0.75rem; // 12px (Tailwind 3)
-	background-color: #fff;
-	padding: 0.625rem 1rem; // 10px 16px (Tailwind 2.5 4)
-	border-radius: radius("lg"); // 8px (Tailwind lg)
+	gap: 0.75rem;
+	background-color: bg-color("white");
+	padding: 0.625rem 1rem;
+	border-radius: radius("lg");
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	color: inherit;
 
@@ -25,18 +24,18 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 0.25rem; // 4px (Tailwind 1)
+		gap: 0.25rem;
 	}
 
 	&__rating {
 		display: flex;
 		align-items: center;
-		gap: 0.375rem; // 6px (Tailwind 1.5)
+		gap: 0.375rem;
 	}
 
 	&__score {
-		font-family: font-family("heading");
-		font-size: font-size("lg"); // 18px (Tailwind lg)
+		font-family: font-family("primary");
+		font-size: font-size("lg");
 		font-weight: 700;
 		color: text-color("heading");
 		line-height: 1;
@@ -45,10 +44,10 @@
 	&__stars {
 		display: flex;
 		align-items: center;
-		gap: 0.125rem; // 2px (Tailwind 0.5)
+		gap: 0.125rem;
 
 		.material-symbols-outlined {
-			font-size: font-size("md"); // 16px (Tailwind base)
+			font-size: font-size("md");
 			color: #fbbc04;
 			line-height: 1;
 			font-variation-settings:
@@ -60,7 +59,7 @@
 	}
 
 	&__reviews {
-		font-size: font-size("xs"); // 12px (Tailwind xs)
+		font-size: font-size("xs");
 		color: text-color("body");
 		opacity: 0.7;
 		line-height: 1.2;
@@ -70,7 +69,6 @@
 		}
 	}
 
-	// Dark variant - para fundos escuros (overlay em imagens)
 	&--dark {
 		background-color: rgba(255, 255, 255, 0.1);
 		backdrop-filter: blur(10px);
@@ -86,7 +84,6 @@
 	}
 }
 
-// Generic Badge Component
 .badge {
 	display: inline-flex;
 	align-items: center;
@@ -98,30 +95,19 @@
 	line-height: 1;
 	white-space: nowrap;
 
-	// Color variants
 	&--primary {
-		background-color: button-color("primary-bg");
-		color: button-color("primary-text");
+		background-color: $primary-bg;
+		color: text-color("inverse");
 	}
 
 	&--secondary {
-		background-color: button-color("secondary-bg");
-		color: button-color("secondary-text");
+		background-color: $secondary-bg;
+		color: text-color("inverse");
 	}
 
-	&--success {
-		background-color: validation-color("success");
-		color: #ffffff;
-	}
-
-	&--error {
-		background-color: validation-color("error");
-		color: #ffffff;
-	}
-
-	&--warning {
-		background-color: validation-color("warning");
-		color: text-color("heading");
+	&--alternative {
+		background-color: $alternative-bg;
+		color: text-color("inverse");
 	}
 
 	&--light {
@@ -129,10 +115,9 @@
 		color: text-color("inverse");
 	}
 
-	// Size variants
 	&--sm {
-		padding: 0.25rem spacing("xs"); // 4px 8px (Tailwind 1 2)
-		font-size: 0.625rem; // 10px
+		padding: 0.25rem spacing("xs");
+		font-size: 0.625rem;
 	}
 
 	&--lg {
@@ -140,9 +125,8 @@
 		font-size: font-size("sm");
 	}
 
-	// With icon
 	i {
-		font-size: font-size("sm"); // 14px (Tailwind sm)
+		font-size: font-size("sm");
 		line-height: 1;
 	}
 }

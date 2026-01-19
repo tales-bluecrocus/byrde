@@ -2,7 +2,7 @@
 @use "../generic/mixins" as *;
 
 .areas-we-serve {
-	background: bg-color("cta");
+	@include section-theme("primary");
 	padding: spacing("4xl") 0;
 
 	&__container {
@@ -11,13 +11,10 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		color: text-color("inverse");
 	}
 
 	&__title {
-		font-family: font-family("heading");
-		font-size: font-size("4xl");
-		font-weight: 700;
+		@include h2;
 		text-align: center;
 		margin-bottom: spacing("md");
 	}
@@ -26,11 +23,10 @@
 		font-size: font-size("lg");
 		text-align: center;
 		margin-bottom: spacing("xl");
-		max-width: 600px;
+		max-width: 800px;
 		margin-left: auto;
 		margin-right: auto;
-		color: text-color("inverse");
-		opacity: 0.92;
+		opacity: 0.95;
 	}
 
 	&__locations {
@@ -45,48 +41,27 @@
 	}
 
 	&__location {
-		background: #fff;
-		color: text-color("body");
+		@include section-theme("white");
 		border-radius: radius("lg");
-		box-shadow: 0 2px 8px 0 rgba(30, 41, 59, 0.08);
-		padding: spacing("xs") spacing("sm");
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		padding: 0.75rem 1.25rem;
 		font-size: font-size("md");
-		font-weight: 600;
+		font-weight: 700;
 		cursor: pointer;
-		transition:
-			background 0.2s,
-			color 0.2s,
-			box-shadow 0.2s,
-			transform 0.2s;
-		border: 2px solid transparent;
-		user-select: none;
-	}
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 
-	&__location.is-active,
-	&__location:hover {
-		background: button-color("primary-bg");
-		color: text-color("inverse");
-		border: 2px solid button-color("primary-hover");
-		box-shadow: 0 4px 16px 0 rgba(30, 41, 59, 0.16);
-		transform: translateY(-2px) scale(1.04);
-	}
+		i {
+			font-size: 1.2rem;
+			opacity: 0.8;
+		}
 
-	@include max($tablet) {
-		&__container {
-			padding: 0 spacing("xs");
-		}
-		&__title {
-			font-size: font-size("2xl");
-		}
-		&__description {
-			font-size: font-size("md");
-		}
-		&__locations {
-			gap: spacing("xs");
-		}
-		&__location {
-			font-size: font-size("sm");
-			padding: spacing("xs") spacing("md");
+		&:hover {
+			@include section-theme("secondary");
+			transform: translateY(-3px);
+			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 		}
 	}
 }

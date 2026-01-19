@@ -1,5 +1,5 @@
-@use "../generic/variables" as *;
-@use "../generic/mixins" as *;
+@use "./variables" as *;
+@use "./mixins" as *;
 
 // Visibility Utilities
 .mobile-only {

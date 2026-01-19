@@ -9,7 +9,7 @@
 					gonna do it, but it was a mess. I could not have done it myself. I will use them again.
 				</blockquote>
 
-				<a href="tel:2089980054" class="btn btn--primary btn--lg btn--icon-left">
+				<a href="tel:2089980054" class="btn btn--secondary btn--lg btn--icon-left">
 					<i class="ph-bold ph-phone"></i>
 					Call For Reliable Junk Removal
 				</a>

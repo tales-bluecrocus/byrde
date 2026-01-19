@@ -2,144 +2,84 @@
 @use "../generic/mixins" as *;
 
 .testimonials {
-	background: #f8fafc;
+	@include section-theme("white");
 	padding: spacing("4xl") 0;
 
 	&__container {
-		max-width: 900px;
+		max-width: 1200px;
 		margin: 0 auto;
 		padding: 0 spacing("md");
 		text-align: center;
 	}
 
 	&__title {
-		font-family: font-family("heading");
-		font-size: font-size("4xl");
-		font-weight: 700;
-		color: text-color("heading");
+		@include h2;
 	}
 
 	&__description {
 		font-size: font-size("lg");
-		color: text-color("body");
+		margin-bottom: spacing("3xl");
+		max-width: 700px;
 		margin-left: auto;
 		margin-right: auto;
-		opacity: 0.92;
-		line-height: 1.7;
-		padding: spacing("md") spacing("lg");
-		display: inline-block;
 	}
 
 	&__carousel {
-		width: 100%;
-		overflow-x: hidden;
-		overflow-y: visible;
-		position: relative;
-		margin: 0 auto;
 		padding: spacing("md") 0;
-		background: transparent;
 	}
 
 	&__track {
 		display: flex;
 		gap: spacing("xl");
-		width: max-content;
-		align-items: center;
-	}
+		overflow-x: auto;
+		padding-bottom: spacing("lg");
 
-	&__card {
-		background: #fff;
-		border-radius: radius("lg");
-		box-shadow: 0 2px 16px 0 rgba(30, 41, 59, 0.08);
-		padding: spacing("xl") spacing("lg");
-		display: flex;
-		flex-direction: column;
-		gap: spacing("sm");
-		transition:
-			box-shadow 0.2s,
-			transform 0.2s,
-			border 0.2s;
-		border: 2px solid #efefef;
-		cursor: pointer;
-		min-width: 320px;
-		max-width: 340px;
-		flex: 0 0 auto;
-		position: relative;
-		will-change: transform;
-
-		.google-reviews-badge {
-			box-shadow: none;
-			padding: 0;
+		&::-webkit-scrollbar {
+			height: 4px;
+		}
+		&::-webkit-scrollbar-thumb {
+			border-radius: 10px;
 		}
 	}
 
-	&__card:hover {
-		border: 2px solid button-color("primary-bg");
-		z-index: 2;
+	&__card {
+		flex: 0 0 350px;
+		border-radius: radius("lg");
+		padding: spacing("2xl");
+		text-align: left;
+		display: flex;
+		flex-direction: column;
+		gap: spacing("md");
+		border: 1.5px solid #efefef;
+		transition: all 0.3s ease;
+
+		&:hover {
+			border-color: $secondary-bg;
+			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+		}
 	}
 
 	&__quote {
-		font-size: font-size("2xl");
-		color: button-color("primary-bg");
-		font-family: Georgia, serif;
-		opacity: 0.7;
-		margin-bottom: spacing("xs");
+		color: $secondary-bg;
+		font-size: 2rem;
+		height: 20px;
 	}
 
 	&__text {
-		font-size: font-size("md");
-		color: text-color("body");
-		font-family: font-family("body");
-		flex: 1;
+		font-style: italic;
+		line-height: 1.6;
+		color: var(--text-muted);
 	}
 
 	&__author {
 		display: flex;
 		align-items: center;
-		gap: spacing("md");
-	}
-
-	&__avatar {
-		width: 56px;
-		height: 56px;
-		border-radius: 50%;
-		object-fit: cover;
-		box-shadow: 0 2px 8px 0 rgba(30, 41, 59, 0.1);
-		border: 2px solid #e5e7eb;
-		background: #f3f4f6;
+		gap: spacing("sm");
+		margin-top: auto;
 	}
 
 	&__name {
-		font-family: font-family("heading");
-		font-size: font-size("md");
 		font-weight: 700;
-		color: text-color("heading");
-	}
-
-	&__role {
-		font-size: font-size("sm");
-		color: text-color("body");
-		opacity: 0.7;
-	}
-
-	@include max($tablet) {
-		&__card {
-			min-width: 260px;
-			max-width: 280px;
-			padding: spacing("md") spacing("sm");
-		}
-		&__title {
-			font-size: font-size("2xl");
-		}
-		&__description {
-			font-size: font-size("md");
-			padding: spacing("sm") spacing("md");
-		}
-		&__carousel {
-			padding: spacing("sm") 0;
-		}
-		&__track {
-			gap: spacing("md");
-		}
+		color: $primary-bg;
 	}
 }

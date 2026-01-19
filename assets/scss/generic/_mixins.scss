@@ -1,30 +1,161 @@
-@use "./_variables.scss" as *;
 @use "sass:meta";
-@use "sass:string";
-
-$tablet: 768; // Default breakpoint for tablet
-$mobile: 767; // Default breakpoint for mobile
+@use "sass:math";
+@use "variables" as *;
 
 @mixin max($breakpoint) {
-	@media (max-width: #{$breakpoint}px) {
+	@if math.is-unitless($breakpoint) {
+		$breakpoint: $breakpoint * 1px;
+	}
+	@media (max-width: $breakpoint) {
 		@content;
 	}
 }
 
 @mixin min($breakpoint) {
-	@media (min-width: #{$breakpoint}px) {
+	@if math.is-unitless($breakpoint) {
+		$breakpoint: $breakpoint * 1px;
+	}
+	@media (min-width: $breakpoint) {
 		@content;
 	}
 }
 
 @mixin between($min, $max) {
-	@media (min-width: #{$min}px) and (max-width: #{$max}px) {
+	@if math.is-unitless($min) {
+		$min: $min * 1px;
+	}
+	@if math.is-unitless($max) {
+		$max: $max * 1px;
+	}
+	@media (min-width: $min) and (max-width: $max) {
 		@content;
 	}
 }
 
-// Usage examples:
-// @include max($tablet) { ... }   // Tablet and below
-// @include max($mobile) { ... }   // Mobile and below
-// @include min(1024) { ... }  // Desktop and above
-// @include min(1440) { ... }  // Large desktop and above
+// Typography Mixins
+@mixin h1 {
+	font-family: font-family("primary");
+	font-size: font-size("5xl");
+	font-weight: 700;
+	line-height: line-height("tight");
+	color: text-color("heading");
+}
+
+@mixin h2 {
+	font-family: font-family("primary");
+	font-size: font-size("4xl");
+	font-weight: 700;
+	line-height: line-height("tight");
+	color: text-color("heading");
+}
+
+@mixin h3 {
+	font-family: font-family("primary");
+	font-size: font-size("3xl");
+	font-weight: 700;
+	line-height: line-height("tight");
+	color: text-color("heading");
+}
+
+@mixin h4 {
+	font-family: font-family("primary");
+	font-size: font-size("2xl");
+	font-weight: 700;
+	line-height: line-height("tight");
+	color: text-color("heading");
+}
+
+// Button Mixins
+@mixin btn-base {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: spacing("xs");
+	padding: 0.75rem 1.75rem;
+	border-radius: radius("md");
+	font-family: font-family("primary");
+	font-size: font-size("md");
+	font-weight: 700;
+	line-height: 1;
+	text-align: center;
+	text-decoration: none !important;
+	cursor: pointer;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	white-space: nowrap;
+	user-select: none;
+
+	&:hover {
+		opacity: 0.85;
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+		transform: none;
+		box-shadow: none;
+	}
+
+	i {
+		font-size: 1.2em;
+	}
+}
+
+@mixin btn-primary {
+	background-color: $btn-primary-bg;
+	color: $btn-primary-text;
+
+	&:hover, a, a:hover {
+		color: $btn-primary-text;
+		text-decoration: none;
+	}
+}
+
+@mixin btn-secondary {
+	background-color: $btn-secondary-bg;
+	color: $btn-secondary-text;
+
+	&:hover, a, a:hover {
+		color: $btn-secondary-text;
+		text-decoration: none;
+	}
+}
+
+@mixin btn-alternative {
+	background-color: $btn-alternative-bg;
+	color: $btn-alternative-text;
+
+	&:hover, a, a:hover {
+		color: $btn-alternative-text;
+		text-decoration: none;
+	}
+}
+
+// ============================================
+// THEME & CONTRAST PROTECTION
+// ============================================
+
+@mixin section-theme($type) {
+	@if $type == "primary" {
+		background-color: $primary-bg;
+		color: $primary-text;
+		h1, h2, h3, h4, h5, h6, p { color: inherit; }
+	} @else if $type == "secondary" {
+		background-color: $secondary-bg;
+		color: $secondary-text;
+		h1, h2, h3, h4, h5, h6, p { color: inherit; }
+	} @else if $type == "alternative" {
+		background-color: $alternative-bg;
+		color: $alternative-text;
+		h1, h2, h3, h4, h5, h6, p { color: inherit; }
+	} @else if $type == "gray" {
+		background-color: var(--bg-gray);
+		color: var(--text-muted);
+	} @else if $type == "white" {
+		background-color: var(--bg-white);
+		color: var(--text-muted);
+	}
+}

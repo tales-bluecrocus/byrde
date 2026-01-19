@@ -2,24 +2,30 @@
 @use "../generic/mixins" as *;
 
 .header {
-	position: relative;
+	position: fixed;
 	width: 100%;
 	z-index: 1000;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	background-color: bg-color("cta");
-	color: text-color("inverse");
-	box-shadow: 0 4px 24px rgba(15, 23, 42, 0.12);
-	padding: spacing("md");
-	border-radius: 0;
-	gap: spacing("sm");
+	background-color: bg-color("primary");
+	padding: spacing("sm") spacing("md");
 
 	&__container {
+		border-radius: radius("lg");
+		background-color: bg-color("primary");
+		color: text-color("inverse");
+		gap: spacing("sm");
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: spacing("sm") spacing("md");
 		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	&__group {
+		display: flex;
+		align-items: center;
+		gap: spacing("md");
 	}
 
-	// Logo area
 	&__logo {
 		flex-shrink: 0;
 
@@ -27,15 +33,6 @@
 			display: inline-block;
 			text-decoration: none;
 			color: inherit;
-		}
-
-		&--center {
-			flex: 0 0 auto;
-		}
-
-		&-text {
-			font-size: font-size("xl");
-			font-weight: font-weight("bold");
 		}
 
 		&-img {
@@ -46,26 +43,9 @@
 			@include min(769) {
 				max-height: 48px;
 			}
-
-			&--desktop {
-				display: block;
-
-				@include max($tablet) {
-					display: none;
-				}
-			}
-
-			&--mobile {
-				display: none;
-
-				@include max($tablet) {
-					display: block;
-				}
-			}
 		}
 	}
 
-	// Phone number
 	&__phone {
 		flex-shrink: 0;
 
@@ -73,132 +53,43 @@
 			display: flex;
 			align-items: center;
 			gap: spacing("xs");
-			text-decoration: none;
 			color: text-color("inverse");
 			font-size: font-size("lg");
 			font-weight: 700;
-			transition: all 0.2s ease;
-
-			&:hover {
-				opacity: 0.85;
-			}
+			transition: all 0.3s ease;
 		}
 
-		// Mobile floating action button
 		@include max($tablet) {
 			position: fixed;
-			bottom: spacing("md"); // 24px (Tailwind 6)
-			right: spacing("sm"); // 16px (Tailwind 4)
+			bottom: spacing("md");
+			right: spacing("sm");
 			z-index: 9999;
 
 			a {
-				width: 3.5rem; // 56px (Tailwind 14)
+				width: 3.5rem;
 				height: 3.5rem;
-				border-radius: 50%;
-				background-color: button-color("primary-bg");
-				box-shadow: 0 4px 16px rgba(249, 115, 22, 0.4);
+				border-radius: radius("full");
+				background-color: $primary-bg;
+				box-shadow: 0 4px 16px rgba($primary-bg, 0.4);
 				justify-content: center;
 				padding: 0;
-				gap: 0;
 
 				i {
-					font-size: font-size("2xl"); // 24px (Tailwind 2xl)
+					font-size: 1.5rem;
 				}
 
-				// Hide text on mobile
 				.header__phone-text {
 					display: none;
 				}
 
 				&:hover {
-					transform: scale(1.05);
-					box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+					transform: scale(1.1);
 				}
 			}
 		}
 	}
 
-	// CTA button
 	&__cta {
 		flex-shrink: 0;
-	}
-
-	// Variation 1: Logo Left | Phone Center-Right | CTA Right
-	&--variation-1 {
-		.header__logo {
-			order: 1;
-		}
-
-		.header__phone {
-			order: 2;
-			margin-left: auto;
-			margin-right: spacing("md");
-		}
-
-		.header__cta {
-			order: 3;
-		}
-	}
-
-	// Variation 2: Phone Left | Logo Center | Google Reviews Right
-	&--variation-2 {
-		justify-content: space-between;
-
-		.header__phone {
-			order: 1;
-		}
-
-		.header__logo--center {
-			order: 2;
-			position: absolute;
-			left: 50%;
-			transform: translateX(-50%);
-		}
-
-		.header__cta {
-			order: 3;
-		}
-	}
-
-	// Variation 3: Google Reviews Left | Logo Center | Phone Right
-	&--variation-3 {
-		justify-content: space-between;
-
-		.header__cta {
-			order: 1;
-		}
-
-		.header__logo--center {
-			order: 2;
-			position: absolute;
-			left: 50%;
-			transform: translateX(-50%);
-		}
-
-		.header__phone {
-			order: 3;
-		}
-	}
-
-	// Variations 2 and 3 need relative positioning for centered logo
-	&--variation-2,
-	&--variation-3 {
-		position: relative;
-	}
-
-	// Hide phone on mobile
-	@include max($tablet) {
-		// Phone is now floating, don't hide it
-		// &__phone {
-		// 	display: none;
-		// }
-
-		&--variation-2,
-		&--variation-3 {
-			.header__logo--center {
-				position: static;
-				transform: none;
-			}
-		}
 	}
 }

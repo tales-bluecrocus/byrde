@@ -2,75 +2,27 @@
 @use "../generic/mixins" as *;
 
 .cta-section {
-	background: bg-color("brand-primary");
+	@include section-theme("gray");
 	padding: spacing("4xl") 0;
 	text-align: center;
 
 	&__container {
-		max-width: 600px;
+		max-width: 800px;
 		margin: 0 auto;
 		padding: 0 spacing("md");
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		color: text-color("primary");
 	}
 
 	&__title {
-		font-family: font-family("heading");
-		font-size: font-size("4xl");
-		font-weight: 700;
-
+		@include h2;
 		margin-bottom: spacing("md");
 	}
 
 	&__description {
 		font-size: font-size("lg");
-
 		margin-bottom: spacing("xl");
-		opacity: 0.92;
-	}
-
-	&__button {
-		display: inline-block;
-		font-family: font-family("heading");
-		font-size: font-size("lg");
-		font-weight: 700;
-		color: text-color("inverse");
-		background: button-color("primary-bg");
-		border: none;
-		border-radius: radius("lg");
-		padding: spacing("sm") spacing("xl");
-		text-decoration: none;
-		box-shadow: 0 2px 8px 0 rgba(30, 41, 59, 0.1);
-		transition:
-			background 0.2s,
-			box-shadow 0.2s,
-			transform 0.2s;
-		cursor: pointer;
-
-		&:hover,
-		&:focus {
-			background: button-color("primary-hover");
-			box-shadow: 0 4px 16px 0 rgba(30, 41, 59, 0.16);
-			transform: translateY(-2px) scale(1.03);
-			color: text-color("inverse");
-		}
-	}
-
-	@include max($tablet) {
-		&__container {
-			padding: 0 spacing("xs");
-		}
-		&__title {
-			font-size: font-size("2xl");
-		}
-		&__description {
-			font-size: font-size("md");
-		}
-		&__button {
-			font-size: font-size("md");
-			padding: spacing("xs") spacing("lg");
-		}
+		opacity: 0.95;
 	}
 }

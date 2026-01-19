@@ -11,25 +11,27 @@
 
 <body <?php body_class(); ?>>
 
-    <header class="header header--variation-1">
+    <header class="header">
         <div class="header__container">
-        <div class="header__logo">
-            <a
-                href="<?php echo esc_url(home_url('/')); ?>">
-                <?php byrde_the_logo(); ?>
-            </a>
-        </div>
+            <div class="header__logo">
+                <a
+                    href="<?php echo esc_url(home_url('/')); ?>">
+                    <?php byrde_the_logo(); ?>
+                </a>
+            </div>
 
-        <div class="header__phone">
-            <a href="tel:1231231234" class="btn btn--transparent btn--icon-left">
-                <i class="ph-bold ph-phone"></i>
-                <span class="header__phone-text">(123) 123-1234</span>
-            </a>
-        </div>
+            <div class="header__group">
+                <div class="header__phone">
+                    <a href="tel:1231231234" class="btn btn--secondary btn--icon-left">
+                        <i class="ph-bold ph-phone"></i>
+                        <span class="header__phone-text">(123) 123-1234</span>
+                    </a>
+                </div>
 
-        <div class="header__cta">
-            <?php get_template_part('template-parts/components/google-reviews-badge'); ?>
-        </div>
+                <div class="header__cta">
+                    <?php get_template_part('template-parts/components/google-reviews-badge'); ?>
+                </div>
+            </div>
         </div>
     </header>
 
