@@ -26,26 +26,21 @@
 
 	&__carousel {
 		padding: spacing("md") 0;
+		overflow: hidden;
 	}
 
 	&__track {
 		display: flex;
+		align-items: center;
 		gap: spacing("xl");
-		overflow-x: auto;
+		will-change: transform;
 		padding-bottom: spacing("lg");
-
-		&::-webkit-scrollbar {
-			height: 4px;
-		}
-		&::-webkit-scrollbar-thumb {
-			border-radius: 10px;
-		}
 	}
 
 	&__card {
 		flex: 0 0 350px;
 		border-radius: radius("lg");
-		padding: spacing("2xl");
+		padding: spacing("lg");
 		text-align: left;
 		display: flex;
 		flex-direction: column;
@@ -75,7 +70,6 @@
 		display: flex;
 		align-items: center;
 		gap: spacing("sm");
-		margin-top: auto;
 	}
 
 	&__name {
