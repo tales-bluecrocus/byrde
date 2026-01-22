@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Otimiza scripts do WordPress (jQuery, Migrate, etc)
- * Move jQuery para o footer quando seguro e adiciona defer
+ * Optimizes WordPress scripts (jQuery, Migrate, etc)
+ * Moves jQuery to footer when safe and adds defer
  */
 add_action('wp_enqueue_scripts', function () {
     if (is_admin()) {
         return;
     }
 
-    // Move jQuery e jQuery Migrate para o footer
+    // Move jQuery and jQuery Migrate to footer
     if (!is_customize_preview()) {
         wp_scripts()->add_data('jquery', 'group', 1);
         wp_scripts()->add_data('jquery-core', 'group', 1);
@@ -18,15 +18,15 @@ add_action('wp_enqueue_scripts', function () {
 }, 100);
 
 /**
- * Adiciona defer em scripts do WordPress quando possível
+ * Adds defer to WordPress scripts when possible
  */
 add_filter('script_loader_tag', function ($tag, $handle, $src) {
-    // Apenas no front-end
+    // Front-end only
     if (is_admin()) {
         return $tag;
     }
 
-    // Lista de scripts que podem ter defer com segurança
+    // List of scripts that can safely have defer
     $defer_scripts = [
         'jquery-migrate',
         'wp-block-library',
@@ -34,7 +34,7 @@ add_filter('script_loader_tag', function ($tag, $handle, $src) {
     ];
 
     if (in_array($handle, $defer_scripts)) {
-        // Adiciona defer se ainda não existir
+        // Add defer if it doesn't already exist
         if (strpos($tag, 'defer') === false) {
             $tag = str_replace(' src', ' defer src', $tag);
         }
@@ -44,11 +44,11 @@ add_filter('script_loader_tag', function ($tag, $handle, $src) {
 }, 10, 3);
 
 /**
- * Remove CSS e JS desnecessários do WordPress
+ * Remove unnecessary CSS and JS from WordPress
  */
 add_action('wp_enqueue_scripts', function () {
     if (!is_admin()) {
-        // Remove block library CSS se não houver blocos core
+        // Remove block library CSS if there are no core blocks
         global $post;
         if ($post && !has_blocks($post->post_content)) {
             wp_dequeue_style('wp-block-library');
@@ -56,12 +56,12 @@ add_action('wp_enqueue_scripts', function () {
             wp_dequeue_style('wc-block-style');
         }
 
-        // Remove dashicons no front-end se usuário não logado
+        // Remove dashicons on front-end if user is not logged in
         if (!is_user_logged_in()) {
             wp_dequeue_style('dashicons');
         }
 
-        // Remove global styles inline se não houver blocos
+        // Remove inline global styles if there are no blocks
         if ($post && !has_blocks($post->post_content)) {
             wp_dequeue_style('global-styles');
         }

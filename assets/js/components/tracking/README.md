@@ -1,83 +1,83 @@
-# Sistema de Tracking
+# Tracking System
 
-Sistema completo de tracking para Google Ads, Meta Ads, UTMs e GTM.
+Complete tracking system for Google Ads, Meta Ads, UTMs and GTM.
 
-## Estrutura
+## Structure
 
-### 📊 tracking.js
+### tracking.js
 
-Módulo core que gerencia o dataLayer e funções helpers.
+Core module that manages dataLayer and helper functions.
 
-**Funções principais:**
+**Main functions:**
 
--   `initTracking()` - Inicializa o sistema
--   `pushEvent(event, data)` - Envia evento para dataLayer
--   `trackPageView(pageData)` - Tracking de pageview
--   `trackConversion(name, data)` - Tracking de conversão
--   `trackFormSubmit(formName, data)` - Tracking de formulário
--   `trackClick(elementName, data)` - Tracking de cliques
+-   `initTracking()` - Initializes the system
+-   `pushEvent(event, data)` - Sends event to dataLayer
+-   `trackPageView(pageData)` - Pageview tracking
+-   `trackConversion(name, data)` - Conversion tracking
+-   `trackFormSubmit(formName, data)` - Form tracking
+-   `trackClick(elementName, data)` - Click tracking
 
-### 🔗 utms.js
+### utms.js
 
-Gerencia captura e armazenamento de parâmetros UTM.
+Manages UTM parameter capture and storage.
 
-**Funções principais:**
+**Main functions:**
 
--   `initUtmTracking()` - Captura UTMs da URL automaticamente
--   `getCurrentUtms()` - Retorna UTMs atuais
--   `getStoredUtms()` - Retorna UTMs armazenados
--   `clearUtms()` - Limpa UTMs salvos
+-   `initUtmTracking()` - Captures UTMs from URL automatically
+-   `getCurrentUtms()` - Returns current UTMs
+-   `getStoredUtms()` - Returns stored UTMs
+-   `clearUtms()` - Clears saved UTMs
 
-**Parâmetros capturados:**
+**Captured parameters:**
 
 -   utm_source, utm_medium, utm_campaign, utm_term, utm_content
 -   gclid (Google), fbclid (Facebook), msclkid (Microsoft)
 
-### 📱 ads.js
+### ads.js
 
-Funções para Google Ads tracking.
+Functions for Google Ads tracking.
 
-**Funções principais:**
+**Main functions:**
 
--   `initGoogleAds(conversionId)` - Inicializa Google Ads
--   `trackGoogleAdsConversion(label, data)` - Tracking de conversão
--   `trackGoogleAdsLead(label, data)` - Tracking de lead
--   `trackGoogleAdsPurchase(label, data)` - Tracking de compra
--   `trackGoogleAdsEvent(name, data)` - Evento customizado
+-   `initGoogleAds(conversionId)` - Initializes Google Ads
+-   `trackGoogleAdsConversion(label, data)` - Conversion tracking
+-   `trackGoogleAdsLead(label, data)` - Lead tracking
+-   `trackGoogleAdsPurchase(label, data)` - Purchase tracking
+-   `trackGoogleAdsEvent(name, data)` - Custom event
 
-### 👥 capi.js
+### capi.js
 
-Funções para Meta (Facebook) Ads tracking.
+Functions for Meta (Facebook) Ads tracking.
 
-**Funções principais:**
+**Main functions:**
 
--   `initMetaPixel(pixelId)` - Inicializa Facebook Pixel
--   `trackMetaEvent(eventName, data)` - Evento padrão
--   `trackMetaLead(data)` - Tracking de lead
--   `trackMetaPurchase(data)` - Tracking de compra
--   `trackMetaAddToCart(data)` - Adicionar ao carrinho
--   `trackMetaViewContent(data)` - Visualização de conteúdo
+-   `initMetaPixel(pixelId)` - Initializes Facebook Pixel
+-   `trackMetaEvent(eventName, data)` - Standard event
+-   `trackMetaLead(data)` - Lead tracking
+-   `trackMetaPurchase(data)` - Purchase tracking
+-   `trackMetaAddToCart(data)` - Add to cart
+-   `trackMetaViewContent(data)` - Content view
 
-## Como Usar
+## How to Use
 
-### 1. Configuração Inicial
+### 1. Initial Configuration
 
-No [load.js](../load.js), descomentar e adicionar seus IDs:
+In [load.js](../load.js), uncomment and add your IDs:
 
 ```javascript
-// Descomentar e adicionar seus IDs
-initGoogleAds("AW-XXXXXXXXXX"); // Seu Google Ads Conversion ID
-initMetaPixel("XXXXXXXXXXXXXXX"); // Seu Facebook Pixel ID
+// Uncomment and add your IDs
+initGoogleAds("AW-XXXXXXXXXX"); // Your Google Ads Conversion ID
+initMetaPixel("XXXXXXXXXXXXXXX"); // Your Facebook Pixel ID
 ```
 
-### 2. Tracking de Conversões
+### 2. Conversion Tracking
 
 **Google Ads:**
 
 ```javascript
 import { trackGoogleAdsLead } from "./components/tracking/ads";
 
-// Ao enviar formulário
+// On form submission
 trackGoogleAdsLead("AW-XXXXX/YYYY", {
 	value: 100,
 	currency: "BRL",
@@ -89,7 +89,7 @@ trackGoogleAdsLead("AW-XXXXX/YYYY", {
 ```javascript
 import { trackMetaLead } from "./components/tracking/capi";
 
-// Ao enviar formulário
+// On form submission
 trackMetaLead({
 	value: 100,
 	currency: "BRL",
@@ -97,12 +97,12 @@ trackMetaLead({
 });
 ```
 
-### 3. Tracking de Eventos Customizados
+### 3. Custom Event Tracking
 
 ```javascript
 import { pushEvent } from "./components/tracking/tracking";
 
-// Evento customizado
+// Custom event
 pushEvent("custom_event", {
 	category: "engagement",
 	action: "video_play",
@@ -110,18 +110,18 @@ pushEvent("custom_event", {
 });
 ```
 
-### 4. Acessar UTMs
+### 4. Access UTMs
 
 ```javascript
 import { getCurrentUtms } from "./components/tracking/utms";
 
-// Pegar UTMs atuais
+// Get current UTMs
 const utms = getCurrentUtms();
 console.log(utms);
 // { utm_source: 'google', utm_medium: 'cpc', ... }
 ```
 
-### 5. Tracking de Formulários
+### 5. Form Tracking
 
 ```javascript
 import { trackFormSubmit } from "./components/tracking/tracking";
@@ -129,7 +129,7 @@ import { trackGoogleAdsLead } from "./components/tracking/ads";
 import { trackMetaLead } from "./components/tracking/capi";
 
 document.querySelector("#contact-form").addEventListener("submit", (e) => {
-	// Tracking genérico
+	// Generic tracking
 	trackFormSubmit("contact_form", {
 		form_location: "homepage",
 	});
@@ -144,38 +144,38 @@ document.querySelector("#contact-form").addEventListener("submit", (e) => {
 
 ## DataLayer
 
-Todos os eventos são automaticamente enviados para `window.dataLayer`, permitindo configurar triggers no GTM.
+All events are automatically sent to `window.dataLayer`, allowing you to configure triggers in GTM.
 
-**Estrutura do dataLayer:**
+**DataLayer structure:**
 
 ```javascript
 {
-  event: 'nome_do_evento',
-  // ... dados do evento
+  event: 'event_name',
+  // ... event data
 }
 ```
 
-## Eventos Disponíveis
+## Available Events
 
-| Evento                  | Descrição               |
+| Event                  | Description               |
 | ----------------------- | ----------------------- |
-| `pageview`              | Visualização de página  |
-| `conversion`            | Conversão genérica      |
-| `form_submit`           | Envio de formulário     |
-| `click`                 | Clique em elemento      |
-| `google_ads_conversion` | Conversão Google Ads    |
-| `google_ads_event`      | Evento Google Ads       |
-| `meta_ads_event`        | Evento Meta Ads         |
-| `meta_custom_event`     | Evento customizado Meta |
+| `pageview`              | Page view  |
+| `conversion`            | Generic conversion      |
+| `form_submit`           | Form submission     |
+| `click`                 | Element click      |
+| `google_ads_conversion` | Google Ads conversion    |
+| `google_ads_event`      | Google Ads event       |
+| `meta_ads_event`        | Meta Ads event         |
+| `meta_custom_event`     | Meta custom event |
 
 ## Storage
 
-**UTMs são armazenados em:**
+**UTMs are stored in:**
 
 -   localStorage: `utm_params`
--   Cookie: `utm_params` (fallback, 30 dias)
+-   Cookie: `utm_params` (fallback, 30 days)
 
-**Estrutura dos dados:**
+**Data structure:**
 
 ```javascript
 {
@@ -187,7 +187,7 @@ Todos os eventos são automaticamente enviados para `window.dataLayer`, permitin
 }
 ```
 
-## Exemplos Práticos
+## Practical Examples
 
 ### E-commerce
 
@@ -195,7 +195,7 @@ Todos os eventos são automaticamente enviados para `window.dataLayer`, permitin
 import { trackGoogleAdsPurchase } from "./components/tracking/ads";
 import { trackMetaPurchase } from "./components/tracking/capi";
 
-// Ao finalizar compra
+// On checkout completion
 const purchaseData = {
 	value: 299.9,
 	currency: "BRL",
@@ -207,14 +207,14 @@ trackGoogleAdsPurchase("AW-XXXXX/YYYY", purchaseData);
 trackMetaPurchase(purchaseData);
 ```
 
-### Landing Page de Lead
+### Lead Landing Page
 
 ```javascript
 import { trackGoogleAdsLead } from "./components/tracking/ads";
 import { trackMetaLead } from "./components/tracking/capi";
 import { trackFormSubmit } from "./components/tracking/tracking";
 
-// Formulário de captura
+// Capture form
 form.addEventListener("submit", async (e) => {
 	e.preventDefault();
 
@@ -223,24 +223,24 @@ form.addEventListener("submit", async (e) => {
 	trackGoogleAdsLead("AW-XXXXX/YYYY");
 	trackMetaLead();
 
-	// Enviar dados...
+	// Send data...
 });
 ```
 
 ## Debugging
 
-Todos os módulos fazem `console.log` das ações. Abra o DevTools para ver:
+All modules log their actions to console. Open DevTools to see:
 
--   UTMs capturados
--   Eventos enviados
--   Conversões registradas
+-   Captured UTMs
+-   Sent events
+-   Registered conversions
 
 ## GTM Integration
 
-No GTM, você pode criar triggers baseados nos eventos do dataLayer:
+In GTM, you can create triggers based on dataLayer events:
 
-**Trigger exemplo:**
+**Trigger example:**
 
--   Tipo: Evento Personalizado
--   Nome do evento: `form_submit`
--   Condição: `form_name` equals `contact_form`
+-   Type: Custom Event
+-   Event name: `form_submit`
+-   Condition: `form_name` equals `contact_form`

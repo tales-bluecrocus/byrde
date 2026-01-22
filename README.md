@@ -1,94 +1,94 @@
 # Byrde WordPress Theme
 
-Theme WordPress com atualizações automáticas via GitHub.
+WordPress theme with automatic updates via GitHub.
 
-## 🚀 Como criar uma release (versão)
+## How to create a release (version)
 
-### Passo 1: Faça suas alterações normalmente
+### Step 1: Make your changes normally
 
 ```bash
 git add .
-git commit -m "sua mensagem"
+git commit -m "your message"
 git push origin main
 ```
 
-### Passo 2: Crie a release
+### Step 2: Create the release
 
 ```bash
-# Primeira release
+# First release
 ./.config/create-release.sh 1.0.0
 
-# Próximas releases (auto-incremento)
-./.config/bump-version.sh patch    # 1.0.0 → 1.0.1 (correções)
-./.config/bump-version.sh minor    # 1.0.0 → 1.1.0 (novas funcionalidades)
-./.config/bump-version.sh major    # 1.0.0 → 2.0.0 (mudanças grandes)
+# Next releases (auto-increment)
+./.config/bump-version.sh patch    # 1.0.0 → 1.0.1 (bug fixes)
+./.config/bump-version.sh minor    # 1.0.0 → 1.1.0 (new features)
+./.config/bump-version.sh major    # 1.0.0 → 2.0.0 (breaking changes)
 ```
 
-### Passo 3: Aguarde 2-3 minutos
+### Step 3: Wait 2-3 minutes
 
-O GitHub Actions vai automaticamente:
+GitHub Actions will automatically:
 
--   ✅ Compilar os assets (CSS/JS)
--   ✅ Criar o ZIP do tema
--   ✅ Publicar a release
+-   Compile assets (CSS/JS)
+-   Create theme ZIP
+-   Publish the release
 
-Acompanhe em: `https://github.com/tales-bluecrocus/byrde/actions`
+Track progress at: `https://github.com/tales-bluecrocus/byrde/actions`
 
-### Passo 4: WordPress atualiza sozinho!
+### Step 4: WordPress updates automatically!
 
-O WordPress vai detectar a nova versão automaticamente em até 12 horas.
+WordPress will detect the new version automatically within 12 hours.
 
-Para forçar a verificação: **Aparência → Temas** no painel do WordPress.
+To force check: **Appearance → Themes** in WordPress admin panel.
 
 ---
 
-## 🛠️ Comandos úteis
+## Useful commands
 
 ```bash
-# Desenvolver localmente
+# Development mode
 npm run dev
 
-# Compilar para produção
+# Production build
 npm run build
 
-# Gerar ZIP manualmente (para testes)
+# Generate ZIP manually (for testing)
 ./.config/build-zip.sh
 ```
 
 ---
 
-## ❓ Como funciona
+## How it works
 
-1. **Você cria uma tag Git** (ex: `v1.0.1`)
-2. **GitHub Actions compila tudo** e cria um ZIP limpo
-3. **Plugin Update Checker** verifica releases no GitHub
-4. **WordPress mostra** "Atualização disponível" automaticamente
+1. **You create a Git tag** (e.g., `v1.0.1`)
+2. **GitHub Actions compiles everything** and creates a clean ZIP
+3. **Plugin Update Checker** checks for releases on GitHub
+4. **WordPress shows** "Update available" automatically
 
 ---
 
-## 🔒 Repositório privado?
+## Private repository?
 
-Se o repositório for privado, edite [`inc/update-checker.php`](inc/update-checker.php) e descomente:
+If the repository is private, edit [`inc/update-checker.php`](inc/update-checker.php) and uncomment:
 
 ```php
-$updateChecker->setAuthentication('seu-github-token-aqui');
+$updateChecker->setAuthentication('your-github-token-here');
 ```
 
-Crie um token em: https://github.com/settings/tokens (com permissão `repo`)
+Create a token at: https://github.com/settings/tokens (with `repo` permission)
 
 ---
 
-## 📚 Links úteis
+## Useful links
 
--   [Releases do tema](https://github.com/tales-bluecrocus/byrde/releases)
+-   [Theme releases](https://github.com/tales-bluecrocus/byrde/releases)
 -   [GitHub Actions](https://github.com/tales-bluecrocus/byrde/actions)
 -   [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker)
 
-# Build desenvolvimento
+# Development build
 
 npm run dev
 
-# Build produção
+# Production build
 
 npm run build
 
@@ -96,7 +96,7 @@ npm run build
 
 ---
 
-## 📊 Tracking System
+## Tracking System
 
 Complete tracking system for Google Ads, Meta Ads, UTMs and GTM integration.
 
@@ -130,7 +130,7 @@ trackMetaLead({ content_name: 'Contact Form' });
 
 ---
 
-## 🐛 Debug System
+## Debug System
 
 Smart debug system that only works when:
 
@@ -140,9 +140,9 @@ Smart debug system that only works when:
 **Available methods:**
 
 -   `debug.log()` - Standard log
--   `debug.success()` - Success (green) ✓
--   `debug.warn()` - Warning (yellow) ⚠
--   `debug.error()` - Error (red) ✖
+-   `debug.success()` - Success (green)
+-   `debug.warn()` - Warning (yellow)
+-   `debug.error()` - Error (red)
 -   `debug.group()` / `debug.groupEnd()` - Grouped logs
 -   `debug.table()` - Display tables
 
@@ -150,7 +150,7 @@ Smart debug system that only works when:
 
 ---
 
-## 📚 Mais informações
+## More information
 
 -   [Plugin Update Checker Documentation](https://github.com/YahnisElsts/plugin-update-checker)
 -   [WordPress Theme Development](https://developer.wordpress.org/themes/)

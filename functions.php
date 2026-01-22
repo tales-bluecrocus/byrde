@@ -26,7 +26,11 @@ function theme_autoload_includes($directory)
     }
 }
 
-// Automatically include all files in the "inc" directory
+// Load Design System first (required by theme-settings.php)
+require_once get_template_directory() . '/inc/design-system/color-generator.php';
+require_once get_template_directory() . '/inc/design-system/semantic-tokens.php';
+require_once get_template_directory() . '/inc/design-system/migration.php';
+
 // Automatically include all files in the "inc" directory
 theme_autoload_includes(get_template_directory() . '/inc');
 

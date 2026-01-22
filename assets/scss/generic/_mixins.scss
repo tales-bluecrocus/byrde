@@ -105,31 +105,94 @@
 }
 
 @mixin btn-primary {
-	background-color: $btn-primary-bg;
-	color: $btn-primary-text;
+	background-color: color(primary, 600);
+	color: var(--color-text-inverse);
+	border: 2px solid color(primary, 600);
 
-	&:hover, a, a:hover {
-		color: $btn-primary-text;
+	&:hover,
+	&:focus {
+		background-color: color(primary, 700);
+		border-color: color(primary, 700);
+		color: var(--color-text-inverse);
+		text-decoration: none;
+	}
+
+	&:active {
+		background-color: color(primary, 800);
+		border-color: color(primary, 800);
+	}
+
+	&:disabled {
+		background-color: color(primary, 400);
+		border-color: color(primary, 400);
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	a, a:hover {
+		color: var(--color-text-inverse);
 		text-decoration: none;
 	}
 }
 
 @mixin btn-secondary {
-	background-color: $btn-secondary-bg;
-	color: $btn-secondary-text;
+	background-color: color(secondary, 500);
+	color: var(--color-text-inverse);
+	border: 2px solid color(secondary, 500);
 
-	&:hover, a, a:hover {
-		color: $btn-secondary-text;
+	&:hover,
+	&:focus {
+		background-color: color(secondary, 600);
+		border-color: color(secondary, 600);
+		color: var(--color-text-inverse);
+		text-decoration: none;
+	}
+
+	&:active {
+		background-color: color(secondary, 700);
+		border-color: color(secondary, 700);
+	}
+
+	&:disabled {
+		background-color: color(secondary, 400);
+		border-color: color(secondary, 400);
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	a, a:hover {
+		color: var(--color-text-inverse);
 		text-decoration: none;
 	}
 }
 
 @mixin btn-alternative {
-	background-color: $btn-alternative-bg;
-	color: $btn-alternative-text;
+	background-color: color(accent, 500);
+	color: var(--color-text-inverse);
+	border: 2px solid color(accent, 500);
 
-	&:hover, a, a:hover {
-		color: $btn-alternative-text;
+	&:hover,
+	&:focus {
+		background-color: color(accent, 600);
+		border-color: color(accent, 600);
+		color: var(--color-text-inverse);
+		text-decoration: none;
+	}
+
+	&:active {
+		background-color: color(accent, 700);
+		border-color: color(accent, 700);
+	}
+
+	&:disabled {
+		background-color: color(accent, 400);
+		border-color: color(accent, 400);
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	a, a:hover {
+		color: var(--color-text-inverse);
 		text-decoration: none;
 	}
 }
@@ -140,37 +203,93 @@
 
 @mixin section-theme($type) {
 	@if $type == "primary" {
-		background-color: $primary-bg;
-		color: $primary-text;
-		h1, h2, h3, h4, h5, h6, p, li{ color: inherit; }
-		a:not(.btn) { 
-			color: $primary-link; 
-			transition: opacity 0.3s ease;
-			&:hover { opacity: 0.8; color: $primary-link; }
+		background-color: color(primary, 600);
+		color: color(primary, 50);
+
+		h1, h2, h3, h4, h5, h6, p, li {
+			color: inherit;
+		}
+
+		a:not(.btn) {
+			color: color(primary, 200);
+			transition: color 0.3s ease;
+
+			&:hover {
+				color: color(primary, 100);
+			}
 		}
 	} @else if $type == "secondary" {
-		background-color: $secondary-bg;
-		color: $secondary-text;
-		h1, h2, h3, h4, h5, h6, p, li{ color: inherit; }
-		a:not(.btn) { 
-			color: $secondary-link; 
-			transition: opacity 0.3s ease;
-			&:hover { opacity: 0.8; color: $secondary-link; }
+		background-color: color(secondary, 500);
+		color: color(secondary, 50);
+
+		h1, h2, h3, h4, h5, h6, p, li {
+			color: inherit;
+		}
+
+		a:not(.btn) {
+			color: color(secondary, 100);
+			transition: color 0.3s ease;
+
+			&:hover {
+				color: color(secondary, 50);
+			}
 		}
 	} @else if $type == "alternative" {
-		background-color: $alternative-bg;
-		color: $alternative-text;
-		h1, h2, h3, h4, h5, h6, p, li{ color: inherit; }
-		a:not(.btn) { 
-			color: $alternative-link; 
-			transition: opacity 0.3s ease;
-			&:hover { opacity: 0.8; color: $alternative-link; }
+		// Alias para accent (retrocompatibilidade)
+		background-color: color(accent, 500);
+		color: color(accent, 50);
+
+		h1, h2, h3, h4, h5, h6, p, li {
+			color: inherit;
+		}
+
+		a:not(.btn) {
+			color: color(accent, 100);
+			transition: color 0.3s ease;
+
+			&:hover {
+				color: color(accent, 50);
+			}
 		}
 	} @else if $type == "gray" {
-		background-color: var(--bg-gray);
-		color: var(--text-muted);
+		background-color: color(neutral, 100);
+		color: color(neutral, 900);
+
+		a:not(.btn) {
+			color: color(secondary, 500);
+
+			&:hover {
+				color: color(secondary, 600);
+			}
+		}
 	} @else if $type == "white" {
-		background-color: var(--bg-white);
-		color: var(--text-muted);
+		background-color: color(neutral, 50);
+		color: color(neutral, 900);
+
+		a:not(.btn) {
+			color: color(secondary, 500);
+
+			&:hover {
+				color: color(secondary, 600);
+			}
+		}
 	}
+}
+
+// ============================================
+// NEW UTILITY MIXINS
+// ============================================
+
+@mixin overlay($opacity: 0.1, $color: white) {
+	@if $color == white {
+		background-color: rgba(255, 255, 255, $opacity);
+	} @else {
+		background-color: rgba(0, 0, 0, $opacity);
+	}
+	backdrop-filter: blur(10px);
+}
+
+@mixin focus-ring($color: accent) {
+	outline: 2px solid color($color, 500);
+	outline-offset: 2px;
 }

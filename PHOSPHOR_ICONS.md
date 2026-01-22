@@ -1,10 +1,10 @@
-# Phosphor Icons - Guia de Uso
+# Phosphor Icons - Usage Guide
 
-O projeto agora tem acesso às variantes **Regular**, **Bold** e **Fill** dos ícones Phosphor.
+The project now has access to **Regular**, **Bold** and **Fill** variants of Phosphor icons.
 
-## Como usar
+## How to use
 
-### Regular (padrão)
+### Regular (default)
 
 ```html
 <i class="ph ph-arrow-right"></i>
@@ -12,7 +12,7 @@ O projeto agora tem acesso às variantes **Regular**, **Bold** e **Fill** dos í
 <i class="ph ph-envelope"></i>
 ```
 
-### Bold (mais grosso)
+### Bold (thicker)
 
 ```html
 <i class="ph-bold ph-arrow-right"></i>
@@ -20,7 +20,7 @@ O projeto agora tem acesso às variantes **Regular**, **Bold** e **Fill** dos í
 <i class="ph-bold ph-envelope"></i>
 ```
 
-### Fill (preenchido)
+### Fill (filled)
 
 ```html
 <i class="ph-fill ph-arrow-right"></i>
@@ -28,7 +28,7 @@ O projeto agora tem acesso às variantes **Regular**, **Bold** e **Fill** dos í
 <i class="ph-fill ph-envelope"></i>
 ```
 
-## Exemplos nos botões
+## Button examples
 
 ```html
 <!-- Regular -->
@@ -50,12 +50,12 @@ O projeto agora tem acesso às variantes **Regular**, **Bold** e **Fill** dos í
 </button>
 ```
 
-## Ícones comuns
+## Common icons
 
--   Setas: `arrow-right`, `arrow-left`, `arrow-up`, `arrow-down`
+-   Arrows: `arrow-right`, `arrow-left`, `arrow-up`, `arrow-down`
 -   Social: `facebook-logo`, `instagram-logo`, `twitter-logo`, `linkedin-logo`
--   Contato: `phone`, `envelope`, `map-pin`
--   Ações: `download`, `upload`, `check`, `x`, `star`
+-   Contact: `phone`, `envelope`, `map-pin`
+-   Actions: `download`, `upload`, `check`, `x`, `star`
 -   Info: `info`, `question`, `warning`, `bell`
 
-Documentação completa: https://phosphoricons.com/
+Full documentation: https://phosphoricons.com/

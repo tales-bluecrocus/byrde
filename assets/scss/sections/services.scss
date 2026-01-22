@@ -59,7 +59,7 @@
 
 			transform: translateY(-8px);
 			border-bottom-color: $secondary-bg;
-			box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+			box-shadow: 0 15px 30px rgba(var(--shadow-lg-rgb), 0.2);
 		}
 	}
 

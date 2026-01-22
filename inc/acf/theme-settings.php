@@ -353,208 +353,113 @@ if (function_exists('acf_add_local_field_group')):
             ),
 
             // ============================================
-            // Colors Settings
+            // Brand Colors (Design System)
             // ============================================
             array(
-                'key' => 'field_tab_colors',
-                'label' => 'Theme Colors',
+                'key' => 'field_tab_brand_colors',
+                'label' => 'Brand Colors',
                 'type' => 'tab',
+                'placement' => 'left',
             ),
-            
-            // Global Theme Colors
             array(
-                'key' => 'field_color_message_global',
-                'label' => 'Global Theme Colors',
+                'key' => 'field_colors_message',
                 'type' => 'message',
-            ),
-            array(
-                'key' => 'field_primary_color',
-                'label' => 'Primary Color',
-                'name' => 'primary_color',
-                'type' => 'color_picker',
-                'default_value' => '#0f172a',
-                'wrapper' => array('width' => '33'),
-            ),
-            array(
-                'key' => 'field_primary_text',
-                'label' => 'Primary Text',
-                'name' => 'primary_text',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff',
-                'wrapper' => array('width' => '33'),
-            ),
-            array(
-                'key' => 'field_primary_link',
-                'label' => 'Primary Link',
-                'name' => 'primary_link',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff', // Default to white or suitable contrast
-                'wrapper' => array('width' => '33'),
-            ),
-            array(
-                'key' => 'field_secondary_color',
-                'label' => 'Secondary Color',
-                'name' => 'secondary_color',
-                'type' => 'color_picker',
-                'default_value' => '#f97316',
-                'wrapper' => array('width' => '33'),
-            ),
-            array(
-                'key' => 'field_secondary_text',
-                'label' => 'Secondary Text',
-                'name' => 'secondary_text',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff',
-                'wrapper' => array('width' => '33'),
-            ),
-            array(
-                'key' => 'field_secondary_link',
-                'label' => 'Secondary Link',
-                'name' => 'secondary_link',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff',
-                'wrapper' => array('width' => '33'),
-            ),
-            array(
-                'key' => 'field_alternative_color',
-                'label' => 'Alternative Color',
-                'name' => 'alternative_color',
-                'type' => 'color_picker',
-                'default_value' => '#3b82f6',
-                'wrapper' => array('width' => '33'),
-            ),
-            array(
-                'key' => 'field_alternative_text',
-                'label' => 'Alternative Text',
-                'name' => 'alternative_text',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff',
-                'wrapper' => array('width' => '33'),
-            ),
-            array(
-                'key' => 'field_alternative_link',
-                'label' => 'Alternative Link',
-                'name' => 'alternative_link',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff',
-                'wrapper' => array('width' => '33'),
+                'message' => '<strong>Design System - Brand Colors</strong><br>Select the 8 base brand colors. The system will automatically generate 9 shades (50-900) for each color, plus semantic tokens for backgrounds, texts, borders and shadows.',
             ),
 
-            // Specific Button Colors
+            // Primary Brand Color
             array(
-                'key' => 'field_color_message_buttons',
-                'label' => 'Specific Button Colors',
-                'type' => 'message',
-            ),
-            array(
-                'key' => 'field_btn_primary_bg',
-                'label' => 'Button Primary BG',
-                'name' => 'btn_primary_bg',
+                'key' => 'field_brand_color_primary',
+                'label' => 'Primary',
+                'name' => 'brand_color_primary',
                 'type' => 'color_picker',
-                'default_value' => '#0f172a',
-                'wrapper' => array('width' => '50'),
-            ),
-            array(
-                'key' => 'field_btn_primary_text',
-                'label' => 'Button Primary Text',
-                'name' => 'btn_primary_text',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff',
-                'wrapper' => array('width' => '50'),
-            ),
-            array(
-                'key' => 'field_btn_secondary_bg',
-                'label' => 'Button Secondary BG',
-                'name' => 'btn_secondary_bg',
-                'type' => 'color_picker',
-                'default_value' => '#f97316',
-                'wrapper' => array('width' => '50'),
-            ),
-            array(
-                'key' => 'field_btn_secondary_text',
-                'label' => 'Button Secondary Text',
-                'name' => 'btn_secondary_text',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff',
-                'wrapper' => array('width' => '50'),
-            ),
-            array(
-                'key' => 'field_btn_alternative_bg',
-                'label' => 'Button Alternative BG',
-                'name' => 'btn_alternative_bg',
-                'type' => 'color_picker',
-                'default_value' => '#3b82f6',
-                'wrapper' => array('width' => '50'),
-            ),
-            array(
-                'key' => 'field_btn_alternative_text',
-                'label' => 'Button Alternative Text',
-                'name' => 'btn_alternative_text',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff',
-                'wrapper' => array('width' => '50'),
+                'instructions' => 'Main brand color. Used in headers, navigation and primary elements.',
+                'default_value' => '#1e3a8a',
+                'wrapper' => array('width' => '25'),
             ),
 
-            // Layout Colors
+            // Secondary Brand Color
             array(
-                'key' => 'field_color_message_layout',
-                'label' => 'Layout Colors',
-                'type' => 'message',
-            ),
-            array(
-                'key' => 'field_bg_gray',
-                'label' => 'Background Gray',
-                'name' => 'bg_gray',
+                'key' => 'field_brand_color_secondary',
+                'label' => 'Secondary',
+                'name' => 'brand_color_secondary',
                 'type' => 'color_picker',
-                'default_value' => '#f9fafb',
-                'wrapper' => array('width' => '50'),
-            ),
-            array(
-                'key' => 'field_bg_white',
-                'label' => 'Background White',
-                'name' => 'bg_white',
-                'type' => 'color_picker',
-                'default_value' => '#ffffff',
-                'wrapper' => array('width' => '50'),
+                'instructions' => 'Secondary color. Used in CTAs and highlight elements.',
+                'default_value' => '#ea580c',
+                'wrapper' => array('width' => '25'),
             ),
 
-            // Text Colors
+            // Accent Brand Color
             array(
-                'key' => 'field_color_message_text',
-                'label' => 'Text Colors',
+                'key' => 'field_brand_color_accent',
+                'label' => 'Accent',
+                'name' => 'brand_color_accent',
+                'type' => 'color_picker',
+                'instructions' => 'Accent color. Used for variations and alternative elements.',
+                'default_value' => '#0891b2',
+                'wrapper' => array('width' => '25'),
+            ),
+
+            // Neutral Color
+            array(
+                'key' => 'field_brand_color_neutral',
+                'label' => 'Neutral',
+                'name' => 'brand_color_neutral',
+                'type' => 'color_picker',
+                'instructions' => 'Neutral color (gray). Used in texts, borders and subtle backgrounds.',
+                'default_value' => '#6b7280',
+                'wrapper' => array('width' => '25'),
+            ),
+
+            // Semantic Colors Message
+            array(
+                'key' => 'field_semantic_colors_message',
                 'type' => 'message',
+                'message' => '<strong>Semantic Colors</strong><br>Colors for interface states and feedback.',
             ),
+
+            // Success Color
             array(
-                'key' => 'field_text_main',
-                'label' => 'Text Main',
-                'name' => 'text_main',
+                'key' => 'field_brand_color_success',
+                'label' => 'Success',
+                'name' => 'brand_color_success',
                 'type' => 'color_picker',
-                'default_value' => '#1e293b',
-                'wrapper' => array('width' => '50'),
+                'instructions' => 'Success color. Used in positive messages and confirmations.',
+                'default_value' => '#059669',
+                'wrapper' => array('width' => '25'),
             ),
+
+            // Warning Color
             array(
-                'key' => 'field_text_muted',
-                'label' => 'Text Muted',
-                'name' => 'text_muted',
+                'key' => 'field_brand_color_warning',
+                'label' => 'Warning',
+                'name' => 'brand_color_warning',
                 'type' => 'color_picker',
-                'default_value' => '#475569',
-                'wrapper' => array('width' => '50'),
+                'instructions' => 'Warning color. Used in alerts and warnings.',
+                'default_value' => '#d97706',
+                'wrapper' => array('width' => '25'),
             ),
+
+            // Error Color
             array(
-                'key' => 'field_link_color',
-                'label' => 'Global Link Color',
-                'name' => 'link_color',
+                'key' => 'field_brand_color_error',
+                'label' => 'Error',
+                'name' => 'brand_color_error',
                 'type' => 'color_picker',
-                'default_value' => '#f97316',
-                'wrapper' => array('width' => '50'),
+                'instructions' => 'Error color. Used in error messages and validations.',
+                'default_value' => '#dc2626',
+                'wrapper' => array('width' => '25'),
             ),
+
+            // Info Color
             array(
-                'key' => 'field_link_color_hover',
-                'label' => 'Global Link Hover',
-                'name' => 'link_color_hover',
+                'key' => 'field_brand_color_info',
+                'label' => 'Info',
+                'name' => 'brand_color_info',
                 'type' => 'color_picker',
-                'default_value' => '#0f172a',
-                'wrapper' => array('width' => '50'),
+                'instructions' => 'Informational color. Used in tips and information.',
+                'default_value' => '#0284c7',
+                'wrapper' => array('width' => '25'),
             ),
         ),
         'location' => array(
@@ -571,48 +476,112 @@ if (function_exists('acf_add_local_field_group')):
 endif;
 
 /**
- * Output Theme Design Tokens to :root
+ * Output Theme Design System CSS Variables to :root
+ *
+ * Generates color scales (50-900) from base brand colors and outputs
+ * semantic tokens for consistent theming throughout the site.
  */
 function byrde_output_theme_css_variables() {
-    ?>
-    <style type="text/css">
-        :root {
-            /* Global Theme Colors */
-            --primary-color: <?php echo get_field('primary_color', 'option') ?: '#0f172a'; ?>;
-            --primary-text: <?php echo get_field('primary_text', 'option') ?: '#ffffff'; ?>;
-            --primary-link: <?php echo get_field('primary_link', 'option') ?: '#ffffff'; ?>;
-            
-            --secondary-color: <?php echo get_field('secondary_color', 'option') ?: '#f97316'; ?>;
-            --secondary-text: <?php echo get_field('secondary_text', 'option') ?: '#ffffff'; ?>;
-            --secondary-link: <?php echo get_field('secondary_link', 'option') ?: '#ffffff'; ?>;
-            
-            --alternative-color: <?php echo get_field('alternative_color', 'option') ?: '#3b82f6'; ?>;
-            --alternative-text: <?php echo get_field('alternative_text', 'option') ?: '#ffffff'; ?>;
-            --alternative-link: <?php echo get_field('alternative_link', 'option') ?: '#ffffff'; ?>;
+	// Check cache first
+	$cache_key = 'byrde_css_vars_v1';
+	$cached    = get_transient($cache_key);
 
-            /* Specific Button Colors */
-            --btn-primary-bg: <?php echo get_field('btn_primary_bg', 'option') ?: '#0f172a'; ?>;
-            --btn-primary-text: <?php echo get_field('btn_primary_text', 'option') ?: '#ffffff'; ?>;
-            
-            --btn-secondary-bg: <?php echo get_field('btn_secondary_bg', 'option') ?: '#f97316'; ?>;
-            --btn-secondary-text: <?php echo get_field('btn_secondary_text', 'option') ?: '#ffffff'; ?>;
-            
-            --btn-alternative-bg: <?php echo get_field('btn_alternative_bg', 'option') ?: '#3b82f6'; ?>;
-            --btn-alternative-text: <?php echo get_field('btn_alternative_text', 'option') ?: '#ffffff'; ?>;
-            
-            /* Layout Colors */
-            --bg-gray: <?php echo get_field('bg_gray', 'option') ?: '#f9fafb'; ?>;
-            --bg-white: <?php echo get_field('bg_white', 'option') ?: '#ffffff'; ?>;
-            
-            /* Text Colors */
-            --text-main: <?php echo get_field('text_main', 'option') ?: '#1e293b'; ?>;
-            --text-muted: <?php echo get_field('text_muted', 'option') ?: '#475569'; ?>;
+	if ($cached && ! is_customize_preview()) {
+		echo $cached;
+		return;
+	}
 
-            /* Link Colors */
-            --link-color: <?php echo get_field('link_color', 'option') ?: '#f97316'; ?>;
-            --link-color-hover: <?php echo get_field('link_color_hover', 'option') ?: '#0f172a'; ?>;
-        }
-    </style>
-    <?php
+	// Get base colors from ACF
+	$brand_colors = array(
+		'primary'   => get_field('brand_color_primary', 'option') ?: '#1e3a8a',
+		'secondary' => get_field('brand_color_secondary', 'option') ?: '#ea580c',
+		'accent'    => get_field('brand_color_accent', 'option') ?: '#0891b2',
+		'success'   => get_field('brand_color_success', 'option') ?: '#059669',
+		'warning'   => get_field('brand_color_warning', 'option') ?: '#d97706',
+		'error'     => get_field('brand_color_error', 'option') ?: '#dc2626',
+		'info'      => get_field('brand_color_info', 'option') ?: '#0284c7',
+		'neutral'   => get_field('brand_color_neutral', 'option') ?: '#6b7280',
+	);
+
+	// Generate color scales
+	$all_scales = array();
+	foreach ($brand_colors as $name => $hex) {
+		$all_scales[ $name ] = byrde_generate_color_scale($hex, $name);
+	}
+
+	// Get semantic tokens
+	$semantic_tokens = byrde_get_semantic_token_map();
+
+	// Build CSS
+	ob_start();
+	echo "\n<style id='byrde-design-system'>\n:root {\n";
+
+	// Output color scales
+	foreach ($all_scales as $name => $scale) {
+		echo "    /* {$name} scale */\n";
+		foreach ($scale as $shade => $value) {
+			echo "    --{$name}-{$shade}: {$value['hex']};\n";
+			echo "    --{$name}-{$shade}-rgb: {$value['rgb']};\n";
+		}
+		echo "\n";
+	}
+
+	// Output semantic tokens
+	echo "    /* Semantic tokens */\n";
+	foreach ($semantic_tokens as $token => $value) {
+		if (strpos($value, 'rgba') === 0) {
+			// Literal value
+			echo "    --{$token}: {$value};\n";
+		} else {
+			// Reference to scale
+			echo "    --{$token}: var(--{$value});\n";
+		}
+	}
+
+	// Backwards compatibility aliases
+	echo "\n    /* Legacy aliases (backwards compatibility) */\n";
+	echo "    --primary-color: var(--primary-600);\n";
+	echo "    --primary-text: var(--primary-50);\n";
+	echo "    --primary-link: var(--accent-200);\n";
+	echo "    --secondary-color: var(--secondary-500);\n";
+	echo "    --secondary-text: var(--secondary-50);\n";
+	echo "    --secondary-link: var(--accent-100);\n";
+	echo "    --alternative-color: var(--accent-500);\n";
+	echo "    --alternative-text: var(--accent-50);\n";
+	echo "    --alternative-link: var(--accent-200);\n";
+	echo "    --btn-primary-bg: var(--primary-600);\n";
+	echo "    --btn-primary-text: var(--primary-50);\n";
+	echo "    --btn-secondary-bg: var(--secondary-500);\n";
+	echo "    --btn-secondary-text: var(--secondary-50);\n";
+	echo "    --btn-alternative-bg: var(--accent-500);\n";
+	echo "    --btn-alternative-text: var(--accent-50);\n";
+	echo "    --bg-gray: var(--neutral-100);\n";
+	echo "    --bg-white: var(--neutral-50);\n";
+	echo "    --text-main: var(--neutral-900);\n";
+	echo "    --text-muted: var(--neutral-500);\n";
+	echo "    --link-color: var(--secondary-500);\n";
+	echo "    --link-color-hover: var(--secondary-600);\n";
+
+	echo "}\n</style>\n";
+
+	$output = ob_get_clean();
+
+	// Cache for 24 hours
+	set_transient($cache_key, $output, DAY_IN_SECONDS);
+
+	echo $output;
 }
 add_action('wp_head', 'byrde_output_theme_css_variables');
+
+/**
+ * Clear CSS variables cache when ACF options are saved
+ */
+add_action(
+	'acf/save_post',
+	function ( $post_id ) {
+		if ($post_id === 'options') {
+			delete_transient('byrde_css_vars_v1');
+		}
+	},
+	20
+);

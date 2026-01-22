@@ -43,7 +43,7 @@
 	&__location {
 		@include section-theme("white");
 		border-radius: radius("lg");
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		box-shadow: 0 4px 12px rgba(var(--shadow-md-rgb), 0.15);
 		padding: 0.75rem 1.25rem;
 		font-size: font-size("md");
 		font-weight: 700;
@@ -61,7 +61,7 @@
 		&:hover {
 			@include section-theme("secondary");
 			transform: translateY(-3px);
-			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+			box-shadow: 0 8px 20px rgba(var(--shadow-lg-rgb), 0.2);
 		}
 	}
 }

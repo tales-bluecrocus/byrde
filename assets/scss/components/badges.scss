@@ -9,7 +9,7 @@
 	background-color: bg-color("white");
 	padding: 0.625rem 1rem;
 	border-radius: radius("lg");
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: shadow(sm);
 
 	&__logo {
 		width: 70px;
@@ -47,7 +47,7 @@
 
 		.material-symbols-outlined {
 			font-size: font-size("md");
-			color: #fbbc04;
+			color: var(--color-google-star);
 			line-height: 1;
 			font-variation-settings:
 				"FILL" 1,
@@ -69,16 +69,15 @@
 	}
 
 	&--dark {
-		background-color: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(10px);
+		@include overlay(0.1, white);
 
 		.google-reviews-badge__score {
-			color: #fff;
+			color: var(--color-text-inverse);
 		}
 
 		.google-reviews-badge__reviews {
-			color: rgba(255, 255, 255, 0.9);
-			opacity: 1;
+			color: var(--color-text-inverse);
+			opacity: 0.9;
 		}
 	}
 }
@@ -110,7 +109,7 @@
 	}
 
 	&--light {
-		background-color: rgba(255, 255, 255, 0.15);
+		@include overlay(0.15, white);
 		color: text-color("inverse");
 	}
 

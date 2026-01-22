@@ -45,12 +45,12 @@
 		display: flex;
 		flex-direction: column;
 		gap: spacing("md");
-		border: 1.5px solid #efefef;
+		border: 1.5px solid color(neutral, 200);
 		transition: all 0.3s ease;
 
 		&:hover {
 			border-color: $secondary-bg;
-			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+			box-shadow: 0 10px 25px rgba(var(--shadow-sm-rgb), 0.05);
 		}
 	}
 

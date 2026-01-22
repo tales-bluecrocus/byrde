@@ -1,6 +1,6 @@
 <?php
 
-// Suporte a menus e featured images
+// Support for menus and featured images
 add_action(
     'after_setup_theme',
     function () {
@@ -12,9 +12,9 @@ add_action(
         add_theme_support('menus');
         register_nav_menus(
             [
-                'primary' => __('Menu Principal', 'theme-olly-olly'),
-                'footer'  => __('Menu do Rodapé', 'theme-olly-olly'),
-                'footer_bottom' => __('Menu Rodapé Inferior', 'theme-olly-olly'),
+                'primary' => __('Primary Menu', 'theme-olly-olly'),
+                'footer'  => __('Footer Menu', 'theme-olly-olly'),
+                'footer_bottom' => __('Bottom Footer Menu', 'theme-olly-olly'),
             ],
         );
     },

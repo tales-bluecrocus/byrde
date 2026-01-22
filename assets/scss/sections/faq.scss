@@ -26,7 +26,7 @@
 
 	&__call-card {
 		border-radius: radius("xl");
-		box-shadow: 0 4px 32px 0 rgba($primary-bg, 0.1);
+		box-shadow: 0 4px 32px 0 rgba(var(--primary-600-rgb), 0.1);
 		padding: spacing("xl") spacing("lg");
 		display: flex;
 		align-items: center;
@@ -75,13 +75,13 @@
 
 	&__item {
 		border-radius: radius("lg");
-		box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+		box-shadow: 0 2px 12px 0 rgba(var(--shadow-sm-rgb), 0.05);
 		overflow: hidden;
 		transition: all 0.3s ease;
 		position: relative;
 
 		&--open {
-			box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.1);
+			box-shadow: 0 8px 24px 0 rgba(var(--shadow-md-rgb), 0.1);
 			.faq-section__answer {
 				display: block;
 			}
@@ -133,7 +133,7 @@
 		display: none;
 		font-size: font-size("md");
 		padding: spacing("md");
-		border-top: 1px solid #f3f4f6;
+		border-top: 1px solid color(neutral, 100);
 		line-height: line-height("relaxed");
 	}
 }

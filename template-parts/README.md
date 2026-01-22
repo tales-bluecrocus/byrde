@@ -1,26 +1,26 @@
 # Template Parts
 
-Esta pasta contém template parts (partials) do tema que são chamados via `get_template_part()`.
+This folder contains theme template parts (partials) that are called via `get_template_part()`.
 
-## Estrutura
+## Structure
 
 ```
 template-parts/
-├── components/         # Componentes reutilizáveis (badges, cards, etc.)
-└── README.md          # Este arquivo
+├── components/         # Reusable components (badges, cards, etc.)
+└── README.md          # This file
 ```
 
-## Uso
+## Usage
 
-### Componentes
+### Components
 
-Componentes são chamados usando `get_template_part()`:
+Components are called using `get_template_part()`:
 
 ```php
-// Básico
+// Basic
 <?php get_template_part('template-parts/components/google-reviews-badge'); ?>
 
-// Com argumentos
+// With arguments
 <?php get_template_part('template-parts/components/google-reviews-badge', null, [
     'variant' => 'google-reviews-badge--dark',
     'score' => '4.9',
@@ -30,12 +30,12 @@ Componentes são chamados usando `get_template_part()`:
 ]); ?>
 ```
 
-## ⚠️ Importante
+## Important
 
-**NÃO** coloque arquivos PHP funcionais (funções, classes, hooks) nesta pasta.
+**DO NOT** place functional PHP files (functions, classes, hooks) in this folder.
 
-- ✅ **template-parts/**: Template parts, partials, HTML/PHP de apresentação
-- ✅ **inc/**: Funções, classes, hooks, lógica PHP (auto-carregado)
-- ✅ **assets/**: CSS, JS, imagens, fontes
+- **template-parts/**: Template parts, partials, presentation HTML/PHP
+- **inc/**: Functions, classes, hooks, PHP logic (auto-loaded)
+- **assets/**: CSS, JS, images, fonts
 
-Template parts são carregados apenas quando explicitamente chamados via `get_template_part()`, enquanto arquivos em `inc/` são carregados automaticamente no `functions.php`.
+Template parts are loaded only when explicitly called via `get_template_part()`, while files in `inc/` are automatically loaded in `functions.php`.

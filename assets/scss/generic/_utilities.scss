@@ -1,6 +1,10 @@
 @use "mixins" as *;
+@use "variables" as *;
 
-// Utilities for Background Colors
+// ============================================
+// THEME BACKGROUND UTILITIES
+// ============================================
+
 .bg-primary {
 	@include section-theme("primary");
 }
@@ -11,4 +15,102 @@
 
 .bg-alternative {
 	@include section-theme("alternative");
+}
+
+.bg-accent {
+	@include section-theme("alternative");
+}
+
+.bg-body {
+	background-color: $bg-body;
+	color: $text-primary;
+}
+
+.bg-surface {
+	background-color: $bg-surface;
+	color: $text-primary;
+}
+
+// ============================================
+// SEMANTIC BACKGROUND UTILITIES
+// ============================================
+
+.bg-success {
+	background-color: var(--color-success-bg);
+	color: var(--color-success-text);
+}
+
+.bg-warning {
+	background-color: var(--color-warning-bg);
+	color: var(--color-warning-text);
+}
+
+.bg-error {
+	background-color: var(--color-error-bg);
+	color: var(--color-error-text);
+}
+
+.bg-info {
+	background-color: var(--color-info-bg);
+	color: var(--color-info-text);
+}
+
+// ============================================
+// TEXT COLOR UTILITIES
+// ============================================
+
+.text-primary {
+	color: $text-primary;
+}
+
+.text-secondary {
+	color: $text-secondary;
+}
+
+.text-muted {
+	color: $text-muted;
+}
+
+.text-inverse {
+	color: var(--color-text-inverse);
+}
+
+// ============================================
+// BORDER UTILITIES
+// ============================================
+
+.border {
+	border: 1px solid $border-default;
+}
+
+.border-emphasis {
+	border-color: $border-emphasis;
+}
+
+.border-primary {
+	border-color: color(primary, 500);
+}
+
+.border-secondary {
+	border-color: color(secondary, 500);
+}
+
+// ============================================
+// SHADOW UTILITIES
+// ============================================
+
+.shadow-sm {
+	box-shadow: shadow(sm);
+}
+
+.shadow-md {
+	box-shadow: shadow(md);
+}
+
+.shadow-lg {
+	box-shadow: shadow(lg);
+}
+
+.shadow-xl {
+	box-shadow: shadow(xl);
 }

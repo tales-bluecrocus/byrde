@@ -9,7 +9,7 @@
 		@include section-theme("gray");
 		padding: spacing("sm");
 		border-radius: radius("lg");
-		border: 1px solid #ececec;
+		border: 1px solid color(neutral, 200);
 		max-width: 1200px;
 		margin: 0 auto;
 
