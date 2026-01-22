@@ -5,13 +5,10 @@
 	position: fixed;
 	width: 100%;
 	z-index: 1000;
-	background-color: bg-color("primary");
 	padding: spacing("sm") spacing("md");
 
 	&__container {
 		border-radius: radius("lg");
-		background-color: bg-color("primary");
-		color: text-color("inverse");
 		gap: spacing("sm");
 		max-width: 1200px;
 		margin: 0 auto;
@@ -32,7 +29,6 @@
 		a {
 			display: inline-block;
 			text-decoration: none;
-			color: inherit;
 		}
 
 		&-img {
@@ -46,48 +42,7 @@
 		}
 	}
 
-	&__phone {
-		flex-shrink: 0;
 
-		a {
-			display: flex;
-			align-items: center;
-			gap: spacing("xs");
-			color: text-color("inverse");
-			font-size: font-size("lg");
-			font-weight: 700;
-			transition: all 0.3s ease;
-		}
-
-		@include max($tablet) {
-			position: fixed;
-			bottom: spacing("md");
-			right: spacing("sm");
-			z-index: 9999;
-
-			a {
-				width: 3.5rem;
-				height: 3.5rem;
-				border-radius: radius("full");
-				background-color: $primary-bg;
-				box-shadow: 0 4px 16px rgba($primary-bg, 0.4);
-				justify-content: center;
-				padding: 0;
-
-				i {
-					font-size: 1.5rem;
-				}
-
-				.header__phone-text {
-					display: none;
-				}
-
-				&:hover {
-					transform: scale(1.1);
-				}
-			}
-		}
-	}
 
 	&__cta {
 		flex-shrink: 0;

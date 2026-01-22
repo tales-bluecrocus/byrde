@@ -85,7 +85,7 @@
 	user-select: none;
 
 	&:hover {
-		opacity: 0.85;
+		opacity: 1;
 	}
 
 	&:active {
@@ -93,7 +93,7 @@
 	}
 
 	&:disabled {
-		opacity: 0.6;
+		opacity: 0.8;
 		cursor: not-allowed;
 		transform: none;
 		box-shadow: none;
@@ -142,15 +142,30 @@
 	@if $type == "primary" {
 		background-color: $primary-bg;
 		color: $primary-text;
-		h1, h2, h3, h4, h5, h6, p { color: inherit; }
+		h1, h2, h3, h4, h5, h6, p, li{ color: inherit; }
+		a:not(.btn) { 
+			color: $primary-link; 
+			transition: opacity 0.3s ease;
+			&:hover { opacity: 0.8; color: $primary-link; }
+		}
 	} @else if $type == "secondary" {
 		background-color: $secondary-bg;
 		color: $secondary-text;
-		h1, h2, h3, h4, h5, h6, p { color: inherit; }
+		h1, h2, h3, h4, h5, h6, p, li{ color: inherit; }
+		a:not(.btn) { 
+			color: $secondary-link; 
+			transition: opacity 0.3s ease;
+			&:hover { opacity: 0.8; color: $secondary-link; }
+		}
 	} @else if $type == "alternative" {
 		background-color: $alternative-bg;
 		color: $alternative-text;
-		h1, h2, h3, h4, h5, h6, p { color: inherit; }
+		h1, h2, h3, h4, h5, h6, p, li{ color: inherit; }
+		a:not(.btn) { 
+			color: $alternative-link; 
+			transition: opacity 0.3s ease;
+			&:hover { opacity: 0.8; color: $alternative-link; }
+		}
 	} @else if $type == "gray" {
 		background-color: var(--bg-gray);
 		color: var(--text-muted);

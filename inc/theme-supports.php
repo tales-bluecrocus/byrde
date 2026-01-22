@@ -14,6 +14,7 @@ add_action(
             [
                 'primary' => __('Menu Principal', 'theme-olly-olly'),
                 'footer'  => __('Menu do Rodapé', 'theme-olly-olly'),
+                'footer_bottom' => __('Menu Rodapé Inferior', 'theme-olly-olly'),
             ],
         );
     },

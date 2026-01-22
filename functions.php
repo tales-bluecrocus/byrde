@@ -27,4 +27,8 @@ function theme_autoload_includes($directory)
 }
 
 // Automatically include all files in the "inc" directory
+// Automatically include all files in the "inc" directory
 theme_autoload_includes(get_template_directory() . '/inc');
+
+// Disable Comments
+require_once get_template_directory() . '/inc/disable-comments.php';

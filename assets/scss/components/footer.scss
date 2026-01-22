@@ -2,7 +2,6 @@
 @use "../generic/mixins" as *;
 
 .footer {
-	@include section-theme("primary");
 	position: relative;
 	padding: spacing("4xl") 0 spacing("2xl");
 
@@ -38,7 +37,6 @@
 			}
 
 			.footer__description {
-				color: text-color("white");
 				opacity: 0.8;
 				font-size: font-size("sm");
 				line-height: line-height("normal");
@@ -57,7 +55,6 @@
 					height: 40px;
 					border-radius: radius("md");
 					background: rgba(255, 255, 255, 0.1);
-					color: text-color("inverse");
 					transition: all 0.3s ease;
 
 					i {
@@ -83,7 +80,6 @@
 		margin-bottom: spacing("md");
 
 		i {
-			color: text-color("secondary");
 			font-size: 1.5rem;
 		}
 	}
@@ -98,7 +94,6 @@
 		}
 
 		a {
-			color: text-color("inverse");
 			opacity: 0.8;
 			font-size: font-size("sm");
 			transition: all 0.3s ease;
@@ -107,7 +102,6 @@
 			gap: spacing("xs");
 
 			&:hover {
-				color: text-color("secondary");
 				opacity: 1;
 				transform: translateX(2px);
 			}
@@ -120,23 +114,11 @@
 			align-items: flex-start;
 			gap: spacing("sm");
 			margin-bottom: spacing("md");
-			color: text-color("inverse");
 			opacity: 0.8;
 			font-size: font-size("sm");
 
 			i {
 				font-size: 1.5rem;
-				color: $primary-bg;
-			}
-
-			a {
-				color: inherit;
-				transition: all 0.2s ease;
-
-				&:hover {
-					opacity: 1;
-					color: text-color("secondary");
-				}
 			}
 		}
 	}
@@ -155,18 +137,8 @@
 	}
 
 	&__copyright {
-		color: text-color("inverse");
 		opacity: 0.7;
 		font-size: font-size("xs");
-
-		a {
-			color: inherit;
-			transition: color 0.2s ease;
-
-			&:hover {
-				color: $primary-bg;
-			}
-		}
 	}
 
 	&__nav {
@@ -182,14 +154,12 @@
 		}
 
 		a {
-			color: text-color("inverse");
 			opacity: 0.7;
 			font-size: font-size("xs");
 			transition: all 0.2s ease;
 
 			&:hover {
 				opacity: 1;
-				color: $primary-bg;
 			}
 		}
 	}

@@ -13,9 +13,17 @@
  * @param string $source       Optional. Source name (e.g., 'Google'). Default 'Google'
  */
 
+$defaults_score = '4.9';
+$defaults_reviews = '127';
+
+if (function_exists('get_field')) {
+	$defaults_score = get_field('google_reviews_score', 'option') ?: $defaults_score;
+	$defaults_reviews = get_field('google_reviews_count', 'option') ?: $defaults_reviews;
+}
+
 $variant = isset($args['variant']) ? $args['variant'] : '';
-$score = isset($args['score']) ? $args['score'] : '4.9';
-$reviews = isset($args['reviews']) ? $args['reviews'] : '127';
+$score = isset($args['score']) ? $args['score'] : $defaults_score;
+$reviews = isset($args['reviews']) ? $args['reviews'] : $defaults_reviews;
 $show_reviews = isset($args['show_reviews']) ? $args['show_reviews'] : true;
 $show_logo = isset($args['show_logo']) ? $args['show_logo'] : true;
 $source = isset($args['source']) ? $args['source'] : 'Google';

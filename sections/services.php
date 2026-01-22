@@ -1,50 +1,42 @@
-<section class="services-overview">
+<?php
+$title = get_sub_field('title');
+$description = get_sub_field('description');
+$services = get_sub_field('services');
+$section_theme = get_sub_field('section_theme');
+$section_id = get_sub_field('section_id');
+$section_class = get_sub_field('section_class');
+
+$classes = array('services-overview');
+if ($section_theme) {
+    $classes[] = $section_theme;
+}
+$section_id_attr = $section_id ? 'id="' . esc_attr($section_id) . '"' : '';
+if ($section_class) $classes[] = $section_class;
+?>
+
+<section class="<?php echo esc_attr(implode(' ', $classes)); ?>" <?php echo $section_id_attr; ?>>
     <div class="services-overview__container">
-        <h2 class="services-overview__title">Our Junk Removal Services</h2>
-        <p class="services-overview__description">Explore our trusted services. We’re here to make junk removal simple and stress-free</p>
-        <div class="services-overview__items">
-            <div class="services-overview__item">
-                <div class="services-overview__item-icon">
-                    <img src="https://placehold.co/100x100" alt="Residential Junk Removal icon" width="64" height="64" loading="lazy" />
-                </div>
-                <h3 class="services-overview__item-title">Residential Junk Removal</h3>
-                <p class="services-overview__item-description">We haul away furniture, appliances, yard waste, and clutter. No heavy lifting for you.</p>
+        <?php if ($title): ?>
+            <h2 class="services-overview__title"><?php echo esc_html($title); ?></h2>
+        <?php endif; ?>
+        <?php if ($description): ?>
+            <p class="services-overview__description"><?php echo esc_html($description); ?></p>
+        <?php endif; ?>
+
+        <?php if ($services): ?>
+            <div class="services-overview__items">
+                <?php foreach ($services as $item): ?>
+                    <div class="services-overview__item">
+                        <?php if ($item['icon']): ?>
+                            <div class="services-overview__item-icon">
+                                <i class="<?php echo esc_attr($item['icon']); ?>"></i>
+                            </div>
+                        <?php endif; ?>
+                        <h3 class="services-overview__item-title"><?php echo esc_html($item['title']); ?></h3>
+                        <p class="services-overview__item-description"><?php echo esc_html($item['description']); ?></p>
+                    </div>
+                <?php endforeach; ?>
             </div>
-            <div class="services-overview__item">
-                <div class="services-overview__item-icon">
-                    <img src="https://placehold.co/100x100" alt="Commercial Junk Removal icon" width="64" height="64" loading="lazy" />
-                </div>
-                <h3 class="services-overview__item-title">Commercial Junk Removal</h3>
-                <p class="services-overview__item-description">Office, retail, warehouse and jobsite junk removal done fast and clean.</p>
-            </div>
-            <div class="services-overview__item">
-                <div class="services-overview__item-icon">
-                    <img src="https://placehold.co/100x100" alt="Garage Cleanouts icon" width="64" height="64" loading="lazy" />
-                </div>
-                <h3 class="services-overview__item-title">Garage Cleanouts</h3>
-                <p class="services-overview__item-description">Clear years of junk with full service pickup and disposal.</p>
-            </div>
-            <div class="services-overview__item">
-                <div class="services-overview__item-icon">
-                    <img src="https://placehold.co/100x100" alt="Basement & Estate Cleanouts icon" width="64" height="64" loading="lazy" />
-                </div>
-                <h3 class="services-overview__item-title">Basement & Estate Cleanouts</h3>
-                <p class="services-overview__item-description">Professional cleanup for estates, basements, and other spaces.</p>
-            </div>
-            <div class="services-overview__item">
-                <div class="services-overview__item-icon">
-                    <img src="https://placehold.co/100x100" alt="Appliance & Furniture Removal icon" width="64" height="64" loading="lazy" />
-                </div>
-                <h3 class="services-overview__item-title">Appliance & Furniture Removal</h3>
-                <p class="services-overview__item-description">We remove bulky appliances and furniture safely and efficiently.</p>
-            </div>
-            <div class="services-overview__item">
-                <div class="services-overview__item-icon">
-                    <img src="https://placehold.co/100x100" alt="Construction Debris Hauling icon" width="64" height="64" loading="lazy" />
-                </div>
-                <h3 class="services-overview__item-title">Construction Debris Hauling</h3>
-                <p class="services-overview__item-description">Debris removed from renovation and construction cleanups.</p>
-            </div>
-        </div>
+        <?php endif; ?>
     </div>
 </section>

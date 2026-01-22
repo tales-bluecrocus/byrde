@@ -1,27 +1,37 @@
-<section class="areas-we-serve">
+<?php
+$title = get_sub_field('title');
+$description = get_sub_field('description');
+$locations = get_sub_field('locations');
+$section_theme = get_sub_field('section_theme');
+$section_id = get_sub_field('section_id');
+$section_class = get_sub_field('section_class');
+
+$classes = array('areas-we-serve');
+if ($section_theme) {
+    $classes[] = $section_theme;
+}
+$section_id_attr = $section_id ? 'id="' . esc_attr($section_id) . '"' : '';
+if ($section_class) $classes[] = $section_class;
+?>
+
+<section class="<?php echo esc_attr(implode(' ', $classes)); ?>" <?php echo $section_id_attr; ?>>
 	<div class="areas-we-serve__container">
-		<h2 class="areas-we-serve__title">Proudly Serving Local Communities</h2>
-		<p class="areas-we-serve__description">
-			We provide fast, reliable junk removal throughout Sacramento County, Placer County, and El Dorado County.
-		</p>
-		<ul class="areas-we-serve__locations" id="areasWeServeList">
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Roseville, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Rocklin, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Lincoln, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Granite Bay, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Loomis, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Auburn, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Sacramento, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Citrus Heights, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Folsom, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Rancho Cordova, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> El Dorado Hills, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Placerville, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Cameron Park, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Fair Oaks, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Antelope, CA</li>
-			<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> Orangevale, CA</li>
-		</ul>
+		<?php if ($title): ?>
+			<h2 class="areas-we-serve__title"><?php echo esc_html($title); ?></h2>
+		<?php endif; ?>
+		<?php if ($description): ?>
+			<p class="areas-we-serve__description">
+				<?php echo esc_html($description); ?>
+			</p>
+		<?php endif; ?>
+		
+		<?php if ($locations): ?>
+			<ul class="areas-we-serve__locations" id="areasWeServeList">
+				<?php foreach ($locations as $item): ?>
+					<li class="areas-we-serve__location"><span><i class="ph ph-map-pin"></i></span> <?php echo esc_html($item['location']); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
 	</div>
 </section>
 

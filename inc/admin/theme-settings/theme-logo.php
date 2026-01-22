@@ -14,8 +14,12 @@
  */
 function byrde_get_logo($type = 'desktop')
 {
+    if (!function_exists('get_field')) {
+        return false;
+    }
+
     $key = ('mobile' === $type) ? 'logo_mobile' : 'logo';
-    $logo_id = Byrde_Theme_Settings::get_setting($key);
+    $logo_id = get_field($key, 'option');
 
     if (! $logo_id) {
         return false;
@@ -75,7 +79,12 @@ function byrde_the_logo($args = [])
  */
 function byrde_get_hero_background($size = 'full')
 {
-    $hero_bg_id = Byrde_Theme_Settings::get_setting('hero_background');
+    if (!function_exists('get_field')) {
+        return false;
+    }
+
+    // Note: 'hero_background' field needs to be added to ACF Theme Settings if used
+    $hero_bg_id = get_field('hero_background', 'option');
 
     if (! $hero_bg_id) {
         return false;

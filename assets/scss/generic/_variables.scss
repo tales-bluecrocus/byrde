@@ -45,12 +45,15 @@
 
 $primary-bg: var(--primary-color);
 $primary-text: var(--primary-text);
+$primary-link: var(--primary-link);
 
 $secondary-bg: var(--secondary-color);
 $secondary-text: var(--secondary-text);
+$secondary-link: var(--secondary-link);
 
 $alternative-bg: var(--alternative-color);
 $alternative-text: var(--alternative-text);
+$alternative-link: var(--alternative-link);
 
 // Specific Button Sass Variables
 $btn-primary-bg: var(--btn-primary-bg);
@@ -63,8 +66,8 @@ $btn-alternative-bg: var(--btn-alternative-bg);
 $btn-alternative-text: var(--btn-alternative-text);
 
 // Link Colors
-$link-color: var(--secondary-color);
-$link-color-hover: var(--primary-color);
+$link-color: var(--link-color);
+$link-color-hover: var(--link-color-hover);
 
 // ============================================
 // UTILITIES (Fluid Typography)

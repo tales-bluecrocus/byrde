@@ -1,0 +1,14 @@
+@use "mixins" as *;
+
+// Utilities for Background Colors
+.bg-primary {
+	@include section-theme("primary");
+}
+
+.bg-secondary {
+	@include section-theme("secondary");
+}
+
+.bg-alternative {
+	@include section-theme("alternative");
+}
