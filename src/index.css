@@ -1,0 +1,364 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&display=swap');
+@import "tailwindcss";
+
+/* shadcn/ui CSS Variables */
+:root {
+  --radius: 0.5rem;
+
+  /* Sidebar theme variables - defined at root for portal accessibility */
+  --sidebar-background: 0 0% 8%;
+  --sidebar-foreground: 0 0% 95%;
+  --sidebar-primary: 142 71% 45%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 15%;
+  --sidebar-accent-foreground: 0 0% 95%;
+  --sidebar-border: 0 0% 15%;
+  --sidebar-ring: 142 71% 45%;
+  --sidebar-muted: 0 0% 40%;
+  --sidebar-muted-foreground: 0 0% 65%;
+  --sidebar-card: 0 0% 10%;
+  --sidebar-card-foreground: 0 0% 95%;
+  --sidebar-popover: 0 0% 8%;
+  --sidebar-popover-foreground: 0 0% 95%;
+  --sidebar-secondary: 0 0% 15%;
+  --sidebar-secondary-foreground: 0 0% 95%;
+  --sidebar-destructive: 0 84% 60%;
+  --sidebar-destructive-foreground: 0 0% 100%;
+  --sidebar-input: 0 0% 15%;
+  --sidebar-chart-1: 142 71% 45%;
+  --sidebar-chart-2: 160 60% 45%;
+  --sidebar-chart-3: 30 80% 55%;
+  --sidebar-chart-4: 280 65% 60%;
+  --sidebar-chart-5: 340 75% 55%;
+}
+
+/* shadcn animations */
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+@keyframes enter {
+  from { opacity: var(--tw-enter-opacity, 1); transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0) scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1)) rotate(var(--tw-enter-rotate, 0)); }
+}
+
+@keyframes exit {
+  to { opacity: var(--tw-exit-opacity, 1); transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0)); }
+}
+
+.animate-accordion-down { animation: accordion-down 0.2s ease-out; }
+.animate-accordion-up { animation: accordion-up 0.2s ease-out; }
+.animate-in { animation: enter 0.2s ease-out; }
+.animate-out { animation: exit 0.15s ease-in forwards; }
+.fade-in-0 { --tw-enter-opacity: 0; }
+.fade-out-0 { --tw-exit-opacity: 0; }
+.zoom-in-95 { --tw-enter-scale: .95; }
+.zoom-out-95 { --tw-exit-scale: .95; }
+.slide-in-from-top-2 { --tw-enter-translate-y: -0.5rem; }
+.slide-in-from-bottom-2 { --tw-enter-translate-y: 0.5rem; }
+.slide-in-from-left-2 { --tw-enter-translate-x: -0.5rem; }
+.slide-in-from-right-2 { --tw-enter-translate-x: 0.5rem; }
+
+/* react-colorful overrides for sidebar theme */
+.sidebar-theme .react-colorful {
+  width: 100% !important;
+  height: 150px !important;
+}
+.sidebar-theme .react-colorful__saturation {
+  border-radius: 6px 6px 0 0 !important;
+}
+.sidebar-theme .react-colorful__hue {
+  height: 14px !important;
+  border-radius: 0 0 6px 6px !important;
+}
+.sidebar-theme .react-colorful__pointer {
+  width: 18px !important;
+  height: 18px !important;
+  border-width: 2px !important;
+}
+
+/* Sidebar theme class marker - variables are now defined in :root */
+.sidebar-theme {
+  /* This class is used as a marker for sidebar styling */
+  /* The --sidebar-* variables are defined in :root for portal accessibility */
+}
+
+@theme {
+  /* Typography - Clean & Bold */
+  --font-display: "Outfit", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+
+  /* Brand Colors - Primary Green #3ab342 */
+  --color-primary-600: #2e9035;
+  --color-primary-500: #3ab342;
+  --color-primary-400: #4fc757;
+  --color-primary-300: #7dd685;
+  --color-primary-200: #b3e8b7;
+  --color-primary-100: #e0f5e1;
+  --color-primary-50: #f0faf0;
+
+  /* Button Colors */
+  --color-button-bg: #3ab342;
+  --color-button-text: #ffffff;
+  --color-button-hover: #4fc757;
+  --color-button-active: #2e9035;
+
+  /* Text Colors - these override the base white color */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a3a3a3;
+  --color-text: var(--color-text-primary);
+  --color-text-muted: var(--color-text-secondary);
+
+  /* Override white to use text-primary */
+  --color-white: var(--color-text-primary);
+
+  /* Brand Colors - Secondary Black #000000 */
+  --color-dark-950: #000000;
+  --color-dark-900: #0a0a0a;
+  --color-dark-800: #121212;
+  --color-dark-700: #1a1a1a;
+  --color-dark-600: #262626;
+  --color-dark-500: #404040;
+  --color-dark-400: #525252;
+  --color-dark-300: #737373;
+  --color-dark-200: #a3a3a3;
+  --color-dark-100: #d4d4d4;
+  --color-dark-50: #f5f5f5;
+
+  /* Neutral Grays for Dark Mode - gray-400 uses text-secondary for themeable secondary text */
+  --color-gray-900: #0a0a0a;
+  --color-gray-800: #121212;
+  --color-gray-700: #1a1a1a;
+  --color-gray-600: #262626;
+  --color-gray-500: #404040;
+  --color-gray-400: var(--color-text-secondary);
+  --color-gray-300: #a3a3a3;
+  --color-gray-200: #d4d4d4;
+  --color-gray-100: #e5e7eb;
+  --color-gray-50: #f9fafb;
+
+  /* Accent Yellow for stars/ratings */
+  --color-yellow-400: #facc15;
+  --color-yellow-500: #eab308;
+
+  /* Animations */
+  --animate-fade-in: fade-in 0.6s ease-out forwards;
+  --animate-slide-up: slide-up 0.6s ease-out forwards;
+  --animate-slide-right: slide-right 0.6s ease-out forwards;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-right {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Base Styles - Theme Aware */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-dark-950);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Text color utilities that use theme variables */
+.text-theme-primary {
+  color: var(--color-text-primary);
+}
+
+.text-theme-secondary {
+  color: var(--color-text-secondary);
+}
+
+/* Themed Button */
+.btn-themed {
+  background-color: var(--color-button-bg);
+  color: var(--color-button-text);
+  transition: background-color 0.2s ease;
+}
+
+.btn-themed:hover {
+  background-color: var(--color-button-hover);
+}
+
+.btn-themed:active {
+  background-color: var(--color-button-active);
+}
+
+/* Custom Scrollbar - Dark Mode */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-dark-900);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-600);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dark-500);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-primary-500);
+  color: white;
+}
+
+/* Focus Styles */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+/* Stagger Animation Delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+.stagger-6 { animation-delay: 0.6s; }
+
+/* Noise Texture Overlay */
+.noise-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-400) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== Per-Section Theming ===== */
+
+/* Section backgrounds - use CSS variables with fallbacks */
+.themed-section {
+  background-color: var(--section-bg-primary, inherit);
+}
+
+.section-bg-primary {
+  background-color: var(--section-bg-primary, var(--color-dark-950));
+}
+
+.section-bg-secondary {
+  background-color: var(--section-bg-secondary, var(--color-dark-900));
+}
+
+.section-bg-tertiary {
+  background-color: var(--section-bg-tertiary, var(--color-dark-800));
+}
+
+/* Alternating section backgrounds - using secondary color for visual rhythm */
+.section-bg-even {
+  background-color: var(--section-bg-even, var(--color-dark-950));
+}
+
+.section-bg-odd {
+  background-color: var(--section-bg-odd, var(--color-dark-900));
+  position: relative;
+}
+
+/* Add subtle secondary color accent to odd sections */
+.section-bg-odd::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--section-bg-odd-accent, transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.section-bg-odd > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Section text colors */
+.section-text-primary {
+  color: var(--section-text-primary, var(--color-text-primary));
+}
+
+.section-text-secondary {
+  color: var(--section-text-secondary, var(--color-text-secondary));
+}
+
+.section-text-accent {
+  color: var(--section-text-accent, var(--color-primary-500));
+}
+
+/* Section borders */
+.section-border {
+  border-color: var(--section-border, var(--color-dark-700));
+}
+
+/* Section buttons - overrides btn-themed when inside a themed section */
+.themed-section .btn-section {
+  background-color: var(--section-button-bg, var(--color-button-bg));
+  color: var(--section-button-text, var(--color-button-text));
+  transition: background-color 0.2s ease, filter 0.2s ease;
+}
+
+.themed-section .btn-section:hover {
+  filter: brightness(1.15);
+}
+
+.themed-section .btn-section:active {
+  filter: brightness(0.9);
+}
