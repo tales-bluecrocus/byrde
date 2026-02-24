@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&display=swap');
+/* Google Fonts loaded via PHP preload in functions.php (not CSS @import) */
 @import "tailwindcss";
 
 /* shadcn/ui CSS Variables */
@@ -370,13 +370,8 @@ body {
   filter: brightness(0.9);
 }
 
-/* Button attention pulse */
-@keyframes btn-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 var(--section-button-bg, var(--color-button-bg)); }
-  50% { box-shadow: 0 0 0 8px transparent; }
-}
-
+/* Button hover lift (GPU-composited, no infinite animations) */
 .themed-section .btn-section,
 .btn-themed {
-  animation: btn-pulse 3s ease-in-out infinite;
+  will-change: transform;
 }

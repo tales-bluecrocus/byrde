@@ -5,13 +5,18 @@ THEME_DIR="$(cd "$(dirname "$0")" && pwd)"
 FRONTEND_DIR="$THEME_DIR/front-end"
 OUTPUT="$THEME_DIR/../lakecity-theme.zip"
 
+# Clean old build artifacts (prevents stale hashed files from accumulating)
+echo "Cleaning old build..."
+rm -rf "$FRONTEND_DIR/dist"
+
 # Build frontend
 echo "Building frontend..."
 cd "$FRONTEND_DIR"
 npm run build
 
-# Create zip
+# Create zip (remove old zip first)
 echo "Packaging theme..."
+rm -f "$OUTPUT"
 cd "$THEME_DIR/.."
 zip -r "$OUTPUT" lakecity/ \
   -x "lakecity/front-end/node_modules/*" \

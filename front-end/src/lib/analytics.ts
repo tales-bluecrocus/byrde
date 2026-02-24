@@ -61,16 +61,66 @@ declare global {
   }
 }
 
-// Storage key for ad attribution data
+// Storage keys
 const AD_ATTRIBUTION_KEY = 'lakecity_ad_attribution';
+const CLICK_ID_KEY = 'lakecity_click_ids';
+const CLICK_ID_EXPIRY_DAYS = 90; // Google's GCLID attribution window
+
+// Tracking params that indicate a paid/attributed visit
+const TRACKING_PARAMS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid', 'msclkid'] as const;
 
 // ============================================
 // AD ATTRIBUTION & UTM TRACKING
 // ============================================
 
 /**
- * Capture and store UTM parameters and ad click IDs
- * Call this on page load to capture attribution data
+ * Store click IDs (GCLID, FBCLID, MSCLKID) in localStorage with 90-day expiry.
+ * These persist across sessions for offline conversion tracking.
+ */
+function storeClickIds(clickIds: Record<string, string>): void {
+  if (Object.keys(clickIds).length === 0) return;
+
+  try {
+    const data = {
+      ...clickIds,
+      _stored_at: new Date().toISOString(),
+      _expires_at: new Date(Date.now() + CLICK_ID_EXPIRY_DAYS * 86400000).toISOString(),
+    };
+    localStorage.setItem(CLICK_ID_KEY, JSON.stringify(data));
+  } catch {
+    // localStorage not available
+  }
+}
+
+/**
+ * Get stored click IDs from localStorage (if not expired)
+ */
+function getStoredClickIds(): Record<string, string> {
+  try {
+    const stored = localStorage.getItem(CLICK_ID_KEY);
+    if (!stored) return {};
+
+    const data = JSON.parse(stored);
+    const expiresAt = new Date(data._expires_at).getTime();
+
+    if (Date.now() > expiresAt) {
+      localStorage.removeItem(CLICK_ID_KEY);
+      return {};
+    }
+
+    const { _stored_at: _, _expires_at: __, ...clickIds } = data;
+    return clickIds;
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Capture and store UTM parameters and ad click IDs.
+ * Call this on page load to capture attribution data.
+ *
+ * - UTM params → sessionStorage (session-scoped, first-touch wins)
+ * - Click IDs (GCLID/FBCLID/MSCLKID) → localStorage (90-day expiry for offline conversions)
  */
 export function captureAdAttribution(): AdAttributionData {
   if (typeof window === 'undefined') return {};
@@ -91,10 +141,18 @@ export function captureAdAttribution(): AdAttributionData {
     timestamp: new Date().toISOString(),
   };
 
-  // Only store if we have any attribution data
-  const hasAttribution = Object.values(attribution).some(v => v !== undefined);
+  // Check only actual tracking params (not landing_page/referrer/timestamp which are always defined)
+  const hasTrackingParams = TRACKING_PARAMS.some(key => attribution[key] !== undefined);
 
-  if (hasAttribution) {
+  // Persist click IDs to localStorage (survives session close — needed for offline conversions)
+  const clickIds: Record<string, string> = {};
+  if (attribution.gclid) clickIds.gclid = attribution.gclid;
+  if (attribution.fbclid) clickIds.fbclid = attribution.fbclid;
+  if (attribution.msclkid) clickIds.msclkid = attribution.msclkid;
+  storeClickIds(clickIds);
+
+  // Store full attribution in sessionStorage only if we have real tracking params
+  if (hasTrackingParams) {
     try {
       // Don't overwrite existing attribution (first-touch wins)
       const existing = sessionStorage.getItem(AD_ATTRIBUTION_KEY);
@@ -110,22 +168,31 @@ export function captureAdAttribution(): AdAttributionData {
 }
 
 /**
- * Get stored attribution data
+ * Get stored attribution data.
+ * Merges sessionStorage (UTM + context) with localStorage click IDs (persistent).
  */
 export function getAdAttribution(): AdAttributionData {
   if (typeof window === 'undefined') return {};
 
   try {
     const stored = sessionStorage.getItem(AD_ATTRIBUTION_KEY);
-    return stored ? JSON.parse(stored) : {};
+    const sessionData: AdAttributionData = stored ? JSON.parse(stored) : {};
+
+    // Merge persistent click IDs (localStorage survives session close)
+    const clickIds = getStoredClickIds();
+    if (clickIds.gclid && !sessionData.gclid) sessionData.gclid = clickIds.gclid;
+    if (clickIds.fbclid && !sessionData.fbclid) sessionData.fbclid = clickIds.fbclid;
+    if (clickIds.msclkid && !sessionData.msclkid) sessionData.msclkid = clickIds.msclkid;
+
+    return sessionData;
   } catch {
     return {};
   }
 }
 
 /**
- * Get attribution data for form submission
- * Includes only non-empty values
+ * Get attribution data for form submission.
+ * Includes only non-empty values.
  */
 export function getAttributionForSubmission(): Record<string, string> {
   const attribution = getAdAttribution();
@@ -184,6 +251,41 @@ export function trackFacebookCustomEvent(
 }
 
 // ============================================
+// GOOGLE ADS CONVERSION TRACKING
+// ============================================
+
+/**
+ * Get the Google Ads conversion label from WordPress settings
+ */
+function getGoogleAdsConversionLabel(): string {
+  // Injected via wp_localize_script as lakecityAnalytics
+  const analytics = (window as unknown as Record<string, unknown>).lakecityAnalytics as Record<string, string> | undefined;
+  return analytics?.gads_conversion_label || '';
+}
+
+/**
+ * Fire Google Ads conversion event
+ * Requires gads_conversion_label set in Theme Settings > Analytics
+ */
+export function trackGoogleAdsConversion(serviceType?: string): void {
+  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
+
+  const conversionLabel = getGoogleAdsConversionLabel();
+  if (!conversionLabel) return;
+
+  window.gtag('event', 'conversion', {
+    send_to: conversionLabel,
+    value: 1.0,
+    currency: 'USD',
+    ...(serviceType ? { event_label: serviceType } : {}),
+  } as Record<string, unknown>);
+
+  if (import.meta.env.DEV) {
+    console.log('[Google Ads] Conversion', conversionLabel, serviceType);
+  }
+}
+
+// ============================================
 // EVENT NAMES (Object-Action naming convention)
 // ============================================
 
@@ -235,7 +337,7 @@ export function isAnalyticsAvailable(): boolean {
 }
 
 /**
- * Push event to dataLayer (GTM compatible)
+ * Push event to dataLayer (GA4 / Site Kit compatible)
  */
 export function pushToDataLayer(event: TrackingEvent): void {
   if (typeof window === 'undefined') return;
@@ -263,7 +365,7 @@ export function trackEvent(
       )
     : undefined;
 
-  // Push to dataLayer for GTM
+  // Push to dataLayer
   pushToDataLayer({ name: eventName, properties: cleanProps });
 
   // Also send to gtag if available
@@ -299,6 +401,7 @@ export function trackCTAClick(
 
 /**
  * Track phone click (high-value conversion for local services)
+ * Fires: GA4 phone_clicked, Google Ads conversion, FB Pixel Contact
  */
 export function trackPhoneClick(location: string): void {
   const attribution = getAdAttribution();
@@ -311,6 +414,9 @@ export function trackPhoneClick(location: string): void {
     utm_campaign: attribution.utm_campaign,
     gclid: attribution.gclid,
   });
+
+  // Google Ads conversion for phone calls
+  trackGoogleAdsConversion('phone_call');
 
   // Facebook Pixel - Contact event for phone calls
   trackFacebookEvent('Contact', {
@@ -410,6 +516,7 @@ export function trackFormFieldCompleted(
 
 /**
  * Track form submission with full attribution
+ * Fires: GA4 form_submitted, GA4 lead_generated, Google Ads conversion, FB Pixel Lead
  */
 export function trackFormSubmitted(
   formName: string,
@@ -440,6 +547,9 @@ export function trackFormSubmitted(
     utm_campaign: attribution.utm_campaign,
     gclid: attribution.gclid,
   });
+
+  // Google Ads conversion event (requires gads_conversion_label in settings)
+  trackGoogleAdsConversion(formData?.service);
 
   // Facebook Pixel Lead event
   trackFacebookEvent('Lead', {

@@ -73,9 +73,9 @@ export default function TestimonialsGrid() {
                   {getInitials(testimonial.authorName)}
                 </div>
                 <div>
-                  <h4 className="font-semibold section-text-primary text-sm">
+                  <p className="font-semibold section-text-primary text-sm">
                     {testimonial.authorName}
-                  </h4>
+                  </p>
                   <p className="section-text-secondary text-xs opacity-70">
                     {testimonial.authorTitle || 'Verified Customer'}
                   </p>

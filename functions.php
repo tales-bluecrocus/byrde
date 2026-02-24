@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Include theme modules
  */
 require_once get_template_directory() . '/inc/constants.php'; // Theme constants
+require_once get_template_directory() . '/inc/required-plugins.php'; // Required plugin checks
 require_once get_template_directory() . '/inc/cleanup.php';
 require_once get_template_directory() . '/inc/validators.php'; // Input validation & sanitization
 require_once get_template_directory() . '/inc/rate-limiter.php'; // Rate limiting
@@ -83,6 +84,44 @@ function lakecity_enqueue_assets(): void {
 add_action( 'wp_enqueue_scripts', 'lakecity_enqueue_assets' );
 
 /**
+ * Preload critical resources: JS module, Google Fonts, LCP logo image
+ * Outputs early in <head> so browser discovers resources ASAP.
+ */
+function lakecity_preload_resources(): void {
+    $assets = lakecity_get_assets();
+    $dist_uri = get_template_directory_uri() . '/front-end/dist';
+
+    // Modulepreload JS bundle — browser downloads in parallel with CSS (breaks sequential chain)
+    if ( ! empty( $assets['js'] ) ) {
+        printf(
+            '<link rel="modulepreload" href="%s">' . "\n",
+            esc_url( $dist_uri . '/' . $assets['js'] )
+        );
+    }
+
+    // Preconnect to Google Fonts
+    echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
+    echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+
+    // Load Google Fonts non-blocking (media="print" trick + swap)
+    echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Outfit:wght@100..900&amp;display=swap" media="print" onload="this.media=\'all\'">' . "\n";
+    echo '<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Outfit:wght@100..900&amp;display=swap"></noscript>' . "\n";
+
+    // Preload LCP logo image with fetchpriority=high (use 'logo' 128px size)
+    $logo = lakecity_get_setting( 'logo' );
+    if ( $logo && is_array( $logo ) ) {
+        $logo_url = $logo['sizes']['logo'] ?? $logo['sizes']['thumbnail'] ?? $logo['url'] ?? '';
+        if ( ! empty( $logo_url ) ) {
+            printf(
+                '<link rel="preload" as="image" href="%s" fetchpriority="high">' . "\n",
+                esc_url( $logo_url )
+            );
+        }
+    }
+}
+add_action( 'wp_head', 'lakecity_preload_resources', 1 );
+
+/**
  * Add module type to our script
  */
 function lakecity_script_type( string $tag, string $handle ): string {
@@ -99,6 +138,9 @@ add_filter( 'script_loader_tag', 'lakecity_script_type', 10, 2 );
 function lakecity_setup(): void {
     add_theme_support( 'title-tag' );
     add_theme_support( 'html5', array( 'script', 'style' ) );
+
+    // Custom image size for logo (displayed at 64-98px, 128px = 2x retina)
+    add_image_size( 'logo', 128, 128, false );
 }
 add_action( 'after_setup_theme', 'lakecity_setup' );
 

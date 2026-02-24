@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { useSectionTheme, type SectionId } from '../../../context/SectionThemeContext';
 import { useGlobalConfig } from '../../../context/GlobalConfigContext';
-import { darkPalettes, lightPalettes, allPalettes, type SectionPalette } from '../../../config/sectionPalettes';
+import type { SectionPalette } from '../../../config/sectionPalettes';
 import { useToast } from '../../Toast';
 import { RotateCcw, Check, Palette } from 'lucide-react';
 
@@ -21,7 +21,7 @@ interface StylePanelProps {
 
 export function StylePanel({ sectionId }: StylePanelProps) {
   const { sectionThemes, updateSectionTheme, resetSectionTheme, setOverrideGlobalColors, setSectionPalette } = useSectionTheme();
-  const { globalConfig } = useGlobalConfig();
+  const { globalConfig, generatedPalettes } = useGlobalConfig();
   const { toast } = useToast();
 
   const theme = sectionThemes[sectionId] || {};
@@ -33,7 +33,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
   };
 
   const handleSelectPalette = (paletteId: string) => {
-    const palette = allPalettes.find((p: SectionPalette) => p.id === paletteId);
+    const palette = generatedPalettes.all.find((p: SectionPalette) => p.id === paletteId);
     if (palette) {
       setSectionPalette(sectionId, palette);
       toast(`Applied ${palette.name} palette`, 'success');
@@ -76,7 +76,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
             </Label>
             <p className="text-xs mb-3 text-zinc-400">Pre-designed dark color schemes</p>
             <div className="grid grid-cols-3 gap-2">
-              {darkPalettes.map((palette: SectionPalette) => {
+              {generatedPalettes.dark.map((palette: SectionPalette) => {
                 const isSelected = theme.paletteId === palette.id;
                 return (
                   <button
@@ -110,7 +110,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
             </Label>
             <p className="text-xs mb-3 text-zinc-400">Pre-designed light color schemes</p>
             <div className="grid grid-cols-3 gap-2">
-              {lightPalettes.map((palette: SectionPalette) => {
+              {generatedPalettes.light.map((palette: SectionPalette) => {
                 const isSelected = theme.paletteId === palette.id;
                 return (
                   <button

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import FeaturedTestimonial from './components/FeaturedTestimonial';
@@ -9,7 +9,6 @@ import TestimonialsGrid from './components/TestimonialsGrid';
 import FAQ from './components/FAQ';
 import FooterCTA from './components/FooterCTA';
 import Footer from './components/Footer';
-import ThemeEditor from './components/ThemeEditor';
 import ThemedSection from './components/ThemedSection';
 import PaletteInjector from './components/PaletteInjector';
 import { ToastProvider } from './components/Toast';
@@ -21,6 +20,9 @@ import { ContentProvider } from './context/ContentContext';
 import { useSettings } from './hooks/useSettings';
 import { useScrollDepthTracking, useAdAttributionCapture } from './hooks/useAnalytics';
 import { trackPhoneClick } from './lib/analytics';
+
+// Lazy-load editor-only code (ThemeEditor + react-colorful, shadcn Sheet/Tabs etc.)
+const ThemeEditor = lazy(() => import('./components/ThemeEditor'));
 
 const isDev = import.meta.env.DEV;
 
@@ -59,7 +61,7 @@ function ScrollToTopButton() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed z-60 flex items-center justify-center w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/70 hover:bg-white/20 hover:text-white transition-all duration-300 active:scale-95 shadow-lg shadow-black/20 bottom-6 right-6 sm:bottom-8 sm:right-8"
+      className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 flex items-center justify-center w-11 h-11 rounded-full bg-zinc-800 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 hover:text-white hover:border-zinc-500 transition-all duration-300 active:scale-90 shadow-xl shadow-black/40"
       aria-label="Scroll to top"
     >
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
@@ -171,7 +173,9 @@ function EditorLayout() {
       </div>
       <FloatingPhoneButton />
       <ScrollToTopButton />
-      <ThemeEditor />
+      <Suspense fallback={null}>
+        <ThemeEditor />
+      </Suspense>
     </>
   );
 }

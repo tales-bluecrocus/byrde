@@ -39,15 +39,11 @@ export interface ACFSettings {
   youtube_url?: string;
   yelp_url?: string;
 
-  // SEO (new fields)
+  // SEO
   site_name?: string;
+  site_tagline?: string;
   site_description?: string;
   og_image?: string;
-  schema_type?: 'LocalBusiness' | 'Organization' | 'Service';
-  schema_price_range?: string;
-  schema_geo_lat?: string;
-  schema_geo_lng?: string;
-  schema_area_served?: string[];
 }
 
 // ============================================
@@ -128,7 +124,7 @@ export interface WPMedia {
 }
 
 // ============================================
-// GA4 / GTM
+// GA4
 // ============================================
 
 export type GtagCommand = 'config' | 'event' | 'set' | 'consent' | 'js';

@@ -2,7 +2,7 @@
 /**
  * Analytics Integration
  *
- * Injects GA4, GTM, and Facebook Pixel scripts based on Theme Settings.
+ * Injects GA4 and Facebook Pixel scripts based on Theme Settings.
  *
  * @package LakeCity
  */
@@ -42,55 +42,6 @@ function lakecity_inject_ga4(): void {
     <?php
 }
 add_action( 'wp_head', 'lakecity_inject_ga4', 1 );
-
-/**
- * Inject Google Tag Manager (head)
- */
-function lakecity_inject_gtm_head(): void {
-    $settings = lakecity_get_all_settings();
-    $gtm_id   = $settings['gtm_container_id'] ?? '';
-    if ( empty( $gtm_id ) ) {
-        return;
-    }
-
-    // Don't track in preview mode or admin
-    if ( is_admin() || isset( $_GET['lakecity_preview'] ) ) {
-        return;
-    }
-    ?>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','<?php echo esc_js( $gtm_id ); ?>');</script>
-    <!-- End Google Tag Manager -->
-    <?php
-}
-add_action( 'wp_head', 'lakecity_inject_gtm_head', 1 );
-
-/**
- * Inject Google Tag Manager (body - noscript fallback)
- */
-function lakecity_inject_gtm_body(): void {
-    $settings = lakecity_get_all_settings();
-    $gtm_id   = $settings['gtm_container_id'] ?? '';
-    if ( empty( $gtm_id ) ) {
-        return;
-    }
-
-    // Don't track in preview mode or admin
-    if ( is_admin() || isset( $_GET['lakecity_preview'] ) ) {
-        return;
-    }
-    ?>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?php echo esc_attr( $gtm_id ); ?>"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    <?php
-}
-add_action( 'wp_body_open', 'lakecity_inject_gtm_body', 1 );
 
 /**
  * Inject Facebook/Meta Pixel
@@ -135,9 +86,9 @@ function lakecity_analytics_localize_script(): void {
     $settings = lakecity_get_all_settings();
 
     $analytics_settings = array(
-        'ga_measurement_id' => $settings['ga_measurement_id'] ?? '',
-        'gtm_container_id'  => $settings['gtm_container_id'] ?? '',
-        'fb_pixel_id'       => $settings['fb_pixel_id'] ?? '',
+        'ga_measurement_id'     => $settings['ga_measurement_id'] ?? '',
+        'fb_pixel_id'           => $settings['fb_pixel_id'] ?? '',
+        'gads_conversion_label' => $settings['gads_conversion_label'] ?? '',
     );
 
     // Only include non-empty values

@@ -78,6 +78,9 @@ export default function Footer() {
                   <img
                     src={logo}
                     alt={logoAlt}
+                    width={56}
+                    height={56}
+                    loading="lazy"
                     className="w-auto h-12 sm:h-14"
                   />
                 </div>

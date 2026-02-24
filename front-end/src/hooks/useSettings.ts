@@ -30,7 +30,7 @@ export interface ThemeSettings {
   youtube_url: string;
   yelp_url: string;
 
-  // SEO
+  // SEO (site_name/tagline come from WP Settings > General)
   site_name: string;
   site_tagline: string;
   site_description: string;
@@ -38,25 +38,12 @@ export interface ThemeSettings {
   site_url: string;
   og_image: string;
 
-  // Schema
-  schema_type: 'LocalBusiness' | 'HomeAndConstructionBusiness' | 'ProfessionalService' | 'Organization';
-  schema_price_range: string;
-  schema_street: string;
-  schema_city: string;
-  schema_state: string;
-  schema_postal: string;
-  schema_country: string;
-  schema_geo_lat: string;
-  schema_geo_lng: string;
-  schema_service_radius: string;
-  schema_opening_hours: string;
-
   // Analytics
   ga_measurement_id: string;
-  gtm_container_id: string;
   fb_pixel_id: string;
+  gads_conversion_label: string;
 
-  // Legal pages (not from ACF, from page slugs)
+  // Legal pages
   privacy_policy_url: string;
   terms_url: string;
   cookie_settings_url: string;
@@ -94,7 +81,7 @@ const DEFAULT_SETTINGS: ThemeSettings = {
   youtube_url: '',
   yelp_url: '',
 
-  // SEO - NO defaults, must be configured
+  // SEO (site_name/tagline from WP Settings > General)
   site_name: '',
   site_tagline: '',
   site_description: '',
@@ -102,23 +89,10 @@ const DEFAULT_SETTINGS: ThemeSettings = {
   site_url: '',
   og_image: '',
 
-  // Schema - Minimal defaults
-  schema_type: 'LocalBusiness',
-  schema_price_range: '$$',
-  schema_street: '',
-  schema_city: '',
-  schema_state: '',
-  schema_postal: '',
-  schema_country: 'US',
-  schema_geo_lat: '',
-  schema_geo_lng: '',
-  schema_service_radius: '50',
-  schema_opening_hours: '',
-
   // Analytics - NO defaults
   ga_measurement_id: '',
-  gtm_container_id: '',
   fb_pixel_id: '',
+  gads_conversion_label: '',
 
   // Legal pages
   privacy_policy_url: '/privacy-policy',

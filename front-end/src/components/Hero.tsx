@@ -11,7 +11,7 @@ import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent, type BadgeIconType } from '../context/ContentContext';
 import { useSettings } from '../hooks/useSettings';
 import { useFormTracking } from '../hooks/useAnalytics';
-import { trackFormSubmitted, trackFormError, trackPhoneClick } from '../lib/analytics';
+import { trackFormSubmitted, trackFormError, trackPhoneClick, getAttributionForSubmission } from '../lib/analytics';
 import GoogleReviewBadge from './GoogleReviewBadge';
 import { getContrastColor, lighten } from '../utils/colorUtils';
 import * as LucideIcons from 'lucide-react';
@@ -403,6 +403,7 @@ export default function Hero() {
         body: JSON.stringify({
           ...formData,
           _honeypot: (document.getElementById('lakecity_hp') as HTMLInputElement)?.value || '',
+          attribution: getAttributionForSubmission(),
         }),
       });
 
@@ -587,12 +588,14 @@ export default function Hero() {
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Honeypot - hidden from humans */}
+                    <label htmlFor="lakecity_hp" className="sr-only">Leave this empty</label>
                     <input
                       type="text"
                       id="lakecity_hp"
                       name="_honeypot"
                       tabIndex={-1}
                       autoComplete="off"
+                      aria-hidden="true"
                       style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
                     />
                     {/* Name */}

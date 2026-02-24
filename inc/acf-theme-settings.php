@@ -188,24 +188,8 @@ function lakecity_register_acf_fields(): void {
             // === SEO TAB ===
             array(
                 'key'   => 'field_tab_seo',
-                'label' => __( 'SEO & Schema', 'lakecity' ),
+                'label' => __( 'SEO', 'lakecity' ),
                 'type'  => 'tab',
-            ),
-            array(
-                'key'          => 'field_site_name',
-                'label'        => __( 'Site/Business Name', 'lakecity' ),
-                'name'         => 'site_name',
-                'type'         => 'text',
-                'placeholder'  => 'My Business Name',
-                'instructions' => __( 'The name that appears in search results and schema.', 'lakecity' ),
-            ),
-            array(
-                'key'          => 'field_site_tagline',
-                'label'        => __( 'Site Tagline', 'lakecity' ),
-                'name'         => 'site_tagline',
-                'type'         => 'text',
-                'placeholder'  => 'Fast & Reliable Services',
-                'instructions' => __( 'Short tagline for SEO title.', 'lakecity' ),
             ),
             array(
                 'key'          => 'field_site_description',
@@ -242,106 +226,6 @@ function lakecity_register_acf_fields(): void {
                 'instructions' => __( 'Full URL including https://', 'lakecity' ),
             ),
 
-            // === SCHEMA/STRUCTURED DATA TAB ===
-            array(
-                'key'   => 'field_tab_schema',
-                'label' => __( 'Schema Data', 'lakecity' ),
-                'type'  => 'tab',
-            ),
-            array(
-                'key'           => 'field_schema_type',
-                'label'         => __( 'Business Type', 'lakecity' ),
-                'name'          => 'schema_type',
-                'type'          => 'select',
-                'choices'       => array(
-                    'LocalBusiness'            => 'Local Business',
-                    'HomeAndConstructionBusiness' => 'Home & Construction',
-                    'ProfessionalService'      => 'Professional Service',
-                    'Organization'             => 'Organization',
-                ),
-                'default_value' => 'LocalBusiness',
-            ),
-            array(
-                'key'          => 'field_schema_price_range',
-                'label'        => __( 'Price Range', 'lakecity' ),
-                'name'         => 'schema_price_range',
-                'type'         => 'select',
-                'choices'      => array(
-                    '$'    => '$ (Budget)',
-                    '$$'   => '$$ (Moderate)',
-                    '$$$'  => '$$$ (Premium)',
-                    '$$$$' => '$$$$ (Luxury)',
-                ),
-                'default_value' => '$$',
-            ),
-            array(
-                'key'          => 'field_schema_street',
-                'label'        => __( 'Street Address', 'lakecity' ),
-                'name'         => 'schema_street',
-                'type'         => 'text',
-                'placeholder'  => '123 Main Street',
-            ),
-            array(
-                'key'          => 'field_schema_city',
-                'label'        => __( 'City', 'lakecity' ),
-                'name'         => 'schema_city',
-                'type'         => 'text',
-                'placeholder'  => 'Your City',
-            ),
-            array(
-                'key'          => 'field_schema_state',
-                'label'        => __( 'State/Region', 'lakecity' ),
-                'name'         => 'schema_state',
-                'type'         => 'text',
-                'placeholder'  => 'ID',
-            ),
-            array(
-                'key'          => 'field_schema_postal',
-                'label'        => __( 'Postal Code', 'lakecity' ),
-                'name'         => 'schema_postal',
-                'type'         => 'text',
-                'placeholder'  => '83814',
-            ),
-            array(
-                'key'          => 'field_schema_country',
-                'label'        => __( 'Country', 'lakecity' ),
-                'name'         => 'schema_country',
-                'type'         => 'text',
-                'default_value' => 'US',
-            ),
-            array(
-                'key'          => 'field_schema_geo_lat',
-                'label'        => __( 'Latitude', 'lakecity' ),
-                'name'         => 'schema_geo_lat',
-                'type'         => 'text',
-                'placeholder'  => '47.6777',
-                'instructions' => __( 'For Google Maps schema (get from Google Maps).', 'lakecity' ),
-            ),
-            array(
-                'key'          => 'field_schema_geo_lng',
-                'label'        => __( 'Longitude', 'lakecity' ),
-                'name'         => 'schema_geo_lng',
-                'type'         => 'text',
-                'placeholder'  => '-116.7805',
-            ),
-            array(
-                'key'          => 'field_schema_service_radius',
-                'label'        => __( 'Service Radius (miles)', 'lakecity' ),
-                'name'         => 'schema_service_radius',
-                'type'         => 'text',
-                'placeholder'  => '50',
-                'default_value' => '50',
-            ),
-            array(
-                'key'          => 'field_schema_opening_hours',
-                'label'        => __( 'Opening Hours', 'lakecity' ),
-                'name'         => 'schema_opening_hours',
-                'type'         => 'textarea',
-                'rows'         => 4,
-                'placeholder'  => "Monday-Friday: 7AM-7PM\nSaturday: 8AM-5PM\nSunday: Closed",
-                'instructions' => __( 'One line per schedule.', 'lakecity' ),
-            ),
-
             // === ANALYTICS TAB ===
             array(
                 'key'   => 'field_tab_analytics',
@@ -357,20 +241,20 @@ function lakecity_register_acf_fields(): void {
                 'instructions' => __( 'Google Analytics 4 Measurement ID.', 'lakecity' ),
             ),
             array(
-                'key'          => 'field_gtm_container_id',
-                'label'        => __( 'GTM Container ID', 'lakecity' ),
-                'name'         => 'gtm_container_id',
-                'type'         => 'text',
-                'placeholder'  => 'GTM-XXXXXXX',
-                'instructions' => __( 'Google Tag Manager Container ID (optional, use if you prefer GTM over direct GA4).', 'lakecity' ),
-            ),
-            array(
                 'key'          => 'field_fb_pixel_id',
                 'label'        => __( 'Facebook Pixel ID', 'lakecity' ),
                 'name'         => 'fb_pixel_id',
                 'type'         => 'text',
                 'placeholder'  => '1234567890',
                 'instructions' => __( 'Facebook/Meta Pixel ID for conversion tracking.', 'lakecity' ),
+            ),
+            array(
+                'key'          => 'field_gads_conversion_label',
+                'label'        => __( 'Google Ads Conversion Label', 'lakecity' ),
+                'name'         => 'gads_conversion_label',
+                'type'         => 'text',
+                'placeholder'  => 'AW-XXXXXXXXX/YYYYYYYYYYY',
+                'instructions' => __( 'Google Ads conversion label for form submissions (format: AW-ID/LABEL). Found in Google Ads > Tools > Conversions.', 'lakecity' ),
             ),
 
             // === LEGAL PAGES TAB ===
@@ -480,11 +364,9 @@ function lakecity_get_all_settings(): array {
     $logo     = lakecity_get_setting( 'logo' );
     $og_image = lakecity_get_setting( 'og_image' );
 
-    // Get site name with fallback to WP site title
-    $site_name = lakecity_get_setting( 'site_name' );
-    if ( empty( $site_name ) ) {
-        $site_name = get_bloginfo( 'name' );
-    }
+    // Always use WordPress site title and tagline
+    $site_name    = get_bloginfo( 'name' );
+    $site_tagline = get_bloginfo( 'description' );
 
     // Get site URL with fallback to WP home URL
     $site_url = lakecity_get_setting( 'site_url' );
@@ -493,8 +375,8 @@ function lakecity_get_all_settings(): array {
     }
 
     return array(
-        // Brand
-        'logo'                 => $logo ? $logo['url'] : '',
+        // Brand — use 'logo' size (128px) for performance (displayed at 64-98px, 128px = 2x retina)
+        'logo'                 => $logo ? ( $logo['sizes']['logo'] ?? $logo['sizes']['thumbnail'] ?? $logo['url'] ) : '',
         'logo_alt'             => $logo ? ( $logo['alt'] ?: $site_name ) : $site_name,
         'phone'                => $phone,
         'phone_raw'            => $phone ? preg_replace( '/\D/', '', $phone ) : '',
@@ -518,31 +400,18 @@ function lakecity_get_all_settings(): array {
         'youtube_url'          => lakecity_get_setting( 'youtube_url' ),
         'yelp_url'             => lakecity_get_setting( 'yelp_url' ),
 
-        // SEO
+        // SEO (site_name/tagline from WP Settings > General)
         'site_name'            => $site_name,
-        'site_tagline'         => lakecity_get_setting( 'site_tagline' ),
+        'site_tagline'         => $site_tagline,
         'site_description'     => lakecity_get_setting( 'site_description' ),
         'site_keywords'        => lakecity_get_setting( 'site_keywords' ),
         'site_url'             => $site_url,
         'og_image'             => $og_image ? $og_image['url'] : '',
 
-        // Schema
-        'schema_type'          => lakecity_get_setting( 'schema_type', 'LocalBusiness' ),
-        'schema_price_range'   => lakecity_get_setting( 'schema_price_range', '$$' ),
-        'schema_street'        => lakecity_get_setting( 'schema_street' ),
-        'schema_city'          => lakecity_get_setting( 'schema_city' ),
-        'schema_state'         => lakecity_get_setting( 'schema_state' ),
-        'schema_postal'        => lakecity_get_setting( 'schema_postal' ),
-        'schema_country'       => lakecity_get_setting( 'schema_country', 'US' ),
-        'schema_geo_lat'       => lakecity_get_setting( 'schema_geo_lat' ),
-        'schema_geo_lng'       => lakecity_get_setting( 'schema_geo_lng' ),
-        'schema_service_radius' => lakecity_get_setting( 'schema_service_radius', '50' ),
-        'schema_opening_hours' => lakecity_get_setting( 'schema_opening_hours' ),
-
         // Analytics
         'ga_measurement_id'    => lakecity_get_setting( 'ga_measurement_id' ),
-        'gtm_container_id'     => lakecity_get_setting( 'gtm_container_id' ),
         'fb_pixel_id'          => lakecity_get_setting( 'fb_pixel_id' ),
+        'gads_conversion_label' => lakecity_get_setting( 'gads_conversion_label' ),
 
         // Legal Pages
         'privacy_policy_url'   => lakecity_get_setting( 'privacy_policy_url', '/privacy-policy' ),

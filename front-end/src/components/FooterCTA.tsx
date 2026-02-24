@@ -2,6 +2,7 @@ import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent } from '../context/ContentContext';
 import { getContrastColor, withAlpha } from '../utils/colorUtils';
+import { trackPhoneClick } from '../lib/analytics';
 
 const PhoneIcon = () => (
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,6 +101,7 @@ export default function FooterCTA() {
             backgroundColor: buttonBg,
             color: buttonText,
           }}
+          onClick={() => trackPhoneClick('footer_cta')}
         >
           <PhoneIcon />
           {content.ctaText}

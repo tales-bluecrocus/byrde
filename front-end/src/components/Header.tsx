@@ -6,6 +6,7 @@ import { useSectionTheme } from "../context/SectionThemeContext";
 import { useSettings } from "../hooks/useSettings";
 import GoogleReviewBadge from "./GoogleReviewBadge";
 import { getContrastColor, withAlpha } from "../utils/colorUtils";
+import { trackPhoneClick, trackEmailClick } from "../lib/analytics";
 
 const PhoneIcon = () => (
 	<svg
@@ -174,6 +175,7 @@ function Topbar() {
 								<a
 									href={`tel:${settings.phone_raw}`}
 									className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+									onClick={() => trackPhoneClick('topbar')}
 								>
 									<TopbarPhoneIcon className="w-4 h-4" />
 									<span className="text-xs sm:text-sm">{settings.phone}</span>
@@ -183,6 +185,8 @@ function Topbar() {
 								<a
 									href={`mailto:${settings.email}`}
 									className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+									aria-label={`Email ${settings.email}`}
+									onClick={() => trackEmailClick('topbar')}
 								>
 									<EmailIcon />
 									<span className="hidden sm:inline text-xs sm:text-sm">{settings.email}</span>
@@ -216,12 +220,21 @@ export default function Header() {
 	const accentColor = isOverriding ? (headerTheme.accent || globalConfig.brand.accent) : globalConfig.brand.accent;
 	const textPrimary = isOverriding ? (headerTheme.textPrimary || palette.text.primary) : palette.text.primary;
 
+	// Measure header height via ResizeObserver (avoids forced reflow from offsetHeight)
 	useEffect(() => {
-		// Measure initial header height
-		if (headerRef.current) {
-			setHeaderHeight(headerRef.current.offsetHeight);
-		}
+		const el = headerRef.current;
+		if (!el) return;
 
+		const ro = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				setHeaderHeight(entry.contentRect.height);
+			}
+		});
+		ro.observe(el);
+		return () => ro.disconnect();
+	}, []);
+
+	useEffect(() => {
 		const handleScroll = () => {
 			// Show fixed header after scrolling past the hero area (~500px)
 			// Only return to relative at the very top
@@ -229,19 +242,9 @@ export default function Header() {
 			setIsScrolled(prev => prev ? y > 0 : y > 500);
 		};
 
-		const handleResize = () => {
-			if (headerRef.current && !isScrolled) {
-				setHeaderHeight(headerRef.current.offsetHeight);
-			}
-		};
-
-		window.addEventListener("scroll", handleScroll);
-		window.addEventListener("resize", handleResize);
-		return () => {
-			window.removeEventListener("scroll", handleScroll);
-			window.removeEventListener("resize", handleResize);
-		};
-	}, [isScrolled]);
+		window.addEventListener("scroll", handleScroll, { passive: true });
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
 
 	// Determine if header should be fixed based on config and scroll state
 	const shouldBeFixed = headerConfig.isFixed && isScrolled;
@@ -309,6 +312,9 @@ export default function Header() {
 									<img
 										src={logo}
 										alt={logoAlt}
+										width={64}
+										height={64}
+										fetchPriority="high"
 										className="w-auto h-14 sm:h-16"
 									/>
 								</div>
@@ -334,6 +340,7 @@ export default function Header() {
 											backgroundColor: accentColor,
 											color: getContrastColor(accentColor),
 										}}
+										onClick={() => trackPhoneClick('header_cta')}
 									>
 										<PhoneIcon />
 										<span>{settings.phone}</span>

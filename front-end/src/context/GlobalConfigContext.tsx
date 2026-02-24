@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import {
   generateBrandPalette,
@@ -212,6 +212,13 @@ export function GlobalConfigProvider({ children }: { children: ReactNode }) {
     };
     setGeneratedPalettes(newPalettes);
   }, [globalConfig.brand]);
+
+  // Auto-regenerate palettes when brand colors change
+  useEffect(() => {
+    if (needsRegeneration) {
+      generatePalettes();
+    }
+  }, [needsRegeneration, generatePalettes]);
 
   const updateGlobalConfig = useCallback((updates: Partial<GlobalConfig>) => {
     setGlobalConfig((prev) => ({ ...prev, ...updates }));

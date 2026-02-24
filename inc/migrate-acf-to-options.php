@@ -45,7 +45,6 @@ function lakecity_migrate_acf_to_native(): array {
 		'footer'         => array(),
 		'social'         => array(),
 		'seo'            => array(),
-		'schema'         => array(),
 		'analytics'      => array(),
 		'legal'          => array(),
 	);
@@ -75,30 +74,14 @@ function lakecity_migrate_acf_to_native(): array {
 		'youtube_url'            => array( 'social', 'youtube_url' ),
 		'yelp_url'               => array( 'social', 'yelp_url' ),
 
-		// SEO
-		'site_name'              => array( 'seo', 'site_name' ),
-		'site_tagline'           => array( 'seo', 'site_tagline' ),
+		// SEO (site_name/tagline now come from WP Settings > General)
 		'site_description'       => array( 'seo', 'site_description' ),
 		'site_keywords'          => array( 'seo', 'site_keywords' ),
 		'site_url'               => array( 'seo', 'site_url' ),
 		'og_image'               => array( 'seo', 'og_image' ),
 
-		// Schema
-		'schema_type'            => array( 'schema', 'type' ),
-		'schema_price_range'     => array( 'schema', 'price_range' ),
-		'schema_street'          => array( 'schema', 'street' ),
-		'schema_city'            => array( 'schema', 'city' ),
-		'schema_state'           => array( 'schema', 'state' ),
-		'schema_postal'          => array( 'schema', 'postal' ),
-		'schema_country'         => array( 'schema', 'country' ),
-		'schema_geo_lat'         => array( 'schema', 'geo_lat' ),
-		'schema_geo_lng'         => array( 'schema', 'geo_lng' ),
-		'schema_service_radius'  => array( 'schema', 'service_radius' ),
-		'schema_opening_hours'   => array( 'schema', 'opening_hours' ),
-
 		// Analytics
 		'ga_measurement_id'      => array( 'analytics', 'ga_measurement_id' ),
-		'gtm_container_id'       => array( 'analytics', 'gtm_container_id' ),
 		'fb_pixel_id'            => array( 'analytics', 'fb_pixel_id' ),
 
 		// Legal

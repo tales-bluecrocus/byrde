@@ -63,6 +63,7 @@ function lakecity_leads_columns( array $columns ): array {
     $new_columns['email']   = 'Email';
     $new_columns['phone']   = 'Phone';
     $new_columns['service'] = 'Service';
+    $new_columns['source']  = 'Source';
     $new_columns['date']    = 'Date';
     return $new_columns;
 }
@@ -85,6 +86,21 @@ function lakecity_leads_column_content( string $column, int $post_id ): void {
             break;
         case 'service':
             echo esc_html( get_post_meta( $post_id, '_lead_service', true ) );
+            break;
+        case 'source':
+            $attribution = get_post_meta( $post_id, '_lead_attribution', true );
+            if ( is_array( $attribution ) && ! empty( $attribution['utm_source'] ) ) {
+                echo esc_html( $attribution['utm_source'] );
+                if ( ! empty( $attribution['utm_medium'] ) ) {
+                    echo ' / ' . esc_html( $attribution['utm_medium'] );
+                }
+            } elseif ( ! empty( $attribution['gclid'] ) ) {
+                echo 'Google Ads';
+            } elseif ( ! empty( $attribution['fbclid'] ) ) {
+                echo 'Facebook Ads';
+            } else {
+                echo '<span style="color:#999;">Direct</span>';
+            }
             break;
     }
 }
@@ -113,12 +129,13 @@ function lakecity_add_lead_meta_box(): void {
 add_action( 'add_meta_boxes', 'lakecity_add_lead_meta_box' );
 
 function lakecity_render_lead_meta_box( WP_Post $post ): void {
-    $email   = get_post_meta( $post->ID, '_lead_email', true );
-    $phone   = get_post_meta( $post->ID, '_lead_phone', true );
-    $service = get_post_meta( $post->ID, '_lead_service', true );
-    $message = get_post_meta( $post->ID, '_lead_message', true );
-    $ip      = get_post_meta( $post->ID, '_lead_ip', true );
-    $source  = get_post_meta( $post->ID, '_lead_source', true );
+    $email       = get_post_meta( $post->ID, '_lead_email', true );
+    $phone       = get_post_meta( $post->ID, '_lead_phone', true );
+    $service     = get_post_meta( $post->ID, '_lead_service', true );
+    $message     = get_post_meta( $post->ID, '_lead_message', true );
+    $ip          = get_post_meta( $post->ID, '_lead_ip', true );
+    $source      = get_post_meta( $post->ID, '_lead_source', true );
+    $attribution = get_post_meta( $post->ID, '_lead_attribution', true );
     ?>
     <table class="form-table">
         <tr>
@@ -152,7 +169,33 @@ function lakecity_render_lead_meta_box( WP_Post $post ): void {
         </tr>
         <?php endif; ?>
     </table>
-    <?php
+
+    <?php if ( is_array( $attribution ) && ! empty( $attribution ) ) : ?>
+    <h4 style="margin-top:20px;">Ad Attribution</h4>
+    <table class="form-table">
+        <?php
+        $labels = array(
+            'utm_source'   => 'UTM Source',
+            'utm_medium'   => 'UTM Medium',
+            'utm_campaign' => 'UTM Campaign',
+            'utm_content'  => 'UTM Content',
+            'utm_term'     => 'UTM Term',
+            'gclid'        => 'Google Click ID (GCLID)',
+            'fbclid'       => 'Facebook Click ID (FBCLID)',
+            'msclkid'      => 'Microsoft Click ID (MSCLKID)',
+            'landing_page' => 'Landing Page',
+            'referrer'     => 'Referrer',
+        );
+        foreach ( $labels as $key => $label ) :
+            if ( ! empty( $attribution[ $key ] ) ) : ?>
+        <tr>
+            <th><?php echo esc_html( $label ); ?></th>
+            <td><code><?php echo esc_html( $attribution[ $key ] ); ?></code></td>
+        </tr>
+        <?php endif;
+        endforeach; ?>
+    </table>
+    <?php endif;
 }
 
 // ========================================
@@ -243,6 +286,25 @@ function lakecity_handle_contact_form( WP_REST_Request $request ): WP_REST_Respo
     update_post_meta( $post_id, '_lead_message', $message );
     update_post_meta( $post_id, '_lead_ip', $ip );
     update_post_meta( $post_id, '_lead_source', sanitize_text_field( $params['source'] ?? 'website' ) );
+
+    // Store ad attribution data (UTM, GCLID, FBCLID) for offline conversion tracking
+    $attribution = $params['attribution'] ?? array();
+    if ( is_array( $attribution ) && ! empty( $attribution ) ) {
+        $allowed_keys = array( 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid', 'msclkid', 'landing_page', 'referrer' );
+        $clean_attribution = array();
+        foreach ( $allowed_keys as $key ) {
+            if ( ! empty( $attribution[ $key ] ) ) {
+                $clean_attribution[ $key ] = sanitize_text_field( $attribution[ $key ] );
+            }
+        }
+        if ( ! empty( $clean_attribution ) ) {
+            update_post_meta( $post_id, '_lead_attribution', $clean_attribution );
+            // Store GCLID separately for easy Google Ads offline conversion import
+            if ( ! empty( $clean_attribution['gclid'] ) ) {
+                update_post_meta( $post_id, '_lead_gclid', $clean_attribution['gclid'] );
+            }
+        }
+    }
 
     // --- Send email via Postmark ---
     $email_sent = lakecity_send_postmark_email( $name, $email, $phone, $service, $message );
