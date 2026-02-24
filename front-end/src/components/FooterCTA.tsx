@@ -16,56 +16,86 @@ export default function FooterCTA() {
   const content = getContent('footer-cta');
   const ctaTheme = sectionThemes['footer-cta'] || {};
 
-  // Use section palette colors if overriding, otherwise fall back to global
   const isOverriding = ctaTheme.overrideGlobalColors ?? false;
   const hasBgImage = !!ctaTheme.bgImage;
 
-  // Section colors - properly integrated with theme system
+  // Follow same pattern as MidPageCTA — use section bg, not primary as bg
   const bgPrimary = isOverriding
-    ? (ctaTheme.bgPrimary || palette.primary.base)
-    : palette.primary.base;
+    ? (ctaTheme.bgPrimary || palette.background.primary)
+    : palette.background.primary;
   const accentColor = isOverriding
     ? (ctaTheme.accent || globalConfig.brand.accent)
     : globalConfig.brand.accent;
   const textPrimary = isOverriding
     ? (ctaTheme.textPrimary || palette.text.primary)
-    : getContrastColor(bgPrimary);
+    : palette.text.primary;
   const textSecondary = isOverriding
-    ? (ctaTheme.textSecondary || withAlpha(textPrimary, 0.85))
-    : withAlpha(textPrimary, 0.85);
+    ? (ctaTheme.textSecondary || palette.text.secondary)
+    : palette.text.secondary;
 
-  // Button uses accent color for contrast against primary bg
+  const sectionIsLight = isOverriding && ctaTheme.paletteMode === 'light';
+  const isLightMode = isOverriding ? sectionIsLight : globalConfig.brand.mode === 'light';
+
   const buttonBg = accentColor;
   const buttonText = getContrastColor(buttonBg);
 
-  // When bgImage is set, use transparent background to let image show through
-  // ThemedSection handles the background image and color overlay
+  const dividerColor = isLightMode ? withAlpha('#000000', 0.1) : withAlpha('#ffffff', 0.1);
+
   const backgroundStyle = hasBgImage
-    ? {} // Transparent - let ThemedSection's bgImage show
-    : { background: `linear-gradient(to right, ${bgPrimary}, ${bgPrimary})` };
+    ? {}
+    : { backgroundColor: bgPrimary };
 
   return (
     <div
-      className="py-16"
+      className="relative py-24 sm:py-28 overflow-hidden"
       style={backgroundStyle}
     >
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* Subtle radial accent glow */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse at center, ${withAlpha(accentColor, 0.06)} 0%, transparent 70%)`
+        }}
+      />
+
+      {/* Decorative blurred orbs */}
+      <div
+        className="absolute -left-32 top-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl"
+        style={{ backgroundColor: withAlpha(accentColor, 0.08) }}
+      />
+      <div
+        className="absolute -right-32 top-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl"
+        style={{ backgroundColor: withAlpha(accentColor, 0.06) }}
+      />
+
+      {/* Subtle top divider */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-2/3"
+        style={{ background: `linear-gradient(to right, transparent, ${dividerColor}, transparent)` }}
+      />
+
+      <div className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center">
+        {/* Headline */}
         <h2
-          className="font-[var(--font-display)] text-3xl sm:text-4xl font-bold mb-4"
+          className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
           style={{ color: textPrimary }}
         >
           {content.headline}{' '}
           <span style={{ color: accentColor }}>{content.highlightText}</span>
         </h2>
+
+        {/* Subheadline */}
         <p
-          className="text-lg mb-8"
+          className="text-lg sm:text-xl max-w-2xl mx-auto mb-10"
           style={{ color: textSecondary }}
         >
           {content.subheadline}
         </p>
+
+        {/* CTA Button */}
         <a
           href={content.ctaLink}
-          className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-lg shadow-2xl shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-3xl hover:brightness-110 active:scale-95"
+          className="inline-flex items-center gap-3 px-10 py-5 rounded-full font-semibold text-lg shadow-2xl shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-3xl hover:brightness-110 active:scale-95"
           style={{
             backgroundColor: buttonBg,
             color: buttonText,
@@ -74,6 +104,14 @@ export default function FooterCTA() {
           <PhoneIcon />
           {content.ctaText}
         </a>
+
+        {/* Reassurance text */}
+        <p
+          className="mt-6 text-sm font-medium"
+          style={{ color: textSecondary, opacity: 0.6 }}
+        >
+          No obligation &middot; Free estimates &middot; Fast response
+        </p>
       </div>
     </div>
   );

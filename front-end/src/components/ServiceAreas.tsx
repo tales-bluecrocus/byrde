@@ -32,7 +32,7 @@ export default function ServiceAreas() {
       <div className="absolute top-0 left-0 right-0 h-32" style={{ background: 'linear-gradient(to bottom, var(--section-bg-secondary, var(--color-dark-950)), transparent)' }} />
       <div className="absolute bottom-0 left-0 right-0 h-32" style={{ background: 'linear-gradient(to top, var(--section-bg-secondary, var(--color-dark-950)), transparent)' }} />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">

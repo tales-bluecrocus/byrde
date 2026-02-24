@@ -28,14 +28,14 @@ const ColorPicker = React.forwardRef<HTMLButtonElement, ColorPickerProps>(
             disabled={disabled}
             className={cn(
               "w-full justify-start text-left font-normal",
-              !value && "text-[hsl(var(--sidebar-muted-foreground))]",
+              !value && "text-muted-foreground",
               className
             )}
           >
             <div className="flex w-full items-center gap-2">
               {value ? (
                 <div
-                  className="h-4 w-4 rounded-sm border border-[hsl(var(--sidebar-border))]"
+                  className="h-4 w-4 rounded-sm border border-border"
                   style={{ backgroundColor: value }}
                 />
               ) : (
@@ -47,13 +47,18 @@ const ColorPicker = React.forwardRef<HTMLButtonElement, ColorPickerProps>(
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-3" align="start">
+        <PopoverContent
+          className="w-auto p-3 bg-popover border-border shadow-lg"
+          align="start"
+        >
           <div className="flex flex-col gap-3">
             <HexColorPicker color={value || "#000000"} onChange={onChange} />
             <div className="flex items-center gap-2">
-              <Label className="text-xs text-[hsl(var(--sidebar-muted-foreground))]">HEX</Label>
+              <Label className="text-xs text-muted-foreground">HEX</Label>
               <div className="relative flex-1">
-                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-[hsl(var(--sidebar-muted-foreground))]">#</span>
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                  #
+                </span>
                 <Input
                   value={value?.replace("#", "") || ""}
                   onChange={(e) => {
@@ -62,7 +67,7 @@ const ColorPicker = React.forwardRef<HTMLButtonElement, ColorPickerProps>(
                       onChange(`#${hex}`)
                     }
                   }}
-                  className="h-8 pl-5 font-mono text-xs uppercase"
+                  className="h-8 pl-5 font-mono text-xs uppercase bg-background border-input text-foreground"
                   maxLength={6}
                 />
               </div>
@@ -102,8 +107,8 @@ const ColorSwatch = React.forwardRef<HTMLButtonElement, ColorSwatchProps>(
           "rounded-md transition-all border-2",
           sizeClasses[size],
           isSelected
-            ? "border-[hsl(var(--sidebar-primary))] ring-2 ring-[hsl(var(--sidebar-primary))] ring-offset-1 ring-offset-[hsl(var(--sidebar-background))]"
-            : "border-[hsl(var(--sidebar-border))] hover:border-[hsl(var(--sidebar-muted-foreground))] hover:scale-105",
+            ? "border-primary ring-2 ring-primary ring-offset-1 ring-offset-background"
+            : "border-border hover:border-muted-foreground hover:scale-105",
           className
         )}
         style={{ backgroundColor: color }}

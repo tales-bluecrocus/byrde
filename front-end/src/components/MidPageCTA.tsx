@@ -40,8 +40,8 @@ export default function MidPageCTA() {
 
   // Section colors - properly integrated with theme system
   const bgPrimary = isOverriding
-    ? (ctaTheme.bgPrimary || palette.surface.s1)
-    : palette.surface.s1;
+    ? (ctaTheme.bgPrimary || palette.background.primary)
+    : palette.background.primary;
   const accentColor = isOverriding
     ? (ctaTheme.accent || globalConfig.brand.primary)
     : globalConfig.brand.primary;
@@ -106,7 +106,7 @@ export default function MidPageCTA() {
         style={{ backgroundColor: withAlpha(accentColor, 0.1) }}
       />
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative max-w-5xl mx-auto px-6 lg:px-8 text-center">
         {/* Urgency Badge */}
         <div
           className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold mb-8 shadow-lg"

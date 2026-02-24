@@ -31,7 +31,7 @@ export default function FAQ() {
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary-500/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-72 h-72 section-bg-secondary rounded-full blur-3xl opacity-50" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           {/* Left Content */}
           <div className="lg:sticky lg:top-32">

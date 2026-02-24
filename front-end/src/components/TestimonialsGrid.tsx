@@ -29,7 +29,7 @@ export default function TestimonialsGrid() {
         <div className="absolute bottom-0 left-0 w-1/2 h-1/2 opacity-50" style={{ background: 'linear-gradient(to top right, var(--section-bg-secondary, var(--color-dark-900)), transparent)' }} />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">
@@ -77,7 +77,7 @@ export default function TestimonialsGrid() {
                     {testimonial.authorName}
                   </h4>
                   <p className="section-text-secondary text-xs opacity-70">
-                    Verified Customer
+                    {testimonial.authorTitle || 'Verified Customer'}
                   </p>
                 </div>
               </div>

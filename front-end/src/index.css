@@ -4,32 +4,64 @@
 /* shadcn/ui CSS Variables */
 :root {
   --radius: 0.5rem;
+}
 
-  /* Sidebar theme variables - defined at root for portal accessibility */
-  --sidebar-background: 0 0% 8%;
-  --sidebar-foreground: 0 0% 95%;
-  --sidebar-primary: 142 71% 45%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 0 0% 15%;
-  --sidebar-accent-foreground: 0 0% 95%;
-  --sidebar-border: 0 0% 15%;
-  --sidebar-ring: 142 71% 45%;
-  --sidebar-muted: 0 0% 40%;
-  --sidebar-muted-foreground: 0 0% 65%;
-  --sidebar-card: 0 0% 10%;
-  --sidebar-card-foreground: 0 0% 95%;
-  --sidebar-popover: 0 0% 8%;
-  --sidebar-popover-foreground: 0 0% 95%;
-  --sidebar-secondary: 0 0% 15%;
-  --sidebar-secondary-foreground: 0 0% 95%;
-  --sidebar-destructive: 0 84% 60%;
-  --sidebar-destructive-foreground: 0 0% 100%;
-  --sidebar-input: 0 0% 15%;
-  --sidebar-chart-1: 142 71% 45%;
-  --sidebar-chart-2: 160 60% 45%;
-  --sidebar-chart-3: 30 80% 55%;
-  --sidebar-chart-4: 280 65% 60%;
-  --sidebar-chart-5: 340 75% 55%;
+/* EDITOR DARK THEME - Override shadcn semantic tokens for dark editor panel */
+.editor-dark {
+  --color-background: #18181b;           /* zinc-900 */
+  --color-foreground: #f4f4f5;           /* zinc-100 */
+  --color-card: #27272a;                 /* zinc-800 */
+  --color-card-foreground: #f4f4f5;      /* zinc-100 */
+  --color-muted: #27272a;                /* zinc-800 */
+  --color-muted-foreground: #a1a1aa;     /* zinc-400 */
+  --color-input: #52525b;               /* zinc-600 - visible borders & switch tracks */
+  --color-border: #3f3f46;              /* zinc-700 */
+  --color-ring: #22c55e;                /* green-500 */
+  --color-destructive: #f87171;          /* red-400 */
+  --color-accent: #27272a;              /* zinc-800 */
+  --color-accent-foreground: #f4f4f5;    /* zinc-100 */
+  --color-secondary: #27272a;            /* zinc-800 */
+  --color-secondary-foreground: #f4f4f5; /* zinc-100 */
+  --color-primary: #22c55e;             /* green-500 */
+  --color-primary-foreground: #ffffff;
+  --color-popover: #18181b;             /* zinc-900 */
+  --color-popover-foreground: #f4f4f5;   /* zinc-100 */
+}
+
+/* Switches in editor: make checked/unchecked clearly distinct */
+.editor-dark [data-slot="switch"][data-state="checked"],
+.editor-dark button[role="switch"][data-state="checked"] {
+  background-color: #22c55e !important; /* green-500 */
+}
+.editor-dark [data-slot="switch"][data-state="unchecked"],
+.editor-dark button[role="switch"][data-state="unchecked"] {
+  background-color: #52525b !important; /* zinc-600 */
+}
+
+/* ADMIN SIDEBAR - Fixed colors (never change with theme) */
+.sidebar-theme {
+  /* Force dark theme for admin sidebar - these values NEVER change */
+  --sidebar-background: 222.2 84% 4.9%;        /* #020817 - slate-950 */
+  --sidebar-foreground: 210 40% 98%;            /* #f8fafc - slate-50 */
+  --sidebar-primary: 217.2 91.2% 59.8%;         /* #3b82f6 - blue-500 */
+  --sidebar-primary-foreground: 222.47 84% 4.9%; /* #020817 - slate-950 */
+  --sidebar-accent: 217.2 32.6% 17.5%;          /* #1e293b - slate-800 */
+  --sidebar-accent-foreground: 210 40% 98%;     /* #f8fafc - slate-50 */
+  --sidebar-border: 217.2 32.6% 17.5%;          /* #1e293b - slate-800 */
+  --sidebar-ring: 224.3 76.3% 48%;              /* #1d4ed8 - blue-700 */
+  --sidebar-muted: 215 27.9% 16.9%;             /* #1e293b - slate-800 */
+  --sidebar-muted-foreground: 215.4 16.3% 46.9%; /* #64748b - slate-500 */
+}
+
+/* Editor mode isolation: prevent body from interfering with theme preview */
+body.wp-theme-lakecity {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* Ensure #root takes full height and handles theme colors in editor mode */
+#root {
+  min-height: 100vh;
 }
 
 /* shadcn animations */
@@ -64,88 +96,54 @@
 .slide-in-from-left-2 { --tw-enter-translate-x: -0.5rem; }
 .slide-in-from-right-2 { --tw-enter-translate-x: 0.5rem; }
 
-/* react-colorful overrides for sidebar theme */
-.sidebar-theme .react-colorful {
+/* react-colorful */
+.react-colorful {
   width: 100% !important;
   height: 150px !important;
 }
-.sidebar-theme .react-colorful__saturation {
+.react-colorful__saturation {
   border-radius: 6px 6px 0 0 !important;
 }
-.sidebar-theme .react-colorful__hue {
+.react-colorful__hue {
   height: 14px !important;
   border-radius: 0 0 6px 6px !important;
 }
-.sidebar-theme .react-colorful__pointer {
+.react-colorful__pointer {
   width: 18px !important;
   height: 18px !important;
   border-width: 2px !important;
 }
 
-/* Sidebar theme class marker - variables are now defined in :root */
-.sidebar-theme {
-  /* This class is used as a marker for sidebar styling */
-  /* The --sidebar-* variables are defined in :root for portal accessibility */
-}
-
-/* Content Editor Modal - Light theme for editing */
-.content-editor-light {
-  color: #1f2937;
-}
-
-.content-editor-light input,
-.content-editor-light textarea {
-  background-color: #fff !important;
-  border-color: #d1d5db !important;
-  color: #1f2937 !important;
-}
-
-.content-editor-light input::placeholder,
-.content-editor-light textarea::placeholder {
-  color: #9ca3af !important;
-}
-
-.content-editor-light input:focus,
-.content-editor-light textarea:focus {
-  border-color: #3ab342 !important;
-  box-shadow: 0 0 0 2px rgba(58, 179, 66, 0.2) !important;
-}
-
-.content-editor-light .border {
-  border-color: #e5e7eb !important;
-}
-
-.content-editor-light .bg-muted\/30 {
-  background-color: #f9fafb !important;
-}
-
-.content-editor-light .text-destructive {
-  color: #dc2626 !important;
-}
-
-.content-editor-light .text-muted-foreground {
-  color: #6b7280 !important;
-}
-
-/* react-colorful in content editor */
-.content-editor-light .react-colorful {
-  width: 100% !important;
-  height: 150px !important;
-}
-
 @theme {
-  /* Typography - Clean & Bold */
+  /* Typography */
   --font-display: "Outfit", system-ui, sans-serif;
   --font-body: "DM Sans", system-ui, sans-serif;
 
-  /* Brand Colors - Primary Green #3ab342 */
-  --color-primary-600: #2e9035;
-  --color-primary-500: #3ab342;
-  --color-primary-400: #4fc757;
-  --color-primary-300: #7dd685;
-  --color-primary-200: #b3e8b7;
-  --color-primary-100: #e0f5e1;
+  /* Primary Colors (full 50-950 scale, overridden by PaletteInjector at runtime) */
   --color-primary-50: #f0faf0;
+  --color-primary-100: #e0f5e1;
+  --color-primary-200: #b3e8b7;
+  --color-primary-300: #7dd685;
+  --color-primary-400: #4fc757;
+  --color-primary-500: #3ab342;
+  --color-primary-600: #2e9035;
+  --color-primary-700: #236d28;
+  --color-primary-800: #1a521e;
+  --color-primary-900: #113815;
+  --color-primary-950: #0a220d;
+
+  /* Accent Colors (full 50-950 scale, overridden by PaletteInjector at runtime) */
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-200: #fed7aa;
+  --color-accent-300: #fdba74;
+  --color-accent-400: #fb923c;
+  --color-accent-500: #f97316;
+  --color-accent-600: #ea580c;
+  --color-accent-700: #c2410c;
+  --color-accent-800: #9a3412;
+  --color-accent-900: #7c2d12;
+  --color-accent-950: #431407;
 
   /* Button Colors */
   --color-button-bg: #3ab342;
@@ -153,43 +151,20 @@
   --color-button-hover: #4fc757;
   --color-button-active: #2e9035;
 
-  /* Text Colors - these override the base white color */
+  /* Text Colors */
   --color-text-primary: #ffffff;
   --color-text-secondary: #a3a3a3;
-  --color-text: var(--color-text-primary);
-  --color-text-muted: var(--color-text-secondary);
 
-  /* Override white to use text-primary */
-  --color-white: var(--color-text-primary);
-
-  /* Brand Colors - Secondary Black #000000 */
+  /* Background Colors (used by body, section classes, scrollbar) */
   --color-dark-950: #000000;
   --color-dark-900: #0a0a0a;
   --color-dark-800: #121212;
   --color-dark-700: #1a1a1a;
   --color-dark-600: #262626;
   --color-dark-500: #404040;
-  --color-dark-400: #525252;
-  --color-dark-300: #737373;
-  --color-dark-200: #a3a3a3;
-  --color-dark-100: #d4d4d4;
-  --color-dark-50: #f5f5f5;
 
-  /* Neutral Grays for Dark Mode - gray-400 uses text-secondary for themeable secondary text */
-  --color-gray-900: #0a0a0a;
-  --color-gray-800: #121212;
-  --color-gray-700: #1a1a1a;
-  --color-gray-600: #262626;
-  --color-gray-500: #404040;
-  --color-gray-400: var(--color-text-secondary);
-  --color-gray-300: #a3a3a3;
-  --color-gray-200: #d4d4d4;
-  --color-gray-100: #e5e7eb;
-  --color-gray-50: #f9fafb;
-
-  /* Accent Yellow for stars/ratings */
-  --color-yellow-400: #facc15;
-  --color-yellow-500: #eab308;
+  /* Border */
+  --color-border: #333333;
 
   /* Animations */
   --animate-fade-in: fade-in 0.6s ease-out forwards;
@@ -224,18 +199,12 @@
   }
 
   @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-100%);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-100%); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
-/* Base Styles - Theme Aware */
+/* Base Styles */
 html {
   scroll-behavior: smooth;
 }
@@ -250,7 +219,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Text color utilities that use theme variables */
+/* Text utilities */
 .text-theme-primary {
   color: var(--color-text-primary);
 }
@@ -274,7 +243,7 @@ body {
   background-color: var(--color-button-active);
 }
 
-/* Custom Scrollbar - Dark Mode */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -304,7 +273,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Stagger Animation Delays */
+/* Stagger Animation */
 .stagger-1 { animation-delay: 0.1s; }
 .stagger-2 { animation-delay: 0.2s; }
 .stagger-3 { animation-delay: 0.3s; }
@@ -312,7 +281,7 @@ body {
 .stagger-5 { animation-delay: 0.5s; }
 .stagger-6 { animation-delay: 0.6s; }
 
-/* Noise Texture Overlay */
+/* Noise Texture */
 .noise-overlay::before {
   content: "";
   position: absolute;
@@ -331,9 +300,7 @@ body {
   background-clip: text;
 }
 
-/* ===== Per-Section Theming ===== */
-
-/* Section backgrounds - use CSS variables with fallbacks */
+/* Section Theming */
 .themed-section {
   background-color: var(--section-bg-primary, inherit);
 }
@@ -350,7 +317,6 @@ body {
   background-color: var(--section-bg-tertiary, var(--color-dark-800));
 }
 
-/* Alternating section backgrounds - using secondary color for visual rhythm */
 .section-bg-even {
   background-color: var(--section-bg-even, var(--color-dark-950));
 }
@@ -360,7 +326,6 @@ body {
   position: relative;
 }
 
-/* Add subtle secondary color accent to odd sections */
 .section-bg-odd::before {
   content: "";
   position: absolute;
@@ -375,7 +340,6 @@ body {
   z-index: 1;
 }
 
-/* Section text colors */
 .section-text-primary {
   color: var(--section-text-primary, var(--color-text-primary));
 }
@@ -388,12 +352,10 @@ body {
   color: var(--section-text-accent, var(--color-primary-500));
 }
 
-/* Section borders */
 .section-border {
   border-color: var(--section-border, var(--color-dark-700));
 }
 
-/* Section buttons - overrides btn-themed when inside a themed section */
 .themed-section .btn-section {
   background-color: var(--section-button-bg, var(--color-button-bg));
   color: var(--section-button-text, var(--color-button-text));
@@ -406,4 +368,15 @@ body {
 
 .themed-section .btn-section:active {
   filter: brightness(0.9);
+}
+
+/* Button attention pulse */
+@keyframes btn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--section-button-bg, var(--color-button-bg)); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+}
+
+.themed-section .btn-section,
+.btn-themed {
+  animation: btn-pulse 3s ease-in-out infinite;
 }

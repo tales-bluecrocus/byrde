@@ -12,10 +12,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Include theme modules
  */
+require_once get_template_directory() . '/inc/constants.php'; // Theme constants
 require_once get_template_directory() . '/inc/cleanup.php';
+require_once get_template_directory() . '/inc/validators.php'; // Input validation & sanitization
+require_once get_template_directory() . '/inc/rate-limiter.php'; // Rate limiting
+// require_once get_template_directory() . '/inc/theme-settings-manager.php'; // Disabled: using ACF instead
+// require_once get_template_directory() . '/inc/admin-settings-page.php'; // Disabled: using ACF options page
 require_once get_template_directory() . '/inc/acf-theme-settings.php';
 require_once get_template_directory() . '/inc/page-theme-editor.php';
 require_once get_template_directory() . '/inc/rest-content-api.php';
+require_once get_template_directory() . '/inc/contact-form-handler.php';
+require_once get_template_directory() . '/inc/analytics.php';
+require_once get_template_directory() . '/inc/seo.php';
 
 /**
  * Get the front-end build assets (JS and CSS filenames with hashes)
@@ -93,3 +101,60 @@ function lakecity_setup(): void {
     add_theme_support( 'html5', array( 'script', 'style' ) );
 }
 add_action( 'after_setup_theme', 'lakecity_setup' );
+
+/**
+ * Create default pages on theme activation
+ */
+function lakecity_activate(): void {
+    $pages = array(
+        array(
+            'title' => 'Home',
+            'slug'  => 'home',
+            'set_front' => true,
+        ),
+        array(
+            'title' => 'Privacy Policy',
+            'slug'  => 'privacy-policy',
+        ),
+        array(
+            'title' => 'Terms & Conditions',
+            'slug'  => 'terms-and-conditions',
+        ),
+        array(
+            'title' => 'Cookie Settings',
+            'slug'  => 'cookie-settings',
+        ),
+    );
+
+    $front_page_id = 0;
+
+    foreach ( $pages as $page ) {
+        // Skip if a page with this slug already exists
+        $existing = get_page_by_path( $page['slug'] );
+        if ( $existing ) {
+            if ( ! empty( $page['set_front'] ) ) {
+                $front_page_id = $existing->ID;
+            }
+            continue;
+        }
+
+        $page_id = wp_insert_post( array(
+            'post_title'   => $page['title'],
+            'post_name'    => $page['slug'],
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'post_content' => '',
+        ) );
+
+        if ( ! empty( $page['set_front'] ) && $page_id && ! is_wp_error( $page_id ) ) {
+            $front_page_id = $page_id;
+        }
+    }
+
+    // Set static front page
+    if ( $front_page_id ) {
+        update_option( 'show_on_front', 'page' );
+        update_option( 'page_on_front', $front_page_id );
+    }
+}
+add_action( 'after_switch_theme', 'lakecity_activate' );

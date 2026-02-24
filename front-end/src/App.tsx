@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import FeaturedTestimonial from './components/FeaturedTestimonial';
@@ -8,8 +9,7 @@ import TestimonialsGrid from './components/TestimonialsGrid';
 import FAQ from './components/FAQ';
 import FooterCTA from './components/FooterCTA';
 import Footer from './components/Footer';
-import SEO from './components/SEO';
-import ThemeSidebar from './components/ThemeSidebar';
+import ThemeEditor from './components/ThemeEditor';
 import ThemedSection from './components/ThemedSection';
 import PaletteInjector from './components/PaletteInjector';
 import { ToastProvider } from './components/Toast';
@@ -19,13 +19,15 @@ import { GlobalConfigProvider } from './context/GlobalConfigContext';
 import { SidebarProvider, useSidebar } from './context/SidebarContext';
 import { ContentProvider } from './context/ContentContext';
 import { useSettings } from './hooks/useSettings';
+import { useScrollDepthTracking, useAdAttributionCapture } from './hooks/useAnalytics';
+import { trackPhoneClick } from './lib/analytics';
 
 const isDev = import.meta.env.DEV;
 
 // Check if we should show the sidebar (editor mode)
 function shouldShowSidebar(): boolean {
   if (isDev) return true;
-  if (typeof window !== 'undefined' && (window as any).lakecityAdmin !== undefined) {
+  if (typeof window !== 'undefined' && window.lakecityAdmin !== undefined) {
     return true;
   }
   return false;
@@ -42,13 +44,44 @@ const PhoneIcon = () => (
   </svg>
 );
 
+// Scroll to top button
+function ScrollToTopButton() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      className="fixed z-60 flex items-center justify-center w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/70 hover:bg-white/20 hover:text-white transition-all duration-300 active:scale-95 shadow-lg shadow-black/20 bottom-6 right-6 sm:bottom-8 sm:right-8"
+      aria-label="Scroll to top"
+    >
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+      </svg>
+    </button>
+  );
+}
+
 // Floating phone button for mobile
 function FloatingPhoneButton() {
   const settings = useSettings();
+
+  const handleClick = () => {
+    trackPhoneClick('floating_button');
+  };
+
   return (
     <a
       href={`tel:${settings.phone_raw}`}
-      className="sm:hidden fixed bottom-6 right-6 z-60 flex items-center justify-center w-14 h-14 btn-themed rounded-full shadow-xl shadow-black/30 transition-all duration-300 active:scale-95"
+      onClick={handleClick}
+      className="sm:hidden fixed bottom-20 right-6 z-60 flex items-center justify-center w-14 h-14 btn-themed rounded-full shadow-xl shadow-black/30 transition-all duration-300 active:scale-95"
       aria-label={`Call ${settings.phone}`}
     >
       <PhoneIcon />
@@ -87,9 +120,14 @@ function StaticHomePage() {
 
 // Layout without sidebar (production)
 function ProductionLayout() {
+  // Capture UTM/GCLID/FBCLID on page load for ad attribution
+  useAdAttributionCapture();
+
+  // Enable scroll depth tracking for analytics
+  useScrollDepthTracking();
+
   return (
     <>
-      <SEO />
       <div
         className="min-h-screen"
         style={{ backgroundColor: 'var(--color-dark-950)' }}
@@ -104,22 +142,22 @@ function ProductionLayout() {
         </ThemedSection>
       </div>
       <FloatingPhoneButton />
+      <ScrollToTopButton />
     </>
   );
 }
 
 // Layout with sidebar (editor mode)
 function EditorLayout() {
-  const { isOpen, sidebarWidth } = useSidebar();
+  const { isOpen, totalWidth } = useSidebar();
 
   return (
     <>
-      <SEO />
       <div
         className="min-h-screen transition-all duration-300 ease-in-out"
         style={{
           backgroundColor: 'var(--color-dark-950)',
-          marginLeft: isOpen ? `${sidebarWidth}px` : '0px',
+          marginLeft: isOpen ? `${totalWidth}px` : '0px',
         }}
       >
         <Header />
@@ -132,7 +170,8 @@ function EditorLayout() {
         </ThemedSection>
       </div>
       <FloatingPhoneButton />
-      <ThemeSidebar />
+      <ScrollToTopButton />
+      <ThemeEditor />
     </>
   );
 }

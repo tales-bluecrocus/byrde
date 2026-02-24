@@ -61,7 +61,7 @@ export default function Footer() {
   return (
     <div className={`section-text-primary ${hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
         <div className="flex flex-col md:flex-row gap-8 lg:gap-12 justify-between">
           {/* Brand Column */}
           <div className="max-w-sm">
@@ -154,7 +154,7 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="section-border border-t">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="section-text-secondary text-sm text-center md:text-left">
               {settings.copyright}

@@ -41,9 +41,5 @@ export function getPalettesByMode(mode: 'dark' | 'light', palettes: SectionPalet
   return palettes.filter(p => p.mode === mode);
 }
 
-// Default palette IDs (first palette in each list = brand primary)
-export const DEFAULT_DARK_PALETTE = 'brand-primary-dark';
-export const DEFAULT_LIGHT_PALETTE = 'brand-primary-light';
-
 // Re-export generation functions for use in context
 export { generateDarkPalettes, generateLightPalettes, generateAllPalettes };

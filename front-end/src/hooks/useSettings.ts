@@ -5,24 +5,58 @@
  */
 
 export interface ThemeSettings {
+  // Brand
   logo: string;
   logo_alt: string;
   phone: string;
   phone_raw: string;
   email: string;
+
+  // Google Reviews
   google_rating: string;
   google_reviews_count: string;
   google_reviews_url: string;
+
+  // Footer
   footer_tagline: string;
   footer_description: string;
   address: string;
   business_hours: string;
   copyright: string;
+
+  // Social
   facebook_url: string;
   instagram_url: string;
   youtube_url: string;
   yelp_url: string;
-  // Legal pages
+
+  // SEO
+  site_name: string;
+  site_tagline: string;
+  site_description: string;
+  site_keywords: string;
+  site_url: string;
+  og_image: string;
+
+  // Schema
+  schema_type: 'LocalBusiness' | 'HomeAndConstructionBusiness' | 'ProfessionalService' | 'Organization';
+  schema_price_range: string;
+  schema_street: string;
+  schema_city: string;
+  schema_state: string;
+  schema_postal: string;
+  schema_country: string;
+  schema_geo_lat: string;
+  schema_geo_lng: string;
+  schema_service_radius: string;
+  schema_opening_hours: string;
+
+  // Analytics
+  ga_measurement_id: string;
+  gtm_container_id: string;
+  fb_pixel_id: string;
+
+  // Legal pages (not from ACF, from page slugs)
   privacy_policy_url: string;
   terms_url: string;
   cookie_settings_url: string;
@@ -30,29 +64,63 @@ export interface ThemeSettings {
 
 declare global {
   interface Window {
-    lakecitySettings?: ThemeSettings;
+    lakecitySettings?: Partial<ThemeSettings>;
   }
 }
 
 const DEFAULT_SETTINGS: ThemeSettings = {
+  // Brand - NO defaults, must be configured
   logo: '',
-  logo_alt: 'Lake City Hauling',
-  phone: '(208) 998-0054',
-  phone_raw: '2089980054',
-  email: 'info@lakecityhauling.com',
+  logo_alt: '',
+  phone: '',
+  phone_raw: '',
+  email: '',
+
+  // Google Reviews
   google_rating: '5.0',
-  google_reviews_count: '50+',
+  google_reviews_count: '',
   google_reviews_url: '',
-  footer_tagline: 'Fast & Reliable Junk Removal Services',
+
+  // Footer
+  footer_tagline: '',
   footer_description: '',
   address: '',
-  business_hours: 'Mon-Sat: 7AM - 7PM',
-  copyright: `© ${new Date().getFullYear()} Lake City Hauling. All rights reserved.`,
+  business_hours: '',
+  copyright: `© ${new Date().getFullYear()}. All rights reserved.`,
+
+  // Social
   facebook_url: '',
   instagram_url: '',
   youtube_url: '',
   yelp_url: '',
-  // Legal pages - default to # if not set
+
+  // SEO - NO defaults, must be configured
+  site_name: '',
+  site_tagline: '',
+  site_description: '',
+  site_keywords: '',
+  site_url: '',
+  og_image: '',
+
+  // Schema - Minimal defaults
+  schema_type: 'LocalBusiness',
+  schema_price_range: '$$',
+  schema_street: '',
+  schema_city: '',
+  schema_state: '',
+  schema_postal: '',
+  schema_country: 'US',
+  schema_geo_lat: '',
+  schema_geo_lng: '',
+  schema_service_radius: '50',
+  schema_opening_hours: '',
+
+  // Analytics - NO defaults
+  ga_measurement_id: '',
+  gtm_container_id: '',
+  fb_pixel_id: '',
+
+  // Legal pages
   privacy_policy_url: '/privacy-policy',
   terms_url: '/terms-and-conditions',
   cookie_settings_url: '/cookie-settings',
@@ -65,7 +133,7 @@ export function useSettings(): ThemeSettings {
   return {
     ...DEFAULT_SETTINGS,
     ...window.lakecitySettings,
-  };
+  } as ThemeSettings;
 }
 
 /**
@@ -76,4 +144,33 @@ export function useSetting<K extends keyof ThemeSettings>(
   fallback?: ThemeSettings[K]
 ): ThemeSettings[K] {
   return window.lakecitySettings?.[key] ?? fallback ?? DEFAULT_SETTINGS[key];
+}
+
+/**
+ * Check if essential settings are configured
+ */
+export function useSettingsConfigured(): { isConfigured: boolean; missing: string[] } {
+  const settings = useSettings();
+  const essential = ['site_name', 'phone', 'email'] as const;
+  const missing = essential.filter(key => !settings[key]);
+
+  return {
+    isConfigured: missing.length === 0,
+    missing,
+  };
+}
+
+/**
+ * Get social links as array (only non-empty ones)
+ */
+export function useSocialLinks(): Array<{ platform: string; url: string }> {
+  const settings = useSettings();
+  const links: Array<{ platform: string; url: string }> = [];
+
+  if (settings.facebook_url) links.push({ platform: 'facebook', url: settings.facebook_url });
+  if (settings.instagram_url) links.push({ platform: 'instagram', url: settings.instagram_url });
+  if (settings.youtube_url) links.push({ platform: 'youtube', url: settings.youtube_url });
+  if (settings.yelp_url) links.push({ platform: 'yelp', url: settings.yelp_url });
+
+  return links;
 }

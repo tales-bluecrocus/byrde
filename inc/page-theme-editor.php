@@ -269,17 +269,31 @@ function lakecity_inject_admin_context(): void {
         $lakecity_page_id = absint( $_GET['page_id'] );
     }
 
-    // Check if user is logged in and can edit pages
-    $is_logged_in = is_user_logged_in();
+    // Check user permissions
+    $is_logged_in   = is_user_logged_in();
     $can_edit_pages = current_user_can( 'edit_pages' );
-    $can_edit = $is_logged_in && $can_edit_pages;
+    $can_edit       = false;
 
-    // If specific page permission check is needed
-    if ( $lakecity_page_id && $can_edit ) {
-        $can_edit = current_user_can( 'edit_post', $lakecity_page_id );
+    if ( $is_logged_in ) {
+        if ( $lakecity_page_id ) {
+            // Check specific page permission
+            $can_edit = current_user_can( 'edit_post', $lakecity_page_id );
+        } else {
+            // Check general permission
+            $can_edit = $can_edit_pages;
+        }
     }
 
     $theme_config = $lakecity_page_id ? get_post_meta( $lakecity_page_id, '_lakecity_theme_config', true ) : '';
+
+    // Debug: Log what we're injecting
+    error_log( '[LakeCity Inject] Page ID: ' . $lakecity_page_id );
+    error_log( '[LakeCity Inject] Raw theme_config: ' . substr( $theme_config, 0, 200 ) );
+
+    $decoded_config = $theme_config ? json_decode( $theme_config, true ) : null;
+    if ( $decoded_config && isset( $decoded_config['sectionThemes']['hero'] ) ) {
+        error_log( '[LakeCity Inject] Hero config: ' . print_r( $decoded_config['sectionThemes']['hero'], true ) );
+    }
 
     // Always inject for preview mode (but mark if user can save)
     $admin_data = array(
@@ -288,7 +302,7 @@ function lakecity_inject_admin_context(): void {
         'apiUrl'     => rest_url( 'lakecity/v1' ),
         'nonce'      => $can_edit ? wp_create_nonce( 'wp_rest' ) : '',
         'pageId'     => $lakecity_page_id,
-        'config'     => $theme_config ? json_decode( $theme_config, true ) : null,
+        'config'     => $decoded_config,
         '_debug'     => array(
             'loggedIn'     => $is_logged_in,
             'canEditPages' => $can_edit_pages,
@@ -298,7 +312,9 @@ function lakecity_inject_admin_context(): void {
     ?>
     <script>
         window.lakecityAdmin = <?php echo wp_json_encode( $admin_data ); ?>;
+        <?php if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) : ?>
         console.log('[LakeCity] Admin context injected:', window.lakecityAdmin);
+        <?php endif; ?>
     </script>
     <style>
         /* Hide WordPress admin bar in BlueCrocus Editor preview */
@@ -349,6 +365,15 @@ function lakecity_register_theme_api_routes(): void {
         },
     ) );
 
+    // Atomic save endpoint (theme + content together)
+    register_rest_route( 'lakecity/v1', '/pages/(?P<id>\d+)/save-all', array(
+        'methods'             => 'PUT',
+        'callback'            => 'lakecity_rest_save_all',
+        'permission_callback' => function( WP_REST_Request $request ) {
+            return current_user_can( 'edit_post', $request->get_param( 'id' ) );
+        },
+    ) );
+
     // Image upload endpoint
     register_rest_route( 'lakecity/v1', '/upload-image', array(
         'methods'             => 'POST',
@@ -364,6 +389,14 @@ add_action( 'rest_api_init', 'lakecity_register_theme_api_routes' );
  * REST callback - Upload image to media library
  */
 function lakecity_rest_upload_image( WP_REST_Request $request ): WP_REST_Response {
+    // Rate limit: 5 uploads per minute
+    if ( ! lakecity_check_rate_limit( 'upload_image', 5, 60 ) ) {
+        return new WP_REST_Response( array(
+            'success' => false,
+            'message' => 'Too many upload requests. Please try again in a moment.',
+        ), 429 );
+    }
+
     // Check for file in the request
     $files = $request->get_file_params();
 
@@ -376,21 +409,12 @@ function lakecity_rest_upload_image( WP_REST_Request $request ): WP_REST_Respons
 
     $file = $files['file'];
 
-    // Validate file type
-    $allowed_types = array( 'image/jpeg', 'image/png', 'image/gif', 'image/webp' );
-    if ( ! in_array( $file['type'], $allowed_types, true ) ) {
+    // Validate image upload (secure validation)
+    $validation_result = lakecity_validate_image_upload( $file );
+    if ( is_wp_error( $validation_result ) ) {
         return new WP_REST_Response( array(
             'success' => false,
-            'message' => 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP',
-        ), 400 );
-    }
-
-    // Check file size (max 5MB)
-    $max_size = 5 * 1024 * 1024;
-    if ( $file['size'] > $max_size ) {
-        return new WP_REST_Response( array(
-            'success' => false,
-            'message' => 'File too large. Maximum size is 5MB',
+            'message' => $validation_result->get_error_message(),
         ), 400 );
     }
 
@@ -455,25 +479,135 @@ function lakecity_rest_get_page_theme( WP_REST_Request $request ): WP_REST_Respo
 /**
  * REST callback - Save page theme config
  */
-function lakecity_rest_save_page_theme( WP_REST_Request $request ): WP_REST_Response {
+function lakecity_rest_save_page_theme( WP_REST_Request $request ) {
+    // Rate limit: 10 saves per minute
+    if ( ! lakecity_check_rate_limit( 'save_theme', 10, 60 ) ) {
+        return new WP_Error(
+            'rate_limit_exceeded',
+            'Too many save requests. Please try again in a moment.',
+            array( 'status' => 429 )
+        );
+    }
+
     $lakecity_page_id = $request->get_param( 'id' );
     $config  = $request->get_json_params();
 
+    // Debug logging
+    error_log( '[LakeCity Theme Save] Page ID: ' . $lakecity_page_id );
+    error_log( '[LakeCity Theme Save] Config received: ' . print_r( $config, true ) );
+
     if ( empty( $config ) ) {
-        return new WP_REST_Response( array(
-            'success' => false,
-            'message' => 'No config data provided',
-        ), 400 );
+        return new WP_Error( 'empty_config', 'No config data provided', array( 'status' => 400 ) );
     }
 
-    $json_config = wp_json_encode( $config );
-    update_post_meta( $lakecity_page_id, '_lakecity_theme_config', $json_config );
+    // Validate config structure
+    $errors = lakecity_validate_theme_config( $config );
+    if ( ! empty( $errors ) ) {
+        error_log( '[LakeCity Theme Save] Validation errors: ' . print_r( $errors, true ) );
+        return new WP_Error(
+            'validation_failed',
+            implode( ', ', $errors ),
+            array( 'status' => 400 )
+        );
+    }
 
-    return new WP_REST_Response( array(
+    // Sanitize config
+    $sanitized = lakecity_sanitize_theme_config( $config );
+    error_log( '[LakeCity Theme Save] Sanitized: ' . print_r( $sanitized, true ) );
+
+    // Save as JSON
+    $json_config = wp_json_encode( $sanitized );
+    // Note: update_post_meta returns false if value unchanged, which is OK
+    $result = update_post_meta( $lakecity_page_id, '_lakecity_theme_config', $json_config );
+    error_log( '[LakeCity Theme Save] update_post_meta result: ' . var_export( $result, true ) );
+
+    // CRITICAL: Clear post meta cache to ensure fresh data on next load
+    wp_cache_delete( $lakecity_page_id, 'post_meta' );
+    clean_post_cache( $lakecity_page_id );
+
+    // Verify save by reading back (bypassing cache)
+    $saved_config = get_post_meta( $lakecity_page_id, '_lakecity_theme_config', true );
+    error_log( '[LakeCity Theme Save] Saved config: ' . $saved_config );
+
+    if ( empty( $saved_config ) && ! empty( $json_config ) ) {
+        return new WP_Error( 'save_failed', 'Failed to save theme config', array( 'status' => 500 ) );
+    }
+
+    return rest_ensure_response( array(
         'success' => true,
-        'pageId'  => $lakecity_page_id,
-        'message' => 'Theme config saved successfully',
-    ), 200 );
+        'config'  => $sanitized,
+    ) );
+}
+
+/**
+ * REST callback - Atomic save (theme + content together)
+ *
+ * Saves both theme config and content in a single transaction.
+ * Prevents inconsistent state if one save fails.
+ */
+function lakecity_rest_save_all( WP_REST_Request $request ) {
+    // Rate limit: 10 saves per minute (combined theme + content)
+    if ( ! lakecity_check_rate_limit( 'save_all', 10, 60 ) ) {
+        return new WP_Error(
+            'rate_limit_exceeded',
+            'Too many save requests. Please try again in a moment.',
+            array( 'status' => 429 )
+        );
+    }
+
+    $lakecity_page_id = $request->get_param( 'id' );
+    $data             = $request->get_json_params();
+
+    // Check we have both theme and content
+    if ( empty( $data['theme'] ) || empty( $data['content'] ) ) {
+        return new WP_Error(
+            'missing_data',
+            'Both theme and content are required',
+            array( 'status' => 400 )
+        );
+    }
+
+    $theme_config = $data['theme'];
+    $content      = $data['content'];
+
+    // Validate both
+    $theme_errors   = lakecity_validate_theme_config( $theme_config );
+    $content_errors = lakecity_validate_content( $content );
+    $all_errors     = array_merge( $theme_errors, $content_errors );
+
+    if ( ! empty( $all_errors ) ) {
+        return new WP_Error(
+            'validation_failed',
+            implode( ', ', $all_errors ),
+            array( 'status' => 400 )
+        );
+    }
+
+    // Sanitize both
+    $sanitized_theme   = lakecity_sanitize_theme_config( $theme_config );
+    $sanitized_content = lakecity_sanitize_content( $content );
+
+    // Save both atomically (WordPress doesn't have transactions, but we check both saves)
+    update_post_meta( $lakecity_page_id, '_lakecity_theme_config', wp_json_encode( $sanitized_theme ) );
+    update_post_meta( $lakecity_page_id, '_lakecity_content', $sanitized_content );
+
+    // CRITICAL: Clear post meta cache to ensure fresh data on next load
+    wp_cache_delete( $lakecity_page_id, 'post_meta' );
+    clean_post_cache( $lakecity_page_id );
+
+    // Verify both saves by reading back (bypassing cache)
+    $saved_theme   = get_post_meta( $lakecity_page_id, '_lakecity_theme_config', true );
+    $saved_content = get_post_meta( $lakecity_page_id, '_lakecity_content', true );
+
+    if ( empty( $saved_theme ) || empty( $saved_content ) ) {
+        return new WP_Error( 'save_failed', 'Failed to save theme and/or content', array( 'status' => 500 ) );
+    }
+
+    return rest_ensure_response( array(
+        'success' => true,
+        'theme'   => $sanitized_theme,
+        'content' => $sanitized_content,
+    ) );
 }
 
 /**

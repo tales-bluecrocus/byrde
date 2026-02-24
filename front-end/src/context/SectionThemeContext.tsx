@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { DEFAULT_DARK_PALETTE, DEFAULT_LIGHT_PALETTE } from '../config/sectionPalettes';
 import type { GeneratedPalette } from '../utils/colorUtils';
 
 // Re-export for convenience
@@ -86,6 +85,7 @@ interface SectionThemeContextType {
   sectionVisibility: Record<SectionId, boolean>;
   updateSectionTheme: (sectionId: SectionId, theme: Partial<SectionTheme>) => void;
   resetSectionTheme: (sectionId: SectionId) => void;
+  resetAllSectionThemes: () => void;
   getSectionStyles: (sectionId: SectionId) => React.CSSProperties;
   getResolvedTheme: (sectionId: SectionId) => ResolvedSectionTheme;
   setSectionPalette: (sectionId: SectionId, palette: SectionPalette) => void;
@@ -100,14 +100,14 @@ const SectionThemeContext = createContext<SectionThemeContextType | null>(null);
 const getWpSectionsConfig = (): Record<string, unknown> | null => {
   if (typeof window === 'undefined') return null;
 
-  // Check admin config first
-  if ((window as any).lakecityAdmin?.config?.sections) {
-    return (window as any).lakecityAdmin.config.sections;
+  // Check admin config first (CORRECT KEY: sectionThemes)
+  if (window.lakecityAdmin?.config?.sectionThemes) {
+    return window.lakecityAdmin.config.sectionThemes as Record<string, unknown>;
   }
 
-  // Check public page config
-  if ((window as any).lakecityConfig?.sections) {
-    return (window as any).lakecityConfig.sections;
+  // Check public page config (CORRECT KEY: sectionThemes)
+  if (window.lakecityConfig?.sectionThemes) {
+    return window.lakecityConfig.sectionThemes as Record<string, unknown>;
   }
 
   return null;
@@ -160,11 +160,6 @@ function loadVisibility(): Record<SectionId, boolean> {
   return {} as Record<SectionId, boolean>;
 }
 
-// Get default palette based on global mode
-export function getDefaultPaletteId(mode: 'dark' | 'light'): string {
-  return mode === 'dark' ? DEFAULT_DARK_PALETTE : DEFAULT_LIGHT_PALETTE;
-}
-
 export function SectionThemeProvider({ children }: { children: ReactNode }) {
   const [sectionThemes, setSectionThemes] = useState<Record<SectionId, SectionTheme>>(loadThemes);
   const [sectionVisibility, setSectionVisibilityState] = useState<Record<SectionId, boolean>>(loadVisibility);
@@ -185,6 +180,11 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
       delete newThemes[sectionId];
       return newThemes;
     });
+  }, []);
+
+  const resetAllSectionThemes = useCallback(() => {
+    setSectionThemes({} as Record<SectionId, SectionTheme>);
+    setSectionVisibilityState({} as Record<SectionId, boolean>);
   }, []);
 
   // Set palette for a section - receives the full palette object (dynamically generated)
@@ -366,6 +366,7 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
         sectionVisibility,
         updateSectionTheme,
         resetSectionTheme,
+        resetAllSectionThemes,
         getSectionStyles,
         getResolvedTheme,
         setSectionPalette,

@@ -132,14 +132,14 @@ const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
 const getWpConfig = (): GlobalConfig | null => {
   if (typeof window === 'undefined') return null;
 
-  // Check admin config first (has apiUrl, nonce, etc.)
-  if ((window as any).lakecityAdmin?.config?.global) {
-    return (window as any).lakecityAdmin.config.global as GlobalConfig;
+  // Check admin config first (has apiUrl, nonce, etc.) - CORRECT KEY: globalConfig
+  if (window.lakecityAdmin?.config?.globalConfig) {
+    return window.lakecityAdmin.config.globalConfig as GlobalConfig;
   }
 
-  // Check public page config (just the config object)
-  if ((window as any).lakecityConfig?.global) {
-    return (window as any).lakecityConfig.global as GlobalConfig;
+  // Check public page config (just the config object) - CORRECT KEY: globalConfig
+  if (window.lakecityConfig?.globalConfig) {
+    return window.lakecityConfig.globalConfig as GlobalConfig;
   }
 
   return null;

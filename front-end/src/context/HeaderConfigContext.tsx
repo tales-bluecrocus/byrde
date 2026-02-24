@@ -76,12 +76,12 @@ const DEFAULT_TOPBAR_CONFIG: TopbarConfig = {
 };
 
 // Check for WordPress config (admin or public page)
-const getWpConfig = (): { header?: HeaderConfig; topbar?: TopbarConfig } => {
+const getWpConfig = (): { header?: Partial<HeaderConfig>; topbar?: Partial<TopbarConfig> } => {
   if (typeof window === 'undefined') return {};
 
   // Check admin config first
-  if ((window as any).lakecityAdmin?.config) {
-    const wpConfig = (window as any).lakecityAdmin.config;
+  if (window.lakecityAdmin?.config) {
+    const wpConfig = window.lakecityAdmin.config;
     return {
       header: wpConfig.header,
       topbar: wpConfig.topbar,
@@ -89,8 +89,8 @@ const getWpConfig = (): { header?: HeaderConfig; topbar?: TopbarConfig } => {
   }
 
   // Check public page config
-  if ((window as any).lakecityConfig) {
-    const wpConfig = (window as any).lakecityConfig;
+  if (window.lakecityConfig) {
+    const wpConfig = window.lakecityConfig;
     return {
       header: wpConfig.header,
       topbar: wpConfig.topbar,

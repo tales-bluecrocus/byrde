@@ -64,220 +64,6 @@ export function withAlpha(hex: string, alpha: number): string {
 }
 
 /**
- * Generate a full color palette from a base color
- */
-export interface ColorShades {
-  50: string;   // Lightest
-  100: string;
-  200: string;
-  300: string;
-  400: string;
-  500: string;  // Base
-  600: string;
-  700: string;
-  800: string;
-  900: string;  // Darkest
-  950: string;  // Extra dark
-}
-
-export function generateShades(baseColor: string): ColorShades {
-  return {
-    50: lighten(baseColor, 95),
-    100: lighten(baseColor, 85),
-    200: lighten(baseColor, 70),
-    300: lighten(baseColor, 50),
-    400: lighten(baseColor, 25),
-    500: baseColor,
-    600: darken(baseColor, 10),
-    700: darken(baseColor, 25),
-    800: darken(baseColor, 40),
-    900: darken(baseColor, 55),
-    950: darken(baseColor, 70),
-  };
-}
-
-/**
- * Surface palette - 8 consistent colors per mode
- * These are the base colors for backgrounds/surfaces
- */
-export interface SurfacePalette {
-  // From lightest to darkest (or darkest to lightest in dark mode)
-  s1: string;  // Main background
-  s2: string;  // Elevated surface (cards)
-  s3: string;  // Subtle background
-  s4: string;  // Input backgrounds
-  s5: string;  // Hover states
-  s6: string;  // Active states
-  s7: string;  // Borders
-  s8: string;  // Dividers
-}
-
-/**
- * Brand color system - simplified palette for sections (Primary + Accent)
- */
-export interface BrandPalette {
-  primary: {
-    light: string;
-    base: string;
-    dark: string;
-  };
-  accent: {
-    light: string;
-    base: string;
-    dark: string;
-  };
-  neutral: {
-    light: string;
-    base: string;
-    dark: string;
-  };
-  // 8 surface colors based on mode
-  surface: SurfacePalette;
-  // Pre-computed backgrounds and text colors based on mode
-  background: {
-    primary: string;
-    secondary: string;
-    tertiary: string;
-  };
-  text: {
-    primary: string;
-    secondary: string;
-    muted: string;
-  };
-  border: string;
-}
-
-export type ColorMode = 'light' | 'dark';
-
-/**
- * Generate the complete brand palette based on primary + accent colors and mode
- */
-export function generateBrandPalette(
-  primaryColor: string,
-  accentColor: string,
-  mode: ColorMode
-): BrandPalette {
-  const primaryShades = generateShades(primaryColor);
-  const accentShades = generateShades(accentColor);
-
-  if (mode === 'dark') {
-    // Dark mode: 8 surface colors from darkest to lightest
-    const surface: SurfacePalette = {
-      s1: '#0a0a0a',   // Main background (darkest)
-      s2: '#111111',   // Elevated surface
-      s3: '#161616',   // Subtle background
-      s4: '#1a1a1a',   // Input backgrounds
-      s5: '#222222',   // Hover states
-      s6: '#2a2a2a',   // Active states
-      s7: '#333333',   // Borders
-      s8: '#404040',   // Dividers (lightest)
-    };
-
-    return {
-      primary: {
-        light: primaryShades[400],
-        base: primaryShades[500],
-        dark: primaryShades[600],
-      },
-      accent: {
-        light: accentShades[400],
-        base: accentShades[500],
-        dark: accentShades[600],
-      },
-      neutral: {
-        light: '#374151',  // gray-700
-        base: '#1f2937',   // gray-800
-        dark: '#111827',   // gray-900
-      },
-      surface,
-      background: {
-        primary: surface.s1,
-        secondary: surface.s2,
-        tertiary: surface.s4,
-      },
-      text: {
-        primary: '#ffffff',
-        secondary: '#d1d5db',  // gray-300
-        muted: '#9ca3af',      // gray-400
-      },
-      border: surface.s7,
-    };
-  }
-
-  // Light mode: 8 surface colors from lightest to darkest
-  const surface: SurfacePalette = {
-    s1: '#ffffff',   // Main background (lightest)
-    s2: '#fafafa',   // Elevated surface
-    s3: '#f5f5f5',   // Subtle background
-    s4: '#f0f0f0',   // Input backgrounds
-    s5: '#e8e8e8',   // Hover states
-    s6: '#e0e0e0',   // Active states
-    s7: '#d4d4d4',   // Borders
-    s8: '#c0c0c0',   // Dividers (darkest)
-  };
-
-  return {
-    primary: {
-      light: primaryShades[400],
-      base: primaryShades[500],
-      dark: primaryShades[600],
-    },
-    accent: {
-      light: accentShades[300],
-      base: accentShades[500],
-      dark: accentShades[700],
-    },
-    neutral: {
-      light: '#f9fafb',  // gray-50
-      base: '#f3f4f6',   // gray-100
-      dark: '#e5e7eb',   // gray-200
-    },
-    surface,
-    background: {
-      primary: surface.s1,
-      secondary: surface.s2,
-      tertiary: surface.s4,
-    },
-    text: {
-      primary: '#111827',  // gray-900
-      secondary: '#374151', // gray-700
-      muted: '#6b7280',     // gray-500
-    },
-    border: surface.s7,
-  };
-}
-
-/**
- * Preset brand color combinations (Primary + Accent)
- * 4 Dark presets (saturated, bold colors for dark mode)
- * 4 Light presets (softer, muted colors for light mode)
- */
-export const brandPresets = [
-  // === DARK PRESETS (4) - Bold, saturated colors ===
-  { name: 'Forest', primary: '#22c55e', accent: '#10b981', tone: 'dark' },
-  { name: 'Ocean', primary: '#3b82f6', accent: '#0ea5e9', tone: 'dark' },
-  { name: 'Sunset', primary: '#f97316', accent: '#f59e0b', tone: 'dark' },
-  { name: 'Berry', primary: '#a855f7', accent: '#c026d3', tone: 'dark' },
-  // === LIGHT PRESETS (4) - Softer, muted colors ===
-  { name: 'Sage', primary: '#059669', accent: '#14b8a6', tone: 'light' },
-  { name: 'Sky', primary: '#0284c7', accent: '#6366f1', tone: 'light' },
-  { name: 'Coral', primary: '#dc2626', accent: '#ef4444', tone: 'light' },
-  { name: 'Lavender', primary: '#7c3aed', accent: '#a855f7', tone: 'light' },
-];
-
-/**
- * Get contrasting text color (black or white) based on background
- */
-export function getContrastColor(hexColor: string): string {
-  const rgb = hexToRgb(hexColor);
-  if (!rgb) return '#ffffff';
-
-  // Calculate relative luminance
-  const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-  return luminance > 0.5 ? '#000000' : '#ffffff';
-}
-
-/**
  * Convert RGB to HSL
  */
 export function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
@@ -343,28 +129,12 @@ export function hslToHex(h: number, s: number, l: number): string {
 }
 
 /**
- * Adjust saturation of a color
- */
-export function saturate(hex: string, amount: number): string {
-  const hsl = hexToHsl(hex);
-  if (!hsl) return hex;
-  return hslToHex(hsl.h, Math.min(100, Math.max(0, hsl.s + amount)), hsl.l);
-}
-
-/**
  * Desaturate a color
  */
 export function desaturate(hex: string, amount: number): string {
-  return saturate(hex, -amount);
-}
-
-/**
- * Shift hue of a color
- */
-export function shiftHue(hex: string, degrees: number): string {
   const hsl = hexToHsl(hex);
   if (!hsl) return hex;
-  return hslToHex((hsl.h + degrees + 360) % 360, hsl.s, hsl.l);
+  return hslToHex(hsl.h, Math.min(100, Math.max(0, hsl.s - amount)), hsl.l);
 }
 
 /**
@@ -384,25 +154,141 @@ export function mixColors(hex1: string, hex2: string, weight: number = 50): stri
 }
 
 /**
- * Set lightness of a color
+ * Get contrasting text color (black or white) based on background
  */
-export function setLightness(hex: string, lightness: number): string {
-  const hsl = hexToHsl(hex);
-  if (!hsl) return hex;
-  return hslToHex(hsl.h, hsl.s, Math.min(100, Math.max(0, lightness)));
-}
+export function getContrastColor(hexColor: string): string {
+  const rgb = hexToRgb(hexColor);
+  if (!rgb) return '#ffffff';
 
-/**
- * Set saturation of a color
- */
-export function setSaturation(hex: string, saturation: number): string {
-  const hsl = hexToHsl(hex);
-  if (!hsl) return hex;
-  return hslToHex(hsl.h, Math.min(100, Math.max(0, saturation)), hsl.l);
+  // Calculate relative luminance
+  const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+  return luminance > 0.5 ? '#000000' : '#ffffff';
 }
 
 // ============================================
-// DYNAMIC PALETTE GENERATION
+// SHADE GENERATION (Tailwind-style 50-950)
+// ============================================
+
+/**
+ * Full Tailwind-compatible shade scale from a single base color.
+ * The base color is used as-is for the 500 shade.
+ * Lighter shades (50-400) increase lightness and reduce saturation.
+ * Darker shades (600-950) decrease lightness and preserve saturation.
+ */
+export interface ColorShades {
+  50: string;   // Lightest
+  100: string;
+  200: string;
+  300: string;
+  400: string;
+  500: string;  // Base (user's color, untouched)
+  600: string;
+  700: string;
+  800: string;
+  900: string;
+  950: string;  // Darkest
+}
+
+export function generateShades(baseColor: string): ColorShades {
+  const hsl = hexToHsl(baseColor);
+  if (!hsl) {
+    return { 50: baseColor, 100: baseColor, 200: baseColor, 300: baseColor, 400: baseColor, 500: baseColor, 600: baseColor, 700: baseColor, 800: baseColor, 900: baseColor, 950: baseColor };
+  }
+
+  const { h, s, l } = hsl;
+
+  // For lighter shades: interpolate lightness toward ~97 and reduce saturation
+  // For darker shades: interpolate lightness toward ~4 and keep saturation
+  return {
+    50:  hslToHex(h, Math.max(s * 0.3, 5),  97),
+    100: hslToHex(h, Math.max(s * 0.4, 8),  93),
+    200: hslToHex(h, Math.max(s * 0.55, 12), 85),
+    300: hslToHex(h, Math.max(s * 0.7, 18),  73),
+    400: hslToHex(h, Math.max(s * 0.85, 25), 60),
+    500: baseColor, // The user's color, EXACTLY as provided
+    600: hslToHex(h, s, Math.max(l - 8,  20)),
+    700: hslToHex(h, s, Math.max(l - 18, 15)),
+    800: hslToHex(h, s, Math.max(l - 28, 10)),
+    900: hslToHex(h, s, Math.max(l - 38, 7)),
+    950: hslToHex(h, s, Math.max(l - 45, 4)),
+  };
+}
+
+// ============================================
+// BRAND PALETTE
+// ============================================
+
+export type ColorMode = 'light' | 'dark';
+
+/**
+ * Brand palette: 2 full shade scales (primary + accent) + semantic tokens by mode.
+ * Primary and accent are full ColorShades (50-950) generated from the client's 2 colors.
+ */
+export interface BrandPalette {
+  primary: ColorShades;
+  accent: ColorShades;
+  background: {
+    primary: string;
+    secondary: string;
+    tertiary: string;
+  };
+  text: {
+    primary: string;
+    secondary: string;
+    muted: string;
+  };
+  border: string;
+}
+
+/**
+ * Generate the complete brand palette from 2 colors + mode.
+ * The primary and accent colors become the 500 shade, all others are auto-generated.
+ */
+export function generateBrandPalette(
+  primaryColor: string,
+  accentColor: string,
+  mode: ColorMode
+): BrandPalette {
+  const primary = generateShades(primaryColor);
+  const accent = generateShades(accentColor);
+
+  if (mode === 'dark') {
+    return {
+      primary,
+      accent,
+      background: {
+        primary: '#0a0a0a',
+        secondary: '#111111',
+        tertiary: '#1a1a1a',
+      },
+      text: {
+        primary: '#ffffff',
+        secondary: '#d1d5db',
+        muted: '#9ca3af',
+      },
+      border: '#333333',
+    };
+  }
+
+  return {
+    primary,
+    accent,
+    background: {
+      primary: '#ffffff',
+      secondary: '#fafafa',
+      tertiary: '#f0f0f0',
+    },
+    text: {
+      primary: '#111827',
+      secondary: '#374151',
+      muted: '#6b7280',
+    },
+    border: '#d4d4d4',
+  };
+}
+
+// ============================================
+// DYNAMIC PALETTE GENERATION (Section overrides)
 // ============================================
 
 export interface GeneratedPalette {
@@ -421,205 +307,83 @@ export interface GeneratedPalette {
 }
 
 /**
- * Generate dark palettes from brand colors (6 total)
- * Uses Primary + Accent color system
+ * Generate 2 dark palettes derived from brand colors.
+ * 1. Dark — Neutral dark bg, primary as accent
+ * 2. Brand Dark — Subtle brand tint in bg, accent as accent
  */
 export function generateDarkPalettes(primary: string, accent: string): GeneratedPalette[] {
   return [
-    // 1. Brand Primary Dark - dark with PRIMARY as accent
     {
-      id: 'brand-primary-dark',
-      name: 'Brand Primary',
+      id: 'dark',
+      name: 'Dark',
       mode: 'dark',
       colors: {
         bgPrimary: '#0a0a0a',
         bgSecondary: '#141414',
         bgTertiary: '#1f1f1f',
         textPrimary: '#ffffff',
-        textSecondary: '#a3a3a3',
+        textSecondary: '#a1a1aa',
         accent: primary,
-        borderColor: mixColors('#2a2a2a', primary, 10),
+        borderColor: '#27272a',
       },
     },
-    // 2. Brand Accent Dark - dark with ACCENT as accent
     {
-      id: 'brand-accent-dark',
-      name: 'Brand Accent',
+      id: 'brand-dark',
+      name: 'Brand Dark',
       mode: 'dark',
       colors: {
-        bgPrimary: '#0a0a0a',
-        bgSecondary: '#141414',
-        bgTertiary: '#1f1f1f',
+        bgPrimary: mixColors('#0a0a0a', primary, 4),
+        bgSecondary: mixColors('#141414', primary, 6),
+        bgTertiary: mixColors('#1f1f1f', primary, 5),
         textPrimary: '#ffffff',
-        textSecondary: '#a3a3a3',
+        textSecondary: mixColors('#a1a1aa', primary, 15),
         accent: accent,
-        borderColor: mixColors('#2a2a2a', accent, 10),
-      },
-    },
-    // 3. Primary Tint Dark - subtle primary tint in backgrounds
-    {
-      id: 'primary-tint-dark',
-      name: 'Primary Tint',
-      mode: 'dark',
-      colors: {
-        bgPrimary: mixColors('#0a0a0a', primary, 6),
-        bgSecondary: mixColors('#141414', primary, 8),
-        bgTertiary: mixColors('#1f1f1f', primary, 6),
-        textPrimary: '#ffffff',
-        textSecondary: lighten(desaturate(primary, 30), 40),
-        accent: primary,
-        borderColor: mixColors('#2a2a2a', primary, 15),
-      },
-    },
-    // 4. Accent Tint Dark - subtle accent tint in backgrounds
-    {
-      id: 'accent-tint-dark',
-      name: 'Accent Tint',
-      mode: 'dark',
-      colors: {
-        bgPrimary: mixColors('#0a0a0a', accent, 6),
-        bgSecondary: mixColors('#141414', accent, 8),
-        bgTertiary: mixColors('#1f1f1f', accent, 6),
-        textPrimary: '#ffffff',
-        textSecondary: lighten(desaturate(accent, 30), 40),
-        accent: accent,
-        borderColor: mixColors('#2a2a2a', accent, 15),
-      },
-    },
-    // 5. Vibrant Dark - more saturated mix
-    {
-      id: 'vibrant-dark',
-      name: 'Vibrant',
-      mode: 'dark',
-      colors: {
-        bgPrimary: mixColors('#0a0a0a', primary, 10),
-        bgSecondary: mixColors('#141414', accent, 12),
-        bgTertiary: mixColors('#1f1f1f', primary, 8),
-        textPrimary: '#ffffff',
-        textSecondary: lighten(primary, 35),
-        accent: saturate(accent, 20),
-        borderColor: mixColors('#2a2a2a', primary, 20),
-      },
-    },
-    // 6. Muted Dark - desaturated
-    {
-      id: 'muted-dark',
-      name: 'Muted',
-      mode: 'dark',
-      colors: {
-        bgPrimary: '#0f0f0f',
-        bgSecondary: '#171717',
-        bgTertiary: '#1e1e1e',
-        textPrimary: '#e5e5e5',
-        textSecondary: '#808080',
-        accent: desaturate(accent, 15),
-        borderColor: '#292929',
+        borderColor: mixColors('#27272a', primary, 12),
       },
     },
   ];
 }
 
 /**
- * Generate light palettes from brand colors (6 total)
- * Uses Primary + Accent color system
+ * Generate 2 light palettes derived from brand colors.
+ * 1. Light — Clean white bg, primary as accent
+ * 2. Brand Light — Subtle brand tint in bg, accent as accent
  */
 export function generateLightPalettes(primary: string, accent: string): GeneratedPalette[] {
   return [
-    // 1. Brand Primary Light - clean white with PRIMARY as accent
     {
-      id: 'brand-primary-light',
-      name: 'Brand Primary',
+      id: 'light',
+      name: 'Light',
       mode: 'light',
       colors: {
         bgPrimary: '#ffffff',
-        bgSecondary: '#f8f8f8',
-        bgTertiary: '#f0f0f0',
-        textPrimary: '#111827',
-        textSecondary: '#4b5563',
+        bgSecondary: '#fafafa',
+        bgTertiary: '#f5f5f5',
+        textPrimary: '#18181b',
+        textSecondary: '#52525b',
         accent: primary,
-        borderColor: mixColors('#d4d4d4', primary, 10),
+        borderColor: '#e4e4e7',
       },
     },
-    // 2. Brand Accent Light - clean white with ACCENT as accent
     {
-      id: 'brand-accent-light',
-      name: 'Brand Accent',
+      id: 'brand-light',
+      name: 'Brand Light',
       mode: 'light',
       colors: {
-        bgPrimary: '#ffffff',
-        bgSecondary: '#f8f8f8',
-        bgTertiary: '#f0f0f0',
-        textPrimary: '#111827',
-        textSecondary: '#4b5563',
+        bgPrimary: mixColors('#ffffff', primary, 2),
+        bgSecondary: mixColors('#fafafa', primary, 4),
+        bgTertiary: mixColors('#f5f5f5', primary, 6),
+        textPrimary: '#18181b',
+        textSecondary: mixColors('#52525b', primary, 10),
         accent: accent,
-        borderColor: mixColors('#d4d4d4', accent, 10),
-      },
-    },
-    // 3. Primary Tint Light - subtle primary tint in backgrounds
-    {
-      id: 'primary-tint-light',
-      name: 'Primary Tint',
-      mode: 'light',
-      colors: {
-        bgPrimary: mixColors('#ffffff', primary, 3),
-        bgSecondary: mixColors('#f8f8f8', primary, 5),
-        bgTertiary: mixColors('#f0f0f0', primary, 7),
-        textPrimary: '#111827',
-        textSecondary: darken(desaturate(primary, 30), 40),
-        accent: primary,
-        borderColor: mixColors('#e0e0e0', primary, 12),
-      },
-    },
-    // 4. Accent Tint Light - subtle accent tint in backgrounds
-    {
-      id: 'accent-tint-light',
-      name: 'Accent Tint',
-      mode: 'light',
-      colors: {
-        bgPrimary: mixColors('#ffffff', accent, 3),
-        bgSecondary: mixColors('#f8f8f8', accent, 5),
-        bgTertiary: mixColors('#f0f0f0', accent, 7),
-        textPrimary: '#111827',
-        textSecondary: darken(desaturate(accent, 30), 40),
-        accent: accent,
-        borderColor: mixColors('#e0e0e0', accent, 12),
-      },
-    },
-    // 5. Vibrant Light - more saturated
-    {
-      id: 'vibrant-light',
-      name: 'Vibrant',
-      mode: 'light',
-      colors: {
-        bgPrimary: setLightness(setSaturation(primary, 20), 98),
-        bgSecondary: setLightness(setSaturation(primary, 25), 95),
-        bgTertiary: setLightness(setSaturation(primary, 30), 92),
-        textPrimary: setLightness(setSaturation(primary, 70), 20),
-        textSecondary: setLightness(setSaturation(primary, 50), 35),
-        accent: saturate(accent, 10),
-        borderColor: setLightness(setSaturation(primary, 30), 82),
-      },
-    },
-    // 6. Muted Light - desaturated
-    {
-      id: 'muted-light',
-      name: 'Muted',
-      mode: 'light',
-      colors: {
-        bgPrimary: '#fafafa',
-        bgSecondary: '#f5f5f5',
-        bgTertiary: '#eeeeee',
-        textPrimary: '#333333',
-        textSecondary: '#666666',
-        accent: desaturate(accent, 15),
-        borderColor: '#dddddd',
+        borderColor: mixColors('#e4e4e7', primary, 10),
       },
     },
   ];
 }
 
 /**
- * Generate all palettes from brand colors (6 dark + 6 light = 12 total)
+ * Generate all palettes from brand colors (2 dark + 2 light = 4 total)
  */
 export function generateAllPalettes(primary: string, accent: string): GeneratedPalette[] {
   return [

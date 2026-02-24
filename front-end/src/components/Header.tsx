@@ -106,8 +106,8 @@ function Topbar() {
 
 	// Check if using override colors or global primary
 	const isOverriding = topheaderTheme.overrideGlobalColors ?? false;
-	const bgColor = isOverriding ? (topheaderTheme.bgPrimary || palette.primary.base) : palette.primary.base;
-	const textColor = isOverriding ? (topheaderTheme.textPrimary || getContrastColor(bgColor)) : getContrastColor(palette.primary.base);
+	const bgColor = isOverriding ? (topheaderTheme.bgPrimary || palette.primary[500]) : palette.primary[500];
+	const textColor = isOverriding ? (topheaderTheme.textPrimary || getContrastColor(bgColor)) : getContrastColor(palette.primary[500]);
 
 	// Get the icon component
 	const IconComponent = TOPBAR_ICON_MAP[topbarConfig.icon];
@@ -160,7 +160,7 @@ function Topbar() {
 				color: textColor
 			}}
 		>
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div className="max-w-7xl mx-auto px-6 lg:px-8">
 				<div className={`flex items-center ${getJustifyClass()}`}>
 					{/* Message - hidden on mobile if we have contact info */}
 					<span className={hasContactInfo ? "hidden sm:inline-flex" : "inline-flex"}>
@@ -212,7 +212,7 @@ export default function Header() {
 
 	// Use header palette colors if overriding, otherwise fall back to global
 	const isOverriding = headerTheme.overrideGlobalColors ?? false;
-	const bgColor = isOverriding ? (headerTheme.bgPrimary || palette.surface.s1) : palette.surface.s1;
+	const bgColor = isOverriding ? (headerTheme.bgPrimary || palette.background.primary) : palette.background.primary;
 	const accentColor = isOverriding ? (headerTheme.accent || globalConfig.brand.accent) : globalConfig.brand.accent;
 	const textPrimary = isOverriding ? (headerTheme.textPrimary || palette.text.primary) : palette.text.primary;
 
@@ -223,7 +223,10 @@ export default function Header() {
 		}
 
 		const handleScroll = () => {
-			setIsScrolled(window.scrollY > 100);
+			// Show fixed header after scrolling past the hero area (~500px)
+			// Only return to relative at the very top
+			const y = window.scrollY;
+			setIsScrolled(prev => prev ? y > 0 : y > 500);
 		};
 
 		const handleResize = () => {
@@ -255,7 +258,6 @@ export default function Header() {
 
 	// Get header padding based on config
 	const getHeaderPadding = () => {
-		if (shouldBeFixed) return 'py-2';
 		switch (headerConfig.style.headerPadding) {
 			case 'compact': return 'py-2';
 			case 'spacious': return 'py-6 sm:py-8';
@@ -271,19 +273,19 @@ export default function Header() {
 
 			<div
 				ref={headerRef}
-				className={`left-0 right-0 z-50 transition-all duration-300 ${
+				className={`left-0 right-0 z-50 ${
 					shouldBeFixed
 						? "fixed top-0 animate-[slideDown_0.3s_ease-out]"
 						: "relative"
 				}`}
 			>
-				{/* Topbar */}
-				<Topbar />
+				{/* Topbar - hidden when fixed */}
+				{!shouldBeFixed && <Topbar />}
 
 				{/* Main Header */}
 				<header
 					id="header-section"
-					className={`transition-all duration-300 ${
+					className={`${
 						shouldBeFixed
 							? "backdrop-blur-md shadow-lg shadow-black/20"
 							: ""
@@ -293,14 +295,12 @@ export default function Header() {
 						color: textPrimary,
 					}}
 				>
-					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="max-w-7xl mx-auto px-6 lg:px-8">
 						<div className="flex items-center justify-between">
 							{/* Logo */}
 							<a href="#" className="flex items-center group">
 								<div
-									className={`p-2 transition-all duration-500 ${
-										isScrolled ? "p-1.5" : "p-2 sm:p-3"
-									} ${globalConfig.logo.shape === 'circle' ? 'overflow-hidden' : ''}`}
+									className={`p-2 sm:p-3 ${globalConfig.logo.shape === 'circle' ? 'overflow-hidden' : ''}`}
 									style={{
 										backgroundColor: globalConfig.logo.bgColor,
 										borderRadius: getLogoBorderRadius(),
@@ -309,9 +309,7 @@ export default function Header() {
 									<img
 										src={logo}
 										alt={logoAlt}
-										className={`w-auto transition-all duration-500 ${
-											isScrolled ? "h-12" : "h-20 sm:h-24"
-										}`}
+										className="w-auto h-14 sm:h-16"
 									/>
 								</div>
 							</a>

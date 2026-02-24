@@ -6,20 +6,48 @@ import type { SectionId } from './SectionThemeContext';
 // CONTENT TYPES FOR EACH SECTION
 // ============================================
 
-// Available icons for trust badges
-export type BadgeIconType = 'shield' | 'clock' | 'check' | 'star' | 'truck' | 'phone' | 'map-pin' | 'award' | 'thumbs-up' | 'heart';
+// Available icons for trust badges - comprehensive list
+export type BadgeIconType =
+  // Trust & Safety
+  | 'shield' | 'shield-check' | 'lock' | 'key' | 'badge' | 'badge-check'
+  // Approval & Success
+  | 'check' | 'check-circle' | 'circle-check' | 'thumbs-up' | 'award' | 'trophy' | 'medal'
+  // Ratings & Favorites
+  | 'star' | 'heart' | 'sparkles' | 'zap'
+  // Time & Speed
+  | 'clock' | 'timer' | 'calendar' | 'hourglass' | 'rocket'
+  // Communication
+  | 'phone' | 'phone-call' | 'mail' | 'message-circle' | 'headphones'
+  // Location & Navigation
+  | 'map-pin' | 'navigation' | 'compass' | 'home' | 'building'
+  // Services & Tools
+  | 'truck' | 'package' | 'box' | 'wrench' | 'hammer' | 'tool'
+  // People & Community
+  | 'users' | 'user-check' | 'handshake' | 'smile'
+  // Business & Finance
+  | 'dollar-sign' | 'credit-card' | 'wallet' | 'percent' | 'tag'
+  // Nature & Environment
+  | 'leaf' | 'recycle' | 'sun' | 'droplet'
+  // Misc
+  | 'gift' | 'target' | 'flag' | 'crown' | 'gem';
 
 export interface HeroContent {
   headline: string;
   subheadline: string;
   ctaText: string;
   ctaLink: string;
+  // Hero badge (above headline)
+  heroBadgeText: string;
+  showHeroBadge: boolean;
+  // Trust badges (below benefits list)
   badge1Icon: BadgeIconType;
   badge1Label: string;
   badge1Sublabel: string;
+  showBadge1: boolean;
   badge2Icon: BadgeIconType;
   badge2Label: string;
   badge2Sublabel: string;
+  showBadge2: boolean;
 }
 
 export interface FeaturedTestimonialContent {
@@ -73,6 +101,7 @@ export interface TestimonialItem {
   id: string;
   quote: string;
   authorName: string;
+  authorTitle?: string; // e.g., "Verified Customer", "Business Owner"
   rating: number;
 }
 
@@ -158,12 +187,18 @@ const DEFAULT_HERO_CONTENT: HeroContent = {
   subheadline: 'Professional junk removal services in North Idaho and Spokane. Licensed, insured, and locally owned.',
   ctaText: 'Call For Free Quote',
   ctaLink: 'tel:2089980054',
+  // Hero badge
+  heroBadgeText: 'Fully Insured. Peace of Mind.',
+  showHeroBadge: true,
+  // Trust badges
   badge1Icon: 'shield',
   badge1Label: 'Fully Insured',
   badge1Sublabel: 'Peace of Mind',
+  showBadge1: true,
   badge2Icon: 'clock',
   badge2Label: 'Same-Day',
   badge2Sublabel: 'Service Available',
+  showBadge2: true,
 };
 
 const DEFAULT_FEATURED_TESTIMONIAL_CONTENT: FeaturedTestimonialContent = {
@@ -291,8 +326,8 @@ const ContentContext = createContext<ContentContextType | null>(null);
 // Load initial content from PHP injection or defaults
 function loadContent(): Record<ContentSectionId, SectionContent> {
   // Check for PHP-injected content (public pages)
-  if (typeof window !== 'undefined' && (window as any).lakecityContent) {
-    return { ...DEFAULT_CONTENT, ...(window as any).lakecityContent };
+  if (typeof window !== 'undefined' && window.lakecityContent) {
+    return { ...DEFAULT_CONTENT, ...window.lakecityContent };
   }
   return { ...DEFAULT_CONTENT };
 }
@@ -302,7 +337,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   // Fetch content from API when in editor mode
   useEffect(() => {
-    const wpAdmin = (window as any).lakecityAdmin;
+    const wpAdmin = window.lakecityAdmin;
     if (!wpAdmin?.pageId || !wpAdmin?.apiUrl) return;
 
     const fetchContent = async () => {
@@ -310,13 +345,24 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         const response = await fetch(`${wpAdmin.apiUrl}/pages/${wpAdmin.pageId}/content`, {
           headers: { 'X-WP-Nonce': wpAdmin.nonce },
         });
+
+        // Check response status BEFORE parsing JSON
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${response.statusText}. ${errorText}`);
+        }
+
         const data = await response.json();
 
         if (data.success && data.content) {
           setSectionContent(prev => ({ ...prev, ...data.content }));
+        } else {
+          throw new Error('Invalid response format from server');
         }
       } catch (error) {
         console.error('[ContentContext] Failed to fetch content:', error);
+        // TODO: Show user-facing error notification
+        // toast.error('Failed to load content. Please refresh the page.');
       }
     };
 
