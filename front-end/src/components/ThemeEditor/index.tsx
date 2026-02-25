@@ -22,6 +22,7 @@ import {
   ChevronRight,
   ChevronLeft,
   Save,
+  Loader2,
   RotateCcw,
   Globe,
   EyeOff,
@@ -39,6 +40,7 @@ export function ThemeEditor() {
   const { isOpen, setIsOpen } = useSidebar();
   const [selectedSection, setSelectedSection] = useState<SectionId | 'global' | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { sectionThemes, isSectionVisible, resetAllSectionThemes } = useSectionTheme();
   const { globalConfig, resetGlobalConfig } = useGlobalConfig();
@@ -67,6 +69,8 @@ export function ThemeEditor() {
       toast('Not in admin mode', 'error');
       return;
     }
+
+    setIsSaving(true);
 
     try {
       const configPayload = {
@@ -103,6 +107,8 @@ export function ThemeEditor() {
       toast('Saved to WordPress', 'success');
     } catch {
       toast('Failed to save', 'error');
+    } finally {
+      setIsSaving(false);
     }
   }, [wpAdmin, globalConfig, sectionThemes, headerConfig, topbarConfig, sectionContent, toast]);
 
@@ -206,10 +212,15 @@ export function ThemeEditor() {
         <div className="shrink-0 p-3 space-y-2 border-t border-zinc-800">
           <Button
             onClick={handleSaveConfig}
-            className="w-full bg-green-500 hover:bg-green-600 text-white"
+            disabled={isSaving}
+            className="w-full bg-green-500 hover:bg-green-600 text-white disabled:opacity-70"
             size="sm"
           >
-            <Save className="h-4 w-4 mr-2" /> Save to WordPress
+            {isSaving ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
+            ) : (
+              <><Save className="h-4 w-4 mr-2" /> Save to WordPress</>
+            )}
           </Button>
           <Button
             variant="ghost"

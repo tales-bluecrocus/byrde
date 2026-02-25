@@ -398,15 +398,20 @@ export default function Hero() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/wp-json/byrde/v1/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          _honeypot: (document.getElementById('byrde_hp') as HTMLInputElement)?.value || '',
-          attribution: getAttributionForSubmission(),
+      // Run fetch and a minimum delay in parallel so the user always
+      // sees the "Sending..." state for at least 1.5s
+      const [response] = await Promise.all([
+        fetch('/wp-json/byrde/v1/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...formData,
+            _honeypot: (document.getElementById('byrde_hp') as HTMLInputElement)?.value || '',
+            attribution: getAttributionForSubmission(),
+          }),
         }),
-      });
+        new Promise((r) => setTimeout(r, 1500)),
+      ]);
 
       const result = await response.json();
 

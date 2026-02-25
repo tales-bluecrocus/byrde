@@ -1,245 +1,73 @@
-# Byrde Theme - Documentação Técnica
+# Byrde Theme - Development Instructions
 
-## Visão Geral
+## Architecture
 
-Theme WordPress headless com frontend React. O WordPress serve como backend (dados + API) e o React renderiza toda a UI.
+Headless WordPress theme: PHP backend (data + REST API) with React frontend rendering all UI.
 
-## Stack Tecnológico
+## Tech Stack
 
-| Camada | Tecnologia |
-|--------|------------|
-| CMS | WordPress 6.x |
-| Frontend | React 18 + TypeScript |
-| Build | Vite |
-| Styling | Tailwind CSS |
-| UI Components | shadcn/ui (Radix primitives) |
-| Estado | React Context API |
-| Settings | ACF Pro (Advanced Custom Fields) |
+- **CMS**: WordPress 6.x
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS + shadcn/ui (Radix primitives)
+- **State**: React Context API
+- **Settings**: ACF Pro (Advanced Custom Fields)
+- **Auto-updates**: Plugin Update Checker (Composer) via GitHub Releases
 
----
+## Key Directories
 
-## Estrutura de Diretórios
+- `front-end/src/components/` — React components (one per section)
+- `front-end/src/context/` — React Contexts (global state)
+- `front-end/src/hooks/` — Custom hooks
+- `inc/` — PHP modules (each `require`d in `functions.php`)
+- `.config/` — Release/build scripts
+- `.github/workflows/` — GitHub Actions (release automation)
 
-```
-byrde/
-├── front-end/                    # Aplicação React
-│   ├── src/
-│   │   ├── components/           # Componentes React
-│   │   ├── context/              # React Contexts (estado global)
-│   │   ├── hooks/                # Custom hooks
-│   │   ├── utils/                # Utilitários
-│   │   └── assets/images/        # Assets estáticos (logo fallback)
-│   ├── dist/                     # Build de produção (gerado)
-│   └── package.json
-├── inc/                          # PHP modules
-│   ├── acf-theme-settings.php    # ACF options page + settings
-│   ├── cleanup.php               # Remove posts/comments do WP
-│   ├── page-theme-editor.php     # Editor visual (iframe + REST API)
-│   └── rest-content-api.php      # API para conteúdo das seções
-├── functions.php                 # Bootstrap do theme
-├── index.php                     # Template principal (monta <div id="root">)
-├── page.php                      # Usa index.php
-└── style.css                     # Metadata do theme
-```
+## Data Flow
 
----
+Three data sources injected into React via `window.*`:
 
-## Arquitetura de Dados
+1. **`window.byrdeSettings`** — ACF options (logo, phone, social URLs). Stored in `wp_options`.
+2. **`window.byrdeConfig`** — Theme config (colors, palettes, visibility). Stored in `wp_postmeta` as `_byrde_theme_config`.
+3. **`window.byrdeContent`** — Section content (headlines, text). Stored in `wp_postmeta` as `_byrde_content`.
 
-### 1. Theme Settings (ACF)
-**Onde**: Options page do WordPress (`/wp-admin/admin.php?page=theme-settings`)
-**Armazenamento**: `wp_options` table (ACF options)
-**Uso no React**: `window.byrdeSettings` (injetado via `wp_localize_script`)
+In editor mode (`?byrde_preview=1`), content is fetched via REST API instead.
 
-```php
-// Campos disponíveis:
-- logo, phone, email
-- google_rating, google_reviews_count, google_reviews_url
-- footer_tagline, footer_description, copyright
-- facebook_url, instagram_url, youtube_url, yelp_url
-```
+## REST API
 
-### 2. Theme Config (cores, paletas, visibilidade)
-**Onde**: Post meta `_byrde_theme_config` de cada page
-**Armazenamento**: `wp_postmeta` table (serialized array)
-**Uso no React**:
-- Editor: `window.byrdeAdmin.config`
-- Público: `window.byrdeConfig`
+Base: `/wp-json/byrde/v1`
 
-### 3. Section Content (textos editáveis)
-**Onde**: Post meta `_byrde_content` de cada page
-**Armazenamento**: `wp_postmeta` table (serialized array)
-**Uso no React**:
-- Editor: Fetch via REST API
-- Público: `window.byrdeContent` (injetado via `wp_head`)
+| Method | Endpoint | Purpose | Auth |
+|--------|----------|---------|------|
+| GET | `/pages/{id}/theme` | Get color/palette config | `edit_post` |
+| PUT | `/pages/{id}/theme` | Save color/palette config | `edit_post` |
+| GET | `/pages/{id}/content` | Get section content | `edit_post` |
+| PUT | `/pages/{id}/content` | Save section content | `edit_post` |
+| PUT | `/pages/{id}/save-all` | Atomic save (theme + content) | `edit_post` |
+| GET | `/settings` | Get ACF settings | Public |
+| POST | `/upload-image` | Upload image | `upload_files` |
 
----
+## Build Commands
 
-## REST API Endpoints
-
-Base URL: `/wp-json/byrde/v1`
-
-### Theme Config
-| Method | Endpoint | Descrição | Auth |
-|--------|----------|-----------|------|
-| GET | `/pages/{id}/theme` | Retorna config de cores/paletas | `edit_post` |
-| PUT | `/pages/{id}/theme` | Salva config de cores/paletas | `edit_post` |
-
-### Section Content
-| Method | Endpoint | Descrição | Auth |
-|--------|----------|-----------|------|
-| GET | `/pages/{id}/content` | Retorna conteúdo das seções | `edit_post` |
-| PUT | `/pages/{id}/content` | Salva conteúdo das seções | `edit_post` |
-
-### Outros
-| Method | Endpoint | Descrição | Auth |
-|--------|----------|-----------|------|
-| GET | `/settings` | Retorna ACF settings | Público |
-| POST | `/upload-image` | Upload de imagem | `upload_files` |
-
----
-
-## Fluxo de Save (Editor)
-
-```
-User edita no ThemeSidebar
-         ↓
-Click "Save to WordPress"
-         ↓
-    ┌────┴────┐
-    ↓         ↓
-PUT /theme  PUT /content
-    ↓         ↓
-wp_postmeta wp_postmeta
-(_byrde_theme_config) (_byrde_content)
-```
-
-**Código relevante**: `ThemeSidebar.tsx` → `handleSaveConfig()`
-
----
-
-## Fluxo de Load
-
-### Modo Editor (Preview iframe)
-```
-URL: /?byrde_preview=1&byrde_page_id={id}
-         ↓
-PHP injeta window.byrdeAdmin (com nonce, apiUrl, pageId, config)
-         ↓
-React monta com config do window.byrdeAdmin
-         ↓
-ContentContext faz fetch GET /pages/{id}/content
-         ↓
-Conteúdo carregado no estado
-```
-
-### Modo Público (Página normal)
-```
-URL: /home (ou qualquer page)
-         ↓
-PHP injeta:
-- window.byrdeSettings (ACF)
-- window.byrdeConfig (theme config)
-- window.byrdeContent (section content)
-         ↓
-React monta com dados do window.*
-```
-
----
-
-## React Contexts
-
-| Context | Arquivo | Responsabilidade |
-|---------|---------|------------------|
-| `GlobalConfigProvider` | `GlobalConfigContext.tsx` | Cores globais, paletas, brand settings |
-| `SectionThemeProvider` | `SectionThemeContext.tsx` | Cores por seção, visibilidade, overrides |
-| `HeaderConfigProvider` | `HeaderConfigContext.tsx` | Config do header (fixed, topbar, etc) |
-| `ContentProvider` | `ContentContext.tsx` | Textos editáveis de cada seção |
-| `SidebarProvider` | `SidebarContext.tsx` | Estado do sidebar (aberto/fechado) |
-| `ToastProvider` | `Toast.tsx` | Notificações |
-
----
-
-## Seções Disponíveis
-
-| ID | Componente | Content Editable |
-|----|------------|------------------|
-| `hero` | `Hero.tsx` | headline, subheadline, badges, CTA |
-| `featured-testimonial` | `FeaturedTestimonial.tsx` | quote, author, CTA |
-| `services` | `ServicesGrid.tsx` | headline, services array |
-| `mid-cta` | `MidPageCTA.tsx` | badge, headline, features, CTA |
-| `service-areas` | `ServiceAreas.tsx` | headline, areas array, CTA |
-| `testimonials` | `TestimonialsGrid.tsx` | headline, testimonials array |
-| `faq` | `FAQ.tsx` | headline, faqs array, contact CTA |
-| `footer-cta` | `FooterCTA.tsx` | headline, CTA |
-| `footer` | `Footer.tsx` | description, copyright, links |
-
----
-
-## Build & Deploy
-
-### Desenvolvimento
 ```bash
-cd front-end
-npm install
-npm run dev    # Vite dev server (hot reload)
+cd front-end && npm run dev     # Dev server with HMR
+cd front-end && npm run build   # Production build → front-end/dist/
 ```
 
-### Produção
+## Release System
+
 ```bash
-cd front-end
-npm run build  # Gera dist/ com assets hasheados
+.config/bump-version.sh patch   # 1.1.0 → 1.1.1
+.config/bump-version.sh minor   # 1.1.0 → 1.2.0
+.config/bump-version.sh major   # 1.1.0 → 2.0.0
+.config/build-zip.sh            # Local ZIP for manual upload
 ```
 
-**Output**: `front-end/dist/assets/index-{hash}.js` e `index-{hash}.css`
+Tag push triggers GitHub Actions → builds frontend → creates release ZIP → WordPress auto-detects update via `inc/update-checker.php`.
 
-O WordPress detecta automaticamente os arquivos hasheados via `byrde_get_assets()` em `functions.php`.
+## Important Rules
 
----
-
-## Editor Visual
-
-**Acesso**: `/wp-admin/admin.php?page=byrde-editor&byrde_page_id={id}`
-
-Estrutura:
-- Header com botões (Exit, Preview, Save status)
-- Iframe carregando a página com `?byrde_preview=1`
-- Sidebar React (ThemeSidebar) dentro do iframe
-
-O sidebar permite:
-- Editar cores globais e por seção
-- Alternar visibilidade de seções
-- Editar conteúdo de cada seção
-- Upload de imagens (background, logo)
-- Salvar tudo no WordPress
-
----
-
-## Notas Importantes
-
-1. **Não há posts** - Removidos via `cleanup.php`. Apenas Pages.
-
-2. **Imagens** - Background do Hero e Logo vêm do admin (Media Library). Fallback de logo existe em `assets/images/`.
-
-3. **Paletas** - 12 paletas predefinidas em `SectionThemeContext.tsx`. Cada seção pode usar uma paleta diferente.
-
-4. **Nonce** - Todas as requests autenticadas usam `X-WP-Nonce` header. Gerado via `wp_create_nonce('wp_rest')`.
-
-5. **Serialização** - WordPress serializa arrays automaticamente no post_meta. Não usar `json_encode` manual no save.
-
----
-
-## Troubleshooting
-
-### Content não salva
-- Verificar se `_byrde_content` está no `wp_postmeta`
-- Usar `lando wp post meta get {id} _byrde_content`
-
-### Content não carrega no público
-- Verificar se `window.byrdeContent` está no page source
-- PHP injeta apenas em `is_singular('page')`
-
-### Build não reflete mudanças
-- Verificar se `dist/` foi atualizado
-- Limpar cache do browser
-- Hash do arquivo muda a cada build
+- **No posts** — Only Pages exist. Posts/comments disabled via `cleanup.php`.
+- **No `json_encode`** on save — WordPress serializes post_meta arrays automatically.
+- **Nonce required** — All authenticated requests need `X-WP-Nonce` header.
+- **Multisite aware** — Use `byrde_theme_uri()` instead of `get_template_directory_uri()`.
+- **Fixed filenames** — Vite outputs `main.js` and `style.css` (no hashes). Version-based cache busting via `style.css` Version field.
