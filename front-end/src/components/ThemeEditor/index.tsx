@@ -81,6 +81,8 @@ export function ThemeEditor() {
         version: Date.now(),
       };
 
+      const minDelay = new Promise((r) => setTimeout(r, 600));
+
       const [themeRes, contentRes] = await Promise.all([
         fetch(`${wpAdmin.apiUrl}/pages/${wpAdmin.pageId}/theme`, {
           method: 'PUT',
@@ -98,6 +100,7 @@ export function ThemeEditor() {
           },
           body: JSON.stringify(sectionContent),
         }),
+        minDelay,
       ]);
 
       if (!themeRes.ok || !contentRes.ok) {

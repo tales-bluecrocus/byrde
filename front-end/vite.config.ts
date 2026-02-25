@@ -17,7 +17,7 @@ export default defineConfig({
       output: {
         // Clean filenames without hashes — WordPress handles cache busting via ?ver= query param
         entryFileNames: 'assets/main.js',
-        chunkFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
           // Rename extracted CSS bundle to style.css
           if (assetInfo.names?.some((n: string) => n.endsWith('.css'))) {
