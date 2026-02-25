@@ -437,10 +437,10 @@ function byrde_get_all_settings(): array {
         'fb_pixel_id'          => (string) byrde_get_setting( 'fb_pixel_id' ),
         'gads_conversion_label' => (string) byrde_get_setting( 'gads_conversion_label' ),
 
-        // Legal Pages
-        'privacy_policy_url'   => (string) byrde_get_setting( 'privacy_policy_url', '/privacy-policy' ),
-        'terms_url'            => (string) byrde_get_setting( 'terms_url', '/terms-and-conditions' ),
-        'cookie_settings_url'  => (string) byrde_get_setting( 'cookie_settings_url', '/cookie-settings' ),
+        // Legal Pages — use home_url() so multisite subdirectory prefix (/lp/) is included
+        'privacy_policy_url'   => (string) byrde_get_setting( 'privacy_policy_url', home_url( '/privacy-policy' ) ),
+        'terms_url'            => (string) byrde_get_setting( 'terms_url', home_url( '/terms-and-conditions' ) ),
+        'cookie_settings_url'  => (string) byrde_get_setting( 'cookie_settings_url', home_url( '/cookie-settings' ) ),
     );
 }
 

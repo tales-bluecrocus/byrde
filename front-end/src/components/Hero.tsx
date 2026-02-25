@@ -401,7 +401,7 @@ export default function Hero() {
       // Run fetch and a minimum delay in parallel so the user always
       // sees the "Sending..." state for at least 1.5s
       const [response] = await Promise.all([
-        fetch('/wp-json/byrde/v1/contact', {
+        fetch(`${settings.apiUrl}/contact`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

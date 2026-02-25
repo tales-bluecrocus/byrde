@@ -138,8 +138,10 @@ function byrde_enqueue_assets(): void {
             true
         );
 
-        // Pass theme settings to React
-        wp_localize_script( 'byrde-main', 'byrdeSettings', byrde_get_all_settings() );
+        // Pass theme settings + API URL to React
+        $settings            = byrde_get_all_settings();
+        $settings['apiUrl']  = rest_url( 'byrde/v1' );
+        wp_localize_script( 'byrde-main', 'byrdeSettings', $settings );
     }
 }
 add_action( 'wp_enqueue_scripts', 'byrde_enqueue_assets' );

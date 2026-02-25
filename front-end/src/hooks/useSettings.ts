@@ -47,6 +47,9 @@ export interface ThemeSettings {
   privacy_policy_url: string;
   terms_url: string;
   cookie_settings_url: string;
+
+  // API
+  apiUrl: string;
 }
 
 declare global {
@@ -98,6 +101,9 @@ const DEFAULT_SETTINGS: ThemeSettings = {
   privacy_policy_url: '/privacy-policy',
   terms_url: '/terms-and-conditions',
   cookie_settings_url: '/cookie-settings',
+
+  // API
+  apiUrl: '/wp-json/byrde/v1',
 };
 
 /**
