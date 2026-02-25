@@ -51,7 +51,7 @@ export interface ThemeSettings {
 
 declare global {
   interface Window {
-    lakecitySettings?: Partial<ThemeSettings>;
+    byrdeSettings?: Partial<ThemeSettings>;
   }
 }
 
@@ -106,7 +106,7 @@ const DEFAULT_SETTINGS: ThemeSettings = {
 export function useSettings(): ThemeSettings {
   return {
     ...DEFAULT_SETTINGS,
-    ...window.lakecitySettings,
+    ...window.byrdeSettings,
   } as ThemeSettings;
 }
 
@@ -117,7 +117,7 @@ export function useSetting<K extends keyof ThemeSettings>(
   key: K,
   fallback?: ThemeSettings[K]
 ): ThemeSettings[K] {
-  return window.lakecitySettings?.[key] ?? fallback ?? DEFAULT_SETTINGS[key];
+  return window.byrdeSettings?.[key] ?? fallback ?? DEFAULT_SETTINGS[key];
 }
 
 /**

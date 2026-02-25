@@ -29,7 +29,7 @@ const isDev = import.meta.env.DEV;
 // Check if we should show the sidebar (editor mode)
 function shouldShowSidebar(): boolean {
   if (isDev) return true;
-  if (typeof window !== 'undefined' && window.lakecityAdmin !== undefined) {
+  if (typeof window !== 'undefined' && window.byrdeAdmin !== undefined) {
     return true;
   }
   return false;

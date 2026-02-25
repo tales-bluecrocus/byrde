@@ -5,7 +5,7 @@
  * Replaces ACF Pro dependency with native WordPress options.
  * Manages all global theme settings: brand, social, SEO, analytics, schema, etc.
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return array Default settings with all fields.
  */
-function lakecity_get_default_settings(): array {
+function byrde_get_default_settings(): array {
 	return array(
 		// Brand
 		'brand'          => array(
@@ -100,12 +100,12 @@ function lakecity_get_default_settings(): array {
  *
  * @return array Theme settings array.
  */
-function lakecity_get_theme_settings(): array {
-	$settings = get_option( LAKECITY_OPTION_THEME_SETTINGS, array() );
-	$defaults = lakecity_get_default_settings();
+function byrde_get_theme_settings(): array {
+	$settings = get_option( BYRDE_OPTION_THEME_SETTINGS, array() );
+	$defaults = byrde_get_default_settings();
 
 	// Merge with defaults (deep merge)
-	return lakecity_array_merge_recursive_distinct( $defaults, $settings );
+	return byrde_array_merge_recursive_distinct( $defaults, $settings );
 }
 
 /**
@@ -114,11 +114,11 @@ function lakecity_get_theme_settings(): array {
  * @param array $settings New settings array.
  * @return bool True on success, false on failure.
  */
-function lakecity_update_theme_settings( array $settings ): bool {
+function byrde_update_theme_settings( array $settings ): bool {
 	// Sanitize settings before saving
-	$sanitized = lakecity_sanitize_theme_settings( $settings );
+	$sanitized = byrde_sanitize_theme_settings( $settings );
 
-	return update_option( LAKECITY_OPTION_THEME_SETTINGS, $sanitized );
+	return update_option( BYRDE_OPTION_THEME_SETTINGS, $sanitized );
 }
 
 /**
@@ -127,7 +127,7 @@ function lakecity_update_theme_settings( array $settings ): bool {
  * @param array $settings Settings to sanitize.
  * @return array Sanitized settings.
  */
-function lakecity_sanitize_theme_settings( array $settings ): array {
+function byrde_sanitize_theme_settings( array $settings ): array {
 	$sanitized = array();
 
 	// Brand
@@ -230,12 +230,12 @@ function lakecity_sanitize_theme_settings( array $settings ): array {
  * @param array $array2 Override array.
  * @return array Merged array.
  */
-function lakecity_array_merge_recursive_distinct( array $array1, array $array2 ): array {
+function byrde_array_merge_recursive_distinct( array $array1, array $array2 ): array {
 	$merged = $array1;
 
 	foreach ( $array2 as $key => $value ) {
 		if ( is_array( $value ) && isset( $merged[ $key ] ) && is_array( $merged[ $key ] ) ) {
-			$merged[ $key ] = lakecity_array_merge_recursive_distinct( $merged[ $key ], $value );
+			$merged[ $key ] = byrde_array_merge_recursive_distinct( $merged[ $key ], $value );
 		} else {
 			$merged[ $key ] = $value;
 		}
@@ -251,8 +251,8 @@ function lakecity_array_merge_recursive_distinct( array $array1, array $array2 )
  *
  * @return array Flattened settings.
  */
-function lakecity_get_all_settings(): array {
-	$settings = lakecity_get_theme_settings();
+function byrde_get_all_settings(): array {
+	$settings = byrde_get_theme_settings();
 	$flattened = array();
 
 	// Brand
@@ -317,17 +317,17 @@ function lakecity_get_all_settings(): array {
 /**
  * Register REST API endpoints for theme settings
  */
-function lakecity_register_settings_api(): void {
+function byrde_register_settings_api(): void {
 	// GET settings
 	register_rest_route(
-		LAKECITY_REST_NAMESPACE,
+		BYRDE_REST_NAMESPACE,
 		'/settings',
 		array(
 			'methods'             => 'GET',
 			'callback'            => function() {
 				return rest_ensure_response( array(
 					'success'  => true,
-					'settings' => lakecity_get_all_settings(),
+					'settings' => byrde_get_all_settings(),
 				) );
 			},
 			'permission_callback' => '__return_true', // Public endpoint
@@ -336,13 +336,13 @@ function lakecity_register_settings_api(): void {
 
 	// PUT settings (admin only)
 	register_rest_route(
-		LAKECITY_REST_NAMESPACE,
+		BYRDE_REST_NAMESPACE,
 		'/settings',
 		array(
 			'methods'             => 'PUT',
 			'callback'            => function( WP_REST_Request $request ) {
 				// Rate limit
-				if ( ! lakecity_check_rate_limit( 'update_settings', 5, 60 ) ) {
+				if ( ! byrde_check_rate_limit( 'update_settings', 5, 60 ) ) {
 					return new WP_Error(
 						'rate_limit_exceeded',
 						'Too many requests. Please try again later.',
@@ -361,10 +361,10 @@ function lakecity_register_settings_api(): void {
 				}
 
 				// Save settings (update_option returns false if value unchanged, which is OK)
-				lakecity_update_theme_settings( $settings );
+				byrde_update_theme_settings( $settings );
 
 				// Verify settings were saved by reading them back
-				$saved_settings = lakecity_get_theme_settings();
+				$saved_settings = byrde_get_theme_settings();
 				if ( empty( $saved_settings ) ) {
 					return new WP_Error(
 						'save_failed',
@@ -375,7 +375,7 @@ function lakecity_register_settings_api(): void {
 
 				return rest_ensure_response( array(
 					'success'  => true,
-					'settings' => lakecity_get_all_settings(),
+					'settings' => byrde_get_all_settings(),
 				) );
 			},
 			'permission_callback' => function() {
@@ -384,20 +384,20 @@ function lakecity_register_settings_api(): void {
 		)
 	);
 }
-add_action( 'rest_api_init', 'lakecity_register_settings_api' );
+add_action( 'rest_api_init', 'byrde_register_settings_api' );
 
 /**
  * Inject settings into frontend (for React)
  */
-function lakecity_enqueue_settings_script(): void {
+function byrde_enqueue_settings_script(): void {
 	if ( is_admin() ) {
 		return;
 	}
 
 	wp_localize_script(
-		'lakecity-main',
-		'lakecitySettings',
-		lakecity_get_all_settings()
+		'byrde-main',
+		'byrdeSettings',
+		byrde_get_all_settings()
 	);
 }
-add_action( 'wp_enqueue_scripts', 'lakecity_enqueue_settings_script', 20 );
+add_action( 'wp_enqueue_scripts', 'byrde_enqueue_settings_script', 20 );

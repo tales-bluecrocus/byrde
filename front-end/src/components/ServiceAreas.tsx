@@ -1,5 +1,6 @@
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent } from '../context/ContentContext';
+import { renderHeadline } from '../utils/renderHeadline';
 
 const MapPinIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,10 +37,10 @@ export default function ServiceAreas() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">
-            Areas We Serve
+            {content.badgeText}
           </span>
           <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6">
-            {content.headline} <span className="text-primary-500">{content.highlightText}</span>
+            {renderHeadline(content.headline, 'section-text-accent')}
           </h2>
           <p className="section-text-secondary text-lg max-w-2xl mx-auto">
             {content.subheadline}
@@ -86,36 +87,32 @@ export default function ServiceAreas() {
           {/* Areas Tags */}
           <div>
             <h3 className="text-xl font-semibold section-text-primary mb-6">
-              Service Locations
+              {content.locationsHeading}
             </h3>
             <div className="flex flex-wrap gap-3">
-              {content.areas.map((area, index) => {
-                // Feature first 3 areas
-                const isFeatured = index < 3;
-                return (
-                  <a
-                    key={area.id}
-                    href="#contato"
-                    className={`group inline-flex items-center gap-2 px-4 py-2.5 rounded-full font-medium transition-all duration-300 ${
-                      isFeatured
-                        ? 'bg-gradient-to-r from-primary-500 to-primary-400 text-white shadow-lg shadow-primary-500/20 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-0.5'
-                        : 'section-bg-secondary section-text-secondary section-border border hover:border-primary-500/50 hover:text-primary-400 shadow-sm hover:shadow-md'
-                    }`}
-                  >
-                    <MapPinIcon />
-                    <span>{area.name}</span>
-                    <span className={`text-xs ${isFeatured ? 'text-white/80' : 'section-text-secondary opacity-70'}`}>
-                      {area.state}
-                    </span>
-                  </a>
-                );
-              })}
+              {content.areas.map((area) => (
+                <a
+                  key={area.id}
+                  href="#contato"
+                  className={`group inline-flex items-center gap-2 px-4 py-2.5 rounded-full font-medium transition-all duration-300 ${
+                    area.highlighted
+                      ? 'bg-gradient-to-r from-primary-500 to-primary-400 text-white shadow-lg shadow-primary-500/20 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-0.5'
+                      : 'section-bg-secondary section-text-secondary section-border border hover:border-primary-500/50 hover:text-primary-400 shadow-sm hover:shadow-md'
+                  }`}
+                >
+                  <MapPinIcon />
+                  <span>{area.name}</span>
+                  <span className={`text-xs ${area.highlighted ? 'text-white/80' : 'section-text-secondary opacity-70'}`}>
+                    {area.state}
+                  </span>
+                </a>
+              ))}
             </div>
 
             {/* Contact Link */}
             <div className="mt-8 pt-6 section-border border-t">
               <p className="section-text-secondary mb-4">
-                Don't see your area? Contact us - we may still be able to help!
+                {content.missingAreaText}
               </p>
               <a
                 href={content.ctaLink}

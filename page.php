@@ -2,7 +2,7 @@
 /**
  * Page Template
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 get_template_part( 'index' );

@@ -2,7 +2,7 @@
 /**
  * Diagnostic script to check theme config save/load flow
  *
- * Run with: lando wp eval-file wp-content/themes/lakecity/diagnose.php
+ * Run with: lando wp eval-file wp-content/themes/byrde/diagnose.php
  */
 
 $page_id = 138;
@@ -13,7 +13,7 @@ echo "\n=== DIAGNOSTIC REPORT ===\n\n";
 // 1. Check what's in the database
 echo "1. RAW DATABASE VALUE:\n";
 $raw_value = $wpdb->get_var( $wpdb->prepare(
-    "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_lakecity_theme_config'",
+    "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = '_byrde_theme_config'",
     $page_id
 ) );
 echo "Length: " . strlen($raw_value) . " bytes\n";
@@ -21,7 +21,7 @@ echo "First 200 chars: " . substr($raw_value, 0, 200) . "\n\n";
 
 // 2. Check via get_post_meta
 echo "2. VIA get_post_meta():\n";
-$meta_value = get_post_meta( $page_id, '_lakecity_theme_config', true );
+$meta_value = get_post_meta( $page_id, '_byrde_theme_config', true );
 echo "Type: " . gettype($meta_value) . "\n";
 echo "Length: " . strlen($meta_value) . " bytes\n";
 echo "First 200 chars: " . substr($meta_value, 0, 200) . "\n\n";

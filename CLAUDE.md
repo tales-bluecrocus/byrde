@@ -1,4 +1,4 @@
-# LakeCity Theme - Documentação Técnica
+# Byrde Theme - Documentação Técnica
 
 ## Visão Geral
 
@@ -21,7 +21,7 @@ Theme WordPress headless com frontend React. O WordPress serve como backend (dad
 ## Estrutura de Diretórios
 
 ```
-lakecity/
+byrde/
 ├── front-end/                    # Aplicação React
 │   ├── src/
 │   │   ├── components/           # Componentes React
@@ -49,7 +49,7 @@ lakecity/
 ### 1. Theme Settings (ACF)
 **Onde**: Options page do WordPress (`/wp-admin/admin.php?page=theme-settings`)
 **Armazenamento**: `wp_options` table (ACF options)
-**Uso no React**: `window.lakecitySettings` (injetado via `wp_localize_script`)
+**Uso no React**: `window.byrdeSettings` (injetado via `wp_localize_script`)
 
 ```php
 // Campos disponíveis:
@@ -60,24 +60,24 @@ lakecity/
 ```
 
 ### 2. Theme Config (cores, paletas, visibilidade)
-**Onde**: Post meta `_lakecity_theme_config` de cada page
+**Onde**: Post meta `_byrde_theme_config` de cada page
 **Armazenamento**: `wp_postmeta` table (serialized array)
 **Uso no React**:
-- Editor: `window.lakecityAdmin.config`
-- Público: `window.lakecityConfig`
+- Editor: `window.byrdeAdmin.config`
+- Público: `window.byrdeConfig`
 
 ### 3. Section Content (textos editáveis)
-**Onde**: Post meta `_lakecity_content` de cada page
+**Onde**: Post meta `_byrde_content` de cada page
 **Armazenamento**: `wp_postmeta` table (serialized array)
 **Uso no React**:
 - Editor: Fetch via REST API
-- Público: `window.lakecityContent` (injetado via `wp_head`)
+- Público: `window.byrdeContent` (injetado via `wp_head`)
 
 ---
 
 ## REST API Endpoints
 
-Base URL: `/wp-json/lakecity/v1`
+Base URL: `/wp-json/byrde/v1`
 
 ### Theme Config
 | Method | Endpoint | Descrição | Auth |
@@ -111,7 +111,7 @@ Click "Save to WordPress"
 PUT /theme  PUT /content
     ↓         ↓
 wp_postmeta wp_postmeta
-(_lakecity_theme_config) (_lakecity_content)
+(_byrde_theme_config) (_byrde_content)
 ```
 
 **Código relevante**: `ThemeSidebar.tsx` → `handleSaveConfig()`
@@ -122,11 +122,11 @@ wp_postmeta wp_postmeta
 
 ### Modo Editor (Preview iframe)
 ```
-URL: /?lakecity_preview=1&lakecity_page_id={id}
+URL: /?byrde_preview=1&byrde_page_id={id}
          ↓
-PHP injeta window.lakecityAdmin (com nonce, apiUrl, pageId, config)
+PHP injeta window.byrdeAdmin (com nonce, apiUrl, pageId, config)
          ↓
-React monta com config do window.lakecityAdmin
+React monta com config do window.byrdeAdmin
          ↓
 ContentContext faz fetch GET /pages/{id}/content
          ↓
@@ -138,9 +138,9 @@ Conteúdo carregado no estado
 URL: /home (ou qualquer page)
          ↓
 PHP injeta:
-- window.lakecitySettings (ACF)
-- window.lakecityConfig (theme config)
-- window.lakecityContent (section content)
+- window.byrdeSettings (ACF)
+- window.byrdeConfig (theme config)
+- window.byrdeContent (section content)
          ↓
 React monta com dados do window.*
 ```
@@ -193,17 +193,17 @@ npm run build  # Gera dist/ com assets hasheados
 
 **Output**: `front-end/dist/assets/index-{hash}.js` e `index-{hash}.css`
 
-O WordPress detecta automaticamente os arquivos hasheados via `lakecity_get_assets()` em `functions.php`.
+O WordPress detecta automaticamente os arquivos hasheados via `byrde_get_assets()` em `functions.php`.
 
 ---
 
 ## Editor Visual
 
-**Acesso**: `/wp-admin/admin.php?page=lakecity-editor&lakecity_page_id={id}`
+**Acesso**: `/wp-admin/admin.php?page=byrde-editor&byrde_page_id={id}`
 
 Estrutura:
 - Header com botões (Exit, Preview, Save status)
-- Iframe carregando a página com `?lakecity_preview=1`
+- Iframe carregando a página com `?byrde_preview=1`
 - Sidebar React (ThemeSidebar) dentro do iframe
 
 O sidebar permite:
@@ -232,11 +232,11 @@ O sidebar permite:
 ## Troubleshooting
 
 ### Content não salva
-- Verificar se `_lakecity_content` está no `wp_postmeta`
-- Usar `lando wp post meta get {id} _lakecity_content`
+- Verificar se `_byrde_content` está no `wp_postmeta`
+- Usar `lando wp post meta get {id} _byrde_content`
 
 ### Content não carrega no público
-- Verificar se `window.lakecityContent` está no page source
+- Verificar se `window.byrdeContent` está no page source
 - PHP injeta apenas em `is_singular('page')`
 
 ### Build não reflete mudanças

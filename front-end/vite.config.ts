@@ -15,6 +15,16 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        // Clean filenames without hashes — WordPress handles cache busting via ?ver= query param
+        entryFileNames: 'assets/main.js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: (assetInfo) => {
+          // Rename extracted CSS bundle to style.css
+          if (assetInfo.names?.some((n: string) => n.endsWith('.css'))) {
+            return 'assets/style.css'
+          }
+          return 'assets/[name][extname]'
+        },
         manualChunks: {
           // Editor-only: ThemeEditor + react-colorful + shadcn Sheet/Tabs/ColorPicker
           'editor': [

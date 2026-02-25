@@ -2,7 +2,7 @@
 /**
  * Main Template
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-    <div id="root"></div>
+    <div id="root"><?php byrde_render_shell(); ?></div>
 
 <?php wp_footer(); ?>
 </body>

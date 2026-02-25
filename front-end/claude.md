@@ -4,7 +4,7 @@ AI assistant instructions for this project.
 
 ## Project Overview
 
-**Lake City Hauling** - Landing page de alta conversao para servicos de junk removal.
+**Byrde** - Landing page de alta conversao para servicos de junk removal.
 
 - **Stack**: React 19 + TypeScript + Vite + Tailwind CSS 4
 - **Tipo**: Single-page landing page com formulario de contato

@@ -80,8 +80,8 @@ const getWpConfig = (): { header?: Partial<HeaderConfig>; topbar?: Partial<Topba
   if (typeof window === 'undefined') return {};
 
   // Check admin config first
-  if (window.lakecityAdmin?.config) {
-    const wpConfig = window.lakecityAdmin.config;
+  if (window.byrdeAdmin?.config) {
+    const wpConfig = window.byrdeAdmin.config;
     return {
       header: wpConfig.header,
       topbar: wpConfig.topbar,
@@ -89,8 +89,8 @@ const getWpConfig = (): { header?: Partial<HeaderConfig>; topbar?: Partial<Topba
   }
 
   // Check public page config
-  if (window.lakecityConfig) {
-    const wpConfig = window.lakecityConfig;
+  if (window.byrdeConfig) {
+    const wpConfig = window.byrdeConfig;
     return {
       header: wpConfig.header,
       topbar: wpConfig.topbar,

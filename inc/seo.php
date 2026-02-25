@@ -5,7 +5,7 @@
  * Server-side rendering of meta tags and JSON-LD schemas.
  * All data comes from ACF Theme Settings.
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,13 +15,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Output SEO meta tags in wp_head
  */
-function lakecity_output_seo_meta(): void {
+function byrde_output_seo_meta(): void {
     // Skip in admin or preview mode
     if ( is_admin() ) {
         return;
     }
 
-    $settings = lakecity_get_all_settings();
+    $settings = byrde_get_all_settings();
 
     // Skip if no site name configured
     if ( empty( $settings['site_name'] ) ) {
@@ -46,8 +46,8 @@ function lakecity_output_seo_meta(): void {
     // Keywords
     $keywords = esc_attr( $settings['site_keywords'] ?? '' );
 
-    // Canonical URL
-    $canonical = is_front_page() ? $site_url : get_permalink();
+    // Canonical URL (get_permalink can return false)
+    $canonical = is_front_page() ? $site_url : ( get_permalink() ?: $site_url );
     ?>
 
     <!-- Primary Meta Tags -->
@@ -90,18 +90,18 @@ function lakecity_output_seo_meta(): void {
 
     <?php
 }
-add_action( 'wp_head', 'lakecity_output_seo_meta', 1 );
+add_action( 'wp_head', 'byrde_output_seo_meta', 1 );
 
 /**
  * Output JSON-LD Structured Data
  */
-function lakecity_output_structured_data(): void {
+function byrde_output_structured_data(): void {
     // Skip in admin
     if ( is_admin() ) {
         return;
     }
 
-    $settings = lakecity_get_all_settings();
+    $settings = byrde_get_all_settings();
 
     // Skip if no site name configured
     if ( empty( $settings['site_name'] ) ) {
@@ -116,7 +116,7 @@ function lakecity_output_structured_data(): void {
     if ( is_singular( 'page' ) ) {
         $page_id = get_the_ID();
         if ( $page_id ) {
-            $content = get_post_meta( $page_id, '_lakecity_content', true );
+            $content = get_post_meta( $page_id, '_byrde_content', true );
             if ( ! empty( $content['faq']['faqs'] ) && is_array( $content['faq']['faqs'] ) ) {
                 $faq_items = array();
                 foreach ( $content['faq']['faqs'] as $faq ) {
@@ -165,12 +165,12 @@ function lakecity_output_structured_data(): void {
         echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n";
     }
 }
-add_action( 'wp_head', 'lakecity_output_structured_data', 2 );
+add_action( 'wp_head', 'byrde_output_structured_data', 2 );
 
 /**
  * Override WordPress title
  */
-function lakecity_custom_title( array $title ): array {
+function byrde_custom_title( array $title ): array {
     $site_name = get_bloginfo( 'name' );
 
     if ( ! empty( $site_name ) ) {
@@ -184,12 +184,12 @@ function lakecity_custom_title( array $title ): array {
 
     return $title;
 }
-add_filter( 'document_title_parts', 'lakecity_custom_title' );
+add_filter( 'document_title_parts', 'byrde_custom_title' );
 
 /**
  * Custom title separator
  */
-function lakecity_title_separator( string $sep ): string {
+function byrde_title_separator( string $sep ): string {
     return '-';
 }
-add_filter( 'document_title_separator', 'lakecity_title_separator' );
+add_filter( 'document_title_separator', 'byrde_title_separator' );

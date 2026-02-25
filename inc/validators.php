@@ -5,7 +5,7 @@
  * Security functions to validate and sanitize data before saving to database.
  * Prevents injection attacks, data corruption, and DoS via large payloads.
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param string $color Color value to validate.
  * @return bool
  */
-function lakecity_is_valid_color( string $color ): bool {
+function byrde_is_valid_color( string $color ): bool {
 	return (bool) preg_match( '/^#[0-9A-Fa-f]{6}$/', $color );
 }
 
@@ -28,7 +28,7 @@ function lakecity_is_valid_color( string $color ): bool {
  * @param array $config Theme configuration array.
  * @return array Array of error messages (empty if valid).
  */
-function lakecity_validate_theme_config( array $config ): array {
+function byrde_validate_theme_config( array $config ): array {
 	$errors = array();
 
 	// Check overall structure
@@ -41,11 +41,11 @@ function lakecity_validate_theme_config( array $config ): array {
 	if ( isset( $config['global']['brand'] ) && is_array( $config['global']['brand'] ) ) {
 		$brand = $config['global']['brand'];
 
-		if ( ! empty( $brand['primary'] ) && ! lakecity_is_valid_color( $brand['primary'] ) ) {
+		if ( ! empty( $brand['primary'] ) && ! byrde_is_valid_color( $brand['primary'] ) ) {
 			$errors[] = 'Invalid primary color format (must be #RRGGBB)';
 		}
 
-		if ( ! empty( $brand['accent'] ) && ! lakecity_is_valid_color( $brand['accent'] ) ) {
+		if ( ! empty( $brand['accent'] ) && ! byrde_is_valid_color( $brand['accent'] ) ) {
 			$errors[] = 'Invalid accent color format (must be #RRGGBB)';
 		}
 
@@ -57,7 +57,7 @@ function lakecity_validate_theme_config( array $config ): array {
 	// Validate logo.bgColor
 	if ( isset( $config['global']['logo']['bgColor'] ) ) {
 		$bg_color = $config['global']['logo']['bgColor'];
-		if ( ! empty( $bg_color ) && ! lakecity_is_valid_color( $bg_color ) ) {
+		if ( ! empty( $bg_color ) && ! byrde_is_valid_color( $bg_color ) ) {
 			$errors[] = 'Invalid logo background color';
 		}
 	}
@@ -85,7 +85,7 @@ function lakecity_validate_theme_config( array $config ): array {
 			if ( ! empty( $section_config['overrideGlobalColors'] ) ) {
 				$color_fields = array( 'bgPrimary', 'bgSecondary', 'textPrimary', 'accent', 'bgImageOverlayColor' );
 				foreach ( $color_fields as $field ) {
-					if ( ! empty( $section_config[ $field ] ) && ! lakecity_is_valid_color( $section_config[ $field ] ) ) {
+					if ( ! empty( $section_config[ $field ] ) && ! byrde_is_valid_color( $section_config[ $field ] ) ) {
 						$errors[] = "Invalid color in section $section_id: $field";
 					}
 				}
@@ -121,7 +121,7 @@ function lakecity_validate_theme_config( array $config ): array {
  * @param mixed $data Data to sanitize.
  * @return mixed Sanitized data.
  */
-function lakecity_sanitize_theme_config( $data, $depth = 0 ) {
+function byrde_sanitize_theme_config( $data, $depth = 0 ) {
 	// Add logging at root level
 	if ( $depth === 0 ) {
 		error_log( '[Sanitize START] Input type: ' . gettype( $data ) . ' - keys: ' . ( is_array( $data ) ? implode( ', ', array_keys( $data ) ) : 'N/A' ) );
@@ -130,7 +130,7 @@ function lakecity_sanitize_theme_config( $data, $depth = 0 ) {
 	if ( is_array( $data ) ) {
 		$result = array();
 		foreach ( $data as $key => $value ) {
-			$sanitized = lakecity_sanitize_theme_config( $value, $depth + 1 );
+			$sanitized = byrde_sanitize_theme_config( $value, $depth + 1 );
 			if ( $sanitized !== null ) {
 				$result[ $key ] = $sanitized;
 			} else {
@@ -173,7 +173,7 @@ function lakecity_sanitize_theme_config( $data, $depth = 0 ) {
  * @param array $content Section content array.
  * @return array Array of error messages (empty if valid).
  */
-function lakecity_validate_content( array $content ): array {
+function byrde_validate_content( array $content ): array {
 	$allowed_sections = array(
 		'hero',
 		'services',
@@ -243,19 +243,32 @@ function lakecity_validate_content( array $content ): array {
 /**
  * Sanitize content (recursive)
  *
- * Allows HTML in content fields but sanitizes using wp_kses_post.
+ * Uses wp_kses with limited tag allowlist for headline fields (to support
+ * <strong> for accent color), and sanitize_textarea_field for everything else.
  *
- * @param mixed $data Data to sanitize.
+ * @param mixed  $data Data to sanitize.
+ * @param string $key  Current array key (for context-aware sanitization).
  * @return mixed Sanitized data.
  */
-function lakecity_sanitize_content( $data ) {
+function byrde_sanitize_content( $data, string $key = '' ) {
 	if ( is_array( $data ) ) {
-		return array_map( 'lakecity_sanitize_content', $data );
+		$result = array();
+		foreach ( $data as $k => $v ) {
+			$result[ $k ] = byrde_sanitize_content( $v, (string) $k );
+		}
+		return $result;
 	}
 
 	if ( is_string( $data ) ) {
-		// Plain text sanitization - strips tags, preserves &, keeps newlines
-		return sanitize_textarea_field( $data );
+		// Headline fields may contain <strong> for accent coloring
+		if ( $key === 'headline' ) {
+			// wp_kses strips unwanted tags but entity-encodes & → &amp;
+			// Decode since content goes to JSON context, not HTML
+			return wp_specialchars_decode( wp_kses( $data, array( 'strong' => array() ) ), ENT_QUOTES );
+		}
+		// sanitize_textarea_field strips tags then runs htmlspecialchars (& → &amp;)
+		// Decode since content goes to JSON context, not HTML
+		return wp_specialchars_decode( sanitize_textarea_field( $data ), ENT_QUOTES );
 	}
 
 	if ( is_bool( $data ) || is_numeric( $data ) ) {
@@ -276,7 +289,7 @@ function lakecity_sanitize_content( $data ) {
  * @param array $file File array from $_FILES.
  * @return true|WP_Error True on success, WP_Error on failure.
  */
-function lakecity_validate_image_upload( array $file ) {
+function byrde_validate_image_upload( array $file ) {
 	// Check file size (5MB max)
 	$max_size = 5 * 1024 * 1024; // 5MB in bytes
 	if ( $file['size'] > $max_size ) {

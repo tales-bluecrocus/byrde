@@ -52,7 +52,7 @@ Button URL
 Project Gallery
 Title Our Work In Action
 Description See real projects showing cluttered spaces transformed into clean, usable areas.
-URL https://lakecityhauling.com/#before-after
+URL https://byrde.com/#before-after
 Areas We Serve
 Title Serving North Idaho & Spokane
 Description Serving communities from North Idaho to the Spokane Valley with comprehensive services done by a trusted team
@@ -65,16 +65,16 @@ Review 1 Name Sharene May
 Review 1 Description Caleb and team did an excellent job at removing all the stuff from my duplex. It was a major overhaul from an eviction unit. So thankful for their quick and speedy help. Would highly recommend for any major cleanup needs.
 Review 2 Rating 5
 Review 2 Name Brady Coker
-Review 2 Description Lake City Hauling made everything so easy for me. Caleb is a great guy and helped me make the best out of the situation I was in. They are so convenient. They have the best prices around and i couldn’t thank them enough. I will definitely be coming back next time and let everyone know what a great company you guys run. I appreciate you!
+Review 2 Description Byrde made everything so easy for me. Caleb is a great guy and helped me make the best out of the situation I was in. They are so convenient. They have the best prices around and i couldn’t thank them enough. I will definitely be coming back next time and let everyone know what a great company you guys run. I appreciate you!
 Review 3 Rating 5
 Review 3 Name Makaila Wallace
-Review 3 Description Lake city Hauling is the only hauling company I’ll use. They did a great job communicating and taking care of me on such short notice. The prices are also way more reasonable than the other companies in the area. Would definitely recommend!!
+Review 3 Description Byrde is the only hauling company I’ll use. They did a great job communicating and taking care of me on such short notice. The prices are also way more reasonable than the other companies in the area. Would definitely recommend!!
 Review 4 Rating 5
 Review 4 Name Lee Metcalf
-Review 4 Description Lake City Hauling did an amazing job. We hired them for a two day job and it only took one. They were so friendly, fast at work, professional. The cost was so reasonable, and I would use them again and again if I needed them. Call and ask for Caleb.
+Review 4 Description Byrde did an amazing job. We hired them for a two day job and it only took one. They were so friendly, fast at work, professional. The cost was so reasonable, and I would use them again and again if I needed them. Call and ask for Caleb.
 Review 5 Rating 5
 Review 5 Name Brason Alexander
-Review 5 Description Lake City Hauling & Caleb were amazing! I contacted couple different folks and they were the best. Customer service was excellent, was even able to provide me a second dumpster the day of and this was out in Harrison, ID. The service was on time, easy to work with, communicated great. And the price was what he said it was. Big Thanks!
+Review 5 Description Byrde & Caleb were amazing! I contacted couple different folks and they were the best. Customer service was excellent, was even able to provide me a second dumpster the day of and this was out in Harrison, ID. The service was on time, easy to work with, communicated great. And the price was what he said it was. Big Thanks!
 Review 6 Rating 5
 Review 6 Name Dexter Monroe
 Review 6 Description They hauled off a massive mess we made tearing down a wall. They were very quick and did a wonderful job. Very simple and transparent pricing! Will certainly be using them any time I’ve got stuff to get rid of.
@@ -101,7 +101,7 @@ Button Text Call Now & Schedule Pickup
 Button URL "https://tel:2089980054
 "
 Footer
-GBP Link Lake City Hauling
-Facebook Link https://web.facebook.com/lakecityhauling/
-Instagram Link https://www.instagram.com/lakecityhauling/
+GBP Link Byrde
+Facebook Link https://web.facebook.com/byrde/
+Instagram Link https://www.instagram.com/byrde/
 Address 1402 E Best Ave, Coeur d'Alene, ID 83814, United States

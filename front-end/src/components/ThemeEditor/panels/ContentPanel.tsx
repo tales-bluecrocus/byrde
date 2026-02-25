@@ -22,10 +22,14 @@ import {
   hasContentEditor,
   type ContentSectionId,
   type HeroContent,
+  type BadgeIconType,
   type FeaturedTestimonialContent,
   type ServicesContent,
+  type ServiceItem,
   type MidCtaContent,
+  type FeatureItem,
   type ServiceAreasContent,
+  type AreaItem,
   type TestimonialsContent,
   type FaqContent,
   type FooterCtaContent,
@@ -33,7 +37,8 @@ import {
 } from '../../../context/ContentContext';
 import { useHeaderConfig, type TopbarIcon, type TextAlign, type IconPosition } from '../../../context/HeaderConfigContext';
 import type { SectionId } from '../../../context/SectionThemeContext';
-import { Plus, Trash2, FileText, Star, Phone, Mail, MapPin, Ban, Shield, Clock, CheckCircle, Truck } from 'lucide-react';
+import { Plus, Trash2, FileText, Star, Phone, Mail, MapPin, Ban, Shield, Clock, CheckCircle, Truck, Image as ImageIcon } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const TOPBAR_ICON_OPTIONS: { value: TopbarIcon; label: string; icon: typeof MapPin }[] = [
@@ -59,11 +64,12 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function FormField({ label, children }: { label: string; children: React.ReactNode }) {
+function FormField({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <Label className="text-xs font-medium text-muted-foreground">{label}</Label>
       {children}
+      {hint && <p className="text-[10px] text-muted-foreground/70">{hint}</p>}
     </div>
   );
 }
@@ -85,15 +91,258 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
+// Common Lucide icon names for the picker
+const COMMON_ICONS: { value: string; label: string }[] = [
+  { value: 'Shield', label: 'Shield' },
+  { value: 'ShieldCheck', label: 'Shield Check' },
+  { value: 'Clock', label: 'Clock' },
+  { value: 'CheckCircle', label: 'Check Circle' },
+  { value: 'Star', label: 'Star' },
+  { value: 'Award', label: 'Award' },
+  { value: 'Trophy', label: 'Trophy' },
+  { value: 'Heart', label: 'Heart' },
+  { value: 'ThumbsUp', label: 'Thumbs Up' },
+  { value: 'Zap', label: 'Zap' },
+  { value: 'Rocket', label: 'Rocket' },
+  { value: 'Phone', label: 'Phone' },
+  { value: 'Mail', label: 'Mail' },
+  { value: 'MapPin', label: 'Map Pin' },
+  { value: 'Home', label: 'Home' },
+  { value: 'Building', label: 'Building' },
+  { value: 'Truck', label: 'Truck' },
+  { value: 'Package', label: 'Package' },
+  { value: 'Box', label: 'Box' },
+  { value: 'Wrench', label: 'Wrench' },
+  { value: 'Hammer', label: 'Hammer' },
+  { value: 'Trash2', label: 'Trash' },
+  { value: 'Users', label: 'Users' },
+  { value: 'Handshake', label: 'Handshake' },
+  { value: 'DollarSign', label: 'Dollar' },
+  { value: 'Leaf', label: 'Leaf' },
+  { value: 'RefreshCw', label: 'Recycle' },
+  { value: 'Target', label: 'Target' },
+  { value: 'Crown', label: 'Crown' },
+  { value: 'Gem', label: 'Gem' },
+  { value: 'Sparkles', label: 'Sparkles' },
+  { value: 'BadgeCheck', label: 'Badge Check' },
+  { value: 'Timer', label: 'Timer' },
+  { value: 'Calendar', label: 'Calendar' },
+  { value: 'Lock', label: 'Lock' },
+  { value: 'CreditCard', label: 'Credit Card' },
+  { value: 'Percent', label: 'Percent' },
+  { value: 'Gift', label: 'Gift' },
+  { value: 'Flag', label: 'Flag' },
+  { value: 'Sun', label: 'Sun' },
+];
+
+// Render a Lucide icon preview by name
+function LucideIconPreview({ name, className }: { name: string; className?: string }) {
+  const Component = (LucideIcons as Record<string, unknown>)[name] as React.ComponentType<{ className?: string }> | undefined;
+  if (!Component) return <LucideIcons.HelpCircle className={className || 'h-4 w-4'} />;
+  return <Component className={className || 'h-4 w-4'} />;
+}
+
+// Icon picker: select Lucide icon or pick image from WP Media Library
+function IconPicker({ value, iconType, iconImage, onChangeIcon, onChangeType, onChangeImage, label }: {
+  value: string;
+  iconType?: 'lucide' | 'image';
+  iconImage?: string;
+  onChangeIcon: (icon: string) => void;
+  onChangeType: (type: 'lucide' | 'image') => void;
+  onChangeImage: (url: string) => void;
+  label?: string;
+}) {
+  const type = iconType || 'lucide';
+
+  const handleMediaLibrary = () => {
+    if (window.wp?.media) {
+      const frame = window.wp.media({
+        title: 'Select Icon Image',
+        button: { text: 'Use Image' },
+        multiple: false,
+      });
+      frame.on('select', () => {
+        const attachment = frame.state().get('selection').first().toJSON();
+        onChangeImage(attachment.url);
+      });
+      frame.open();
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      {label && <Label className="text-xs font-medium text-muted-foreground">{label}</Label>}
+      <div className="flex gap-2 mb-2">
+        <Button
+          size="sm"
+          variant={type === 'lucide' ? 'default' : 'outline'}
+          onClick={() => onChangeType('lucide')}
+          className="flex-1 text-xs"
+        >
+          <LucideIcons.Sparkles className="h-3 w-3 mr-1" /> Lucide Icon
+        </Button>
+        <Button
+          size="sm"
+          variant={type === 'image' ? 'default' : 'outline'}
+          onClick={() => onChangeType('image')}
+          className="flex-1 text-xs"
+        >
+          <ImageIcon className="h-3 w-3 mr-1" /> Image
+        </Button>
+      </div>
+      {type === 'lucide' ? (
+        <Select value={value} onValueChange={onChangeIcon}>
+          <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
+            <SelectValue>
+              <span className="flex items-center gap-2">
+                <LucideIconPreview name={value} />
+                {COMMON_ICONS.find(i => i.value === value)?.label || value}
+              </span>
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001] max-h-60">
+            {COMMON_ICONS.map((icon) => (
+              <SelectItem key={icon.value} value={icon.value} className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">
+                <span className="flex items-center gap-2">
+                  <LucideIconPreview name={icon.value} />
+                  {icon.label}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <div className="space-y-2">
+          {iconImage && (
+            <div className="flex items-center gap-2 p-2 bg-zinc-800 rounded-lg border border-zinc-700">
+              <img src={iconImage} alt="" className="w-8 h-8 object-contain rounded" />
+              <span className="text-xs text-zinc-400 truncate flex-1">{iconImage.split('/').pop()}</span>
+              <Button size="icon" variant="ghost" onClick={() => onChangeImage('')} className="h-6 w-6 shrink-0 text-destructive hover:text-destructive">
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleMediaLibrary}
+            className="w-full text-xs"
+          >
+            <LucideIcons.Upload className="h-3 w-3 mr-1" />
+            {iconImage ? 'Change Image' : 'Select from Media Library'}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Lucide icon picker (simple, no image option) — for features, badges etc.
+function LucideIconPicker({ value, onChange, label }: { value: string; onChange: (v: string) => void; label?: string }) {
+  return (
+    <div className="space-y-2">
+      {label && <Label className="text-xs font-medium text-muted-foreground">{label}</Label>}
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
+          <SelectValue>
+            <span className="flex items-center gap-2">
+              <LucideIconPreview name={value} />
+              {COMMON_ICONS.find(i => i.value === value)?.label || value}
+            </span>
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001] max-h-60">
+          {COMMON_ICONS.map((icon) => (
+            <SelectItem key={icon.value} value={icon.value} className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">
+              <span className="flex items-center gap-2">
+                <LucideIconPreview name={icon.value} />
+                {icon.label}
+              </span>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+// Badge icon type → Lucide name map (for hero trust badges)
+const BADGE_TO_LUCIDE: Record<string, string> = {
+  'shield': 'Shield', 'shield-check': 'ShieldCheck', 'lock': 'Lock', 'key': 'Key',
+  'badge': 'Badge', 'badge-check': 'BadgeCheck', 'check': 'Check', 'check-circle': 'CheckCircle',
+  'circle-check': 'CircleCheck', 'thumbs-up': 'ThumbsUp', 'award': 'Award', 'trophy': 'Trophy',
+  'medal': 'Medal', 'star': 'Star', 'heart': 'Heart', 'sparkles': 'Sparkles', 'zap': 'Zap',
+  'clock': 'Clock', 'timer': 'Timer', 'calendar': 'Calendar', 'hourglass': 'Hourglass',
+  'rocket': 'Rocket', 'phone': 'Phone', 'phone-call': 'PhoneCall', 'mail': 'Mail',
+  'message-circle': 'MessageCircle', 'headphones': 'Headphones', 'map-pin': 'MapPin',
+  'navigation': 'Navigation', 'compass': 'Compass', 'home': 'Home', 'building': 'Building',
+  'truck': 'Truck', 'package': 'Package', 'box': 'Box', 'wrench': 'Wrench', 'hammer': 'Hammer',
+  'tool': 'Drill', 'users': 'Users', 'user-check': 'UserCheck', 'handshake': 'Handshake',
+  'smile': 'Smile', 'dollar-sign': 'DollarSign', 'credit-card': 'CreditCard', 'wallet': 'Wallet',
+  'percent': 'Percent', 'tag': 'Tag', 'leaf': 'Leaf', 'recycle': 'Recycle', 'sun': 'Sun',
+  'droplet': 'Droplet', 'gift': 'Gift', 'target': 'Target', 'flag': 'Flag', 'crown': 'Crown', 'gem': 'Gem',
+};
+
+const LUCIDE_TO_BADGE: Record<string, string> = Object.fromEntries(
+  Object.entries(BADGE_TO_LUCIDE).map(([k, v]) => [v, k])
+);
+
+// Badge icon picker using the BadgeIconType values but rendering Lucide icons
+function BadgeIconPicker({ value, onChange, label }: { value: BadgeIconType; onChange: (v: BadgeIconType) => void; label?: string }) {
+  const lucideName = BADGE_TO_LUCIDE[value] || 'Shield';
+
+  return (
+    <div className="space-y-2">
+      {label && <Label className="text-xs font-medium text-muted-foreground">{label}</Label>}
+      <Select value={lucideName} onValueChange={(v) => onChange((LUCIDE_TO_BADGE[v] || 'shield') as BadgeIconType)}>
+        <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
+          <SelectValue>
+            <span className="flex items-center gap-2">
+              <LucideIconPreview name={lucideName} />
+              {COMMON_ICONS.find(i => i.value === lucideName)?.label || lucideName}
+            </span>
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001] max-h-60">
+          {COMMON_ICONS.map((icon) => (
+            <SelectItem key={icon.value} value={icon.value} className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">
+              <span className="flex items-center gap-2">
+                <LucideIconPreview name={icon.value} />
+                {icon.label}
+              </span>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+const HEADLINE_HINT = 'Wrap text in <strong>...</strong> for accent color';
+
 // Hero Content Editor
 function HeroContentEditor({ content, onChange }: { content: HeroContent; onChange: (updates: Partial<HeroContent>) => void }) {
+  const handleBenefitChange = (index: number, value: string) => {
+    const newBenefits = [...(content.benefits || [])];
+    newBenefits[index] = value;
+    onChange({ benefits: newBenefits });
+  };
+
+  const addBenefit = () => {
+    onChange({ benefits: [...(content.benefits || []), ''] });
+  };
+
+  const removeBenefit = (index: number) => {
+    onChange({ benefits: (content.benefits || []).filter((_, i) => i !== index) });
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <SectionTitle>Headlines</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Headline">
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Main headline" />
+          <FormField label="Headline" hint={HEADLINE_HINT}>
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Fast & Reliable <strong>Junk Removal</strong>" />
           </FormField>
           <FormField label="Subheadline">
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" rows={3} />
@@ -102,13 +351,73 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
       </div>
       <Separator />
       <div>
-        <SectionTitle>Call to Action</SectionTitle>
-        <div className="grid grid-cols-2 gap-4 mt-3">
-          <FormField label="Button Text">
-            <Input value={content.ctaText} onChange={(e) => onChange({ ctaText: e.target.value })} placeholder="Call Now" />
+        <SectionTitle>Benefits</SectionTitle>
+        <div className="space-y-2 mt-3">
+          {(content.benefits || []).map((benefit, index) => (
+            <div key={index} className="flex gap-2">
+              <Input value={benefit} onChange={(e) => handleBenefitChange(index, e.target.value)} placeholder={`Benefit ${index + 1}`} className="flex-1" />
+              <Button size="icon" variant="ghost" onClick={() => removeBenefit(index)} className="h-9 w-9 shrink-0 text-destructive hover:text-destructive">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          <Button size="sm" variant="outline" onClick={addBenefit} className="w-full mt-2">
+            <Plus className="h-4 w-4 mr-1" /> Add Benefit
+          </Button>
+        </div>
+      </div>
+      <Separator />
+      <div>
+        <SectionTitle>Trust Badges</SectionTitle>
+        <div className="space-y-4 mt-3">
+          <Card className="bg-muted">
+            <CardContent className="p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium">Badge 1</Label>
+                <Switch checked={content.showBadge1 ?? true} onCheckedChange={(v) => onChange({ showBadge1: v })} />
+              </div>
+              <BadgeIconPicker value={content.badge1Icon} onChange={(v) => onChange({ badge1Icon: v })} label="Icon" />
+              <div className="grid grid-cols-2 gap-2">
+                <FormField label="Label">
+                  <Input value={content.badge1Label} onChange={(e) => onChange({ badge1Label: e.target.value })} placeholder="Fully Insured" />
+                </FormField>
+                <FormField label="Sublabel">
+                  <Input value={content.badge1Sublabel} onChange={(e) => onChange({ badge1Sublabel: e.target.value })} placeholder="Peace of Mind" />
+                </FormField>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-muted">
+            <CardContent className="p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium">Badge 2</Label>
+                <Switch checked={content.showBadge2 ?? true} onCheckedChange={(v) => onChange({ showBadge2: v })} />
+              </div>
+              <BadgeIconPicker value={content.badge2Icon} onChange={(v) => onChange({ badge2Icon: v })} label="Icon" />
+              <div className="grid grid-cols-2 gap-2">
+                <FormField label="Label">
+                  <Input value={content.badge2Label} onChange={(e) => onChange({ badge2Label: e.target.value })} placeholder="Same-Day" />
+                </FormField>
+                <FormField label="Sublabel">
+                  <Input value={content.badge2Sublabel} onChange={(e) => onChange({ badge2Sublabel: e.target.value })} placeholder="Service Available" />
+                </FormField>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+      <Separator />
+      <div>
+        <SectionTitle>Contact Form</SectionTitle>
+        <div className="space-y-4 mt-3">
+          <FormField label="Form Title">
+            <Input value={content.formTitle} onChange={(e) => onChange({ formTitle: e.target.value })} placeholder="Fill Out This Form for Your Free Estimate" />
           </FormField>
-          <FormField label="Button Link">
-            <Input value={content.ctaLink} onChange={(e) => onChange({ ctaLink: e.target.value })} placeholder="tel:1234567890" />
+          <FormField label="Form Subtitle">
+            <Input value={content.formSubtitle} onChange={(e) => onChange({ formSubtitle: e.target.value })} placeholder="We'll get back to you within 30 minutes" />
+          </FormField>
+          <FormField label="Submit Button Text">
+            <Input value={content.formSubmitText} onChange={(e) => onChange({ formSubmitText: e.target.value })} placeholder="Get My Free Quote" />
           </FormField>
         </div>
       </div>
@@ -129,6 +438,18 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
 function FeaturedTestimonialEditor({ content, onChange }: { content: FeaturedTestimonialContent; onChange: (updates: Partial<FeaturedTestimonialContent>) => void }) {
   return (
     <div className="space-y-6">
+      <div>
+        <SectionTitle>Labels</SectionTitle>
+        <div className="space-y-4 mt-3">
+          <FormField label="Badge Text">
+            <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Featured Review" />
+          </FormField>
+          <FormField label="Verified Text">
+            <Input value={content.verifiedText} onChange={(e) => onChange({ verifiedText: e.target.value })} placeholder="Verified Google Review" />
+          </FormField>
+        </div>
+      </div>
+      <Separator />
       <div>
         <SectionTitle>Testimonial</SectionTitle>
         <div className="space-y-4 mt-3">
@@ -166,14 +487,14 @@ function FeaturedTestimonialEditor({ content, onChange }: { content: FeaturedTes
 
 // Services Editor
 function ServicesContentEditor({ content, onChange }: { content: ServicesContent; onChange: (updates: Partial<ServicesContent>) => void }) {
-  const handleServiceChange = (index: number, field: string, value: string) => {
+  const handleServiceChange = (index: number, updates: Partial<ServiceItem>) => {
     const newServices = [...content.services];
-    newServices[index] = { ...newServices[index], [field]: value };
+    newServices[index] = { ...newServices[index], ...updates };
     onChange({ services: newServices });
   };
 
   const addService = () => {
-    onChange({ services: [...content.services, { id: Date.now().toString(), icon: 'wrench', title: '', description: '' }] });
+    onChange({ services: [...content.services, { id: Date.now().toString(), icon: 'Wrench', iconType: 'lucide', title: '', description: '' }] });
   };
 
   const removeService = (index: number) => {
@@ -185,14 +506,12 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Headline">
-              <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Our" />
-            </FormField>
-            <FormField label="Highlight Text">
-              <Input value={content.highlightText} onChange={(e) => onChange({ highlightText: e.target.value })} placeholder="Services" />
-            </FormField>
-          </div>
+          <FormField label="Badge Text (small uppercase)">
+            <Input value={content.badgeText || ''} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Full-Service Junk Removal & More" />
+          </FormField>
+          <FormField label="Headline" hint={HEADLINE_HINT}>
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Full-Service <strong>Junk Removal</strong>" />
+          </FormField>
           <FormField label="Subheadline">
             <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" />
           </FormField>
@@ -200,20 +519,24 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
       </div>
       <Separator />
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <SectionTitle>Services</SectionTitle>
-          <Button size="sm" variant="outline" onClick={addService}>
-            <Plus className="h-4 w-4 mr-1" /> Add
-          </Button>
-        </div>
-        <div className="space-y-3">
+        <SectionTitle>Services</SectionTitle>
+        <div className="space-y-3 mt-3">
           {content.services.map((service, index) => (
             <Card key={service.id} className="bg-muted">
-              <CardContent className="p-3">
+              <CardContent className="p-3 space-y-3">
                 <div className="flex items-start gap-3">
                   <div className="flex-1 space-y-3">
-                    <Input value={service.title} onChange={(e) => handleServiceChange(index, 'title', e.target.value)} placeholder="Service title" className="font-medium" />
-                    <Textarea value={service.description} onChange={(e) => handleServiceChange(index, 'description', e.target.value)} placeholder="Service description" rows={2} />
+                    <Input value={service.title} onChange={(e) => handleServiceChange(index, { title: e.target.value })} placeholder="Service title" className="font-medium" />
+                    <Textarea value={service.description} onChange={(e) => handleServiceChange(index, { description: e.target.value })} placeholder="Service description" rows={2} />
+                    <IconPicker
+                      label="Icon"
+                      value={service.icon}
+                      iconType={service.iconType || 'lucide'}
+                      iconImage={service.iconImage}
+                      onChangeIcon={(v) => handleServiceChange(index, { icon: v })}
+                      onChangeType={(v) => handleServiceChange(index, { iconType: v })}
+                      onChangeImage={(v) => handleServiceChange(index, { iconImage: v })}
+                    />
                   </div>
                   <Button size="icon" variant="ghost" onClick={() => removeService(index)} className="h-8 w-8 shrink-0 text-destructive hover:text-destructive">
                     <Trash2 className="h-4 w-4" />
@@ -222,6 +545,9 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
               </CardContent>
             </Card>
           ))}
+          <Button size="sm" variant="outline" onClick={addService} className="w-full">
+            <Plus className="h-4 w-4 mr-1" /> Add Service
+          </Button>
         </div>
       </div>
     </div>
@@ -230,10 +556,18 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
 
 // Mid CTA Editor
 function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; onChange: (updates: Partial<MidCtaContent>) => void }) {
-  const handleFeatureChange = (index: number, value: string) => {
+  const handleFeatureChange = (index: number, updates: Partial<FeatureItem>) => {
     const newFeatures = [...content.features];
-    newFeatures[index] = value;
+    newFeatures[index] = { ...newFeatures[index], ...updates };
     onChange({ features: newFeatures });
+  };
+
+  const addFeature = () => {
+    onChange({ features: [...content.features, { id: Date.now().toString(), icon: 'CheckCircle', text: '' }] });
+  };
+
+  const removeFeature = (index: number) => {
+    onChange({ features: content.features.filter((_, i) => i !== index) });
   };
 
   return (
@@ -244,8 +578,8 @@ function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; on
           <FormField label="Badge">
             <Input value={content.badge} onChange={(e) => onChange({ badge: e.target.value })} placeholder="Ready to Clear the Clutter?" />
           </FormField>
-          <FormField label="Headline">
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Get Your Free Quote Today" />
+          <FormField label="Headline" hint={HEADLINE_HINT}>
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Get Your <strong>Free Quote</strong> Today" />
           </FormField>
           <FormField label="Subheadline">
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" rows={2} />
@@ -255,10 +589,25 @@ function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; on
       <Separator />
       <div>
         <SectionTitle>Features</SectionTitle>
-        <div className="space-y-2 mt-3">
+        <div className="space-y-3 mt-3">
           {content.features.map((feature, index) => (
-            <Input key={index} value={feature} onChange={(e) => handleFeatureChange(index, e.target.value)} placeholder={`Feature ${index + 1}`} />
+            <Card key={feature.id} className="bg-muted">
+              <CardContent className="p-3 space-y-3">
+                <div className="flex gap-2 items-start">
+                  <div className="flex-1 space-y-2">
+                    <Input value={feature.text} onChange={(e) => handleFeatureChange(index, { text: e.target.value })} placeholder="Feature text" />
+                    <LucideIconPicker value={feature.icon} onChange={(v) => handleFeatureChange(index, { icon: v })} label="Icon" />
+                  </div>
+                  <Button size="icon" variant="ghost" onClick={() => removeFeature(index)} className="h-8 w-8 shrink-0 text-destructive hover:text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           ))}
+          <Button size="sm" variant="outline" onClick={addFeature} className="w-full">
+            <Plus className="h-4 w-4 mr-1" /> Add Feature
+          </Button>
         </div>
       </div>
       <Separator />
@@ -279,14 +628,14 @@ function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; on
 
 // Service Areas Editor
 function ServiceAreasContentEditor({ content, onChange }: { content: ServiceAreasContent; onChange: (updates: Partial<ServiceAreasContent>) => void }) {
-  const handleAreaChange = (index: number, field: string, value: string) => {
+  const handleAreaChange = (index: number, updates: Partial<AreaItem>) => {
     const newAreas = [...content.areas];
-    newAreas[index] = { ...newAreas[index], [field]: value };
+    newAreas[index] = { ...newAreas[index], ...updates };
     onChange({ areas: newAreas });
   };
 
   const addArea = () => {
-    onChange({ areas: [...content.areas, { id: Date.now().toString(), name: '', state: '' }] });
+    onChange({ areas: [...content.areas, { id: Date.now().toString(), name: '', state: '', highlighted: false }] });
   };
 
   const removeArea = (index: number) => {
@@ -298,34 +647,46 @@ function ServiceAreasContentEditor({ content, onChange }: { content: ServiceArea
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Headline">
-              <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Serving" />
-            </FormField>
-            <FormField label="Highlight Text">
-              <Input value={content.highlightText} onChange={(e) => onChange({ highlightText: e.target.value })} placeholder="North Idaho" />
-            </FormField>
-          </div>
+          <FormField label="Badge Text (small uppercase)">
+            <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Areas We Serve" />
+          </FormField>
+          <FormField label="Headline" hint={HEADLINE_HINT}>
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Serving <strong>North Idaho</strong>" />
+          </FormField>
+          <FormField label="Subheadline">
+            <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Professional junk removal across the region." />
+          </FormField>
+          <FormField label="Locations Heading">
+            <Input value={content.locationsHeading} onChange={(e) => onChange({ locationsHeading: e.target.value })} placeholder="Service Locations" />
+          </FormField>
+          <FormField label="Missing Area Text">
+            <Input value={content.missingAreaText} onChange={(e) => onChange({ missingAreaText: e.target.value })} placeholder="Don't see your area? Contact us..." />
+          </FormField>
         </div>
       </div>
       <Separator />
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <SectionTitle>Areas</SectionTitle>
-          <Button size="sm" variant="outline" onClick={addArea}>
-            <Plus className="h-4 w-4 mr-1" /> Add
-          </Button>
-        </div>
-        <div className="space-y-2">
+        <SectionTitle>Areas</SectionTitle>
+        <div className="space-y-2 mt-3">
           {content.areas.map((area, index) => (
-            <div key={area.id} className="flex gap-2">
-              <Input value={area.name} onChange={(e) => handleAreaChange(index, 'name', e.target.value)} placeholder="City name" className="flex-1" />
-              <Input value={area.state} onChange={(e) => handleAreaChange(index, 'state', e.target.value)} placeholder="ST" className="w-16" />
+            <div key={area.id} className="flex gap-2 items-center">
+              <Input value={area.name} onChange={(e) => handleAreaChange(index, { name: e.target.value })} placeholder="City name" className="flex-1" />
+              <Input value={area.state} onChange={(e) => handleAreaChange(index, { state: e.target.value })} placeholder="ST" className="w-16" />
+              <div className="flex items-center gap-1" title="Highlighted">
+                <Switch
+                  checked={area.highlighted ?? false}
+                  onCheckedChange={(v) => handleAreaChange(index, { highlighted: v })}
+                  className="data-[state=checked]:bg-primary"
+                />
+              </div>
               <Button size="icon" variant="ghost" onClick={() => removeArea(index)} className="h-9 w-9 shrink-0 text-destructive hover:text-destructive">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           ))}
+          <Button size="sm" variant="outline" onClick={addArea} className="w-full">
+            <Plus className="h-4 w-4 mr-1" /> Add Area
+          </Button>
         </div>
       </div>
       <Separator />
@@ -365,28 +726,24 @@ function TestimonialsContentEditor({ content, onChange }: { content: Testimonial
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Headline">
-              <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Trusted By" />
-            </FormField>
-            <FormField label="Highlight Text">
-              <Input value={content.highlightText} onChange={(e) => onChange({ highlightText: e.target.value })} placeholder="Your Neighbors" />
-            </FormField>
-          </div>
+          <FormField label="Badge Text (small uppercase)">
+            <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Testimonials" />
+          </FormField>
+          <FormField label="Headline" hint={HEADLINE_HINT}>
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Trusted By <strong>Your Neighbors</strong>" />
+          </FormField>
           <FormField label="Subheadline">
             <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="See why homeowners love us" />
+          </FormField>
+          <FormField label="Review Label">
+            <Input value={content.reviewLabel} onChange={(e) => onChange({ reviewLabel: e.target.value })} placeholder="Google Review" />
           </FormField>
         </div>
       </div>
       <Separator />
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <SectionTitle>Testimonials</SectionTitle>
-          <Button size="sm" variant="outline" onClick={addTestimonial}>
-            <Plus className="h-4 w-4 mr-1" /> Add
-          </Button>
-        </div>
-        <div className="space-y-3">
+        <SectionTitle>Testimonials</SectionTitle>
+        <div className="space-y-3 mt-3">
           {content.testimonials.map((testimonial, index) => (
             <Card key={testimonial.id} className="bg-muted">
               <CardContent className="p-3 space-y-3">
@@ -407,6 +764,9 @@ function TestimonialsContentEditor({ content, onChange }: { content: Testimonial
               </CardContent>
             </Card>
           ))}
+          <Button size="sm" variant="outline" onClick={addTestimonial} className="w-full">
+            <Plus className="h-4 w-4 mr-1" /> Add Testimonial
+          </Button>
         </div>
       </div>
       <Separator />
@@ -446,25 +806,21 @@ function FaqContentEditor({ content, onChange }: { content: FaqContent; onChange
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Headline">
-              <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Clear answers to" />
-            </FormField>
-            <FormField label="Highlight Text">
-              <Input value={content.highlightText} onChange={(e) => onChange({ highlightText: e.target.value })} placeholder="common concerns" />
-            </FormField>
-          </div>
+          <FormField label="Badge Text (small uppercase)">
+            <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Frequently Asked Questions" />
+          </FormField>
+          <FormField label="Headline" hint={HEADLINE_HINT}>
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Clear answers to <strong>common concerns</strong>" />
+          </FormField>
+          <FormField label="Subheadline">
+            <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="So you can book with confidence" />
+          </FormField>
         </div>
       </div>
       <Separator />
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <SectionTitle>FAQs</SectionTitle>
-          <Button size="sm" variant="outline" onClick={addFaq}>
-            <Plus className="h-4 w-4 mr-1" /> Add
-          </Button>
-        </div>
-        <div className="space-y-3">
+        <SectionTitle>FAQs</SectionTitle>
+        <div className="space-y-3 mt-3">
           {content.faqs.map((faq, index) => (
             <Card key={faq.id} className="bg-muted">
               <CardContent className="p-3 space-y-2">
@@ -478,6 +834,9 @@ function FaqContentEditor({ content, onChange }: { content: FaqContent; onChange
               </CardContent>
             </Card>
           ))}
+          <Button size="sm" variant="outline" onClick={addFaq} className="w-full">
+            <Plus className="h-4 w-4 mr-1" /> Add FAQ
+          </Button>
         </div>
       </div>
       <Separator />
@@ -511,16 +870,14 @@ function FooterCtaContentEditor({ content, onChange }: { content: FooterCtaConte
       <div>
         <SectionTitle>Content</SectionTitle>
         <div className="space-y-4 mt-3">
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Headline">
-              <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Ready to" />
-            </FormField>
-            <FormField label="Highlight Text">
-              <Input value={content.highlightText} onChange={(e) => onChange({ highlightText: e.target.value })} placeholder="Clear the Clutter?" />
-            </FormField>
-          </div>
+          <FormField label="Headline" hint={HEADLINE_HINT}>
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Ready to <strong>Clear the Clutter?</strong>" />
+          </FormField>
           <FormField label="Subheadline">
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Get your free quote today..." rows={2} />
+          </FormField>
+          <FormField label="Reassurance Text">
+            <Input value={content.reassuranceText} onChange={(e) => onChange({ reassuranceText: e.target.value })} placeholder="No obligation · Free estimates · Fast response" />
           </FormField>
         </div>
       </div>

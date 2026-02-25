@@ -13,7 +13,7 @@ export default function PaletteInjector() {
   const { palette, globalConfig } = useGlobalConfig();
 
   useEffect(() => {
-    const isEditorMode = Boolean(window.lakecityAdmin);
+    const isEditorMode = Boolean(window.byrdeAdmin);
     const target = isEditorMode
       ? document.getElementById('root')
       : document.documentElement;

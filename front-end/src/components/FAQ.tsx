@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent } from '../context/ContentContext';
+import { renderHeadline } from '../utils/renderHeadline';
 
 const ChevronIcon = ({ isOpen }: { isOpen: boolean }) => (
   <svg
@@ -36,13 +37,10 @@ export default function FAQ() {
           {/* Left Content */}
           <div className="lg:sticky lg:top-32">
             <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">
-              Frequently Asked Questions
+              {content.badgeText}
             </span>
             <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6">
-              {content.headline}{' '}
-              <span className="text-primary-500">
-                {content.highlightText}
-              </span>
+              {renderHeadline(content.headline, 'section-text-accent')}
             </h2>
             <p className="section-text-secondary text-lg mb-8">
               {content.subheadline}

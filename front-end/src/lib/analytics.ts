@@ -62,8 +62,8 @@ declare global {
 }
 
 // Storage keys
-const AD_ATTRIBUTION_KEY = 'lakecity_ad_attribution';
-const CLICK_ID_KEY = 'lakecity_click_ids';
+const AD_ATTRIBUTION_KEY = 'byrde_ad_attribution';
+const CLICK_ID_KEY = 'byrde_click_ids';
 const CLICK_ID_EXPIRY_DAYS = 90; // Google's GCLID attribution window
 
 // Tracking params that indicate a paid/attributed visit
@@ -258,8 +258,8 @@ export function trackFacebookCustomEvent(
  * Get the Google Ads conversion label from WordPress settings
  */
 function getGoogleAdsConversionLabel(): string {
-  // Injected via wp_localize_script as lakecityAnalytics
-  const analytics = (window as unknown as Record<string, unknown>).lakecityAnalytics as Record<string, string> | undefined;
+  // Injected via wp_localize_script as byrdeAnalytics
+  const analytics = (window as unknown as Record<string, unknown>).byrdeAnalytics as Record<string, string> | undefined;
   return analytics?.gads_conversion_label || '';
 }
 

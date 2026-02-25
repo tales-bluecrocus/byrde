@@ -5,7 +5,7 @@
  * Simple rate limiting using WordPress Transients API.
  * Prevents DoS attacks on REST endpoints.
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param int    $time_window Time window in seconds (default: 60 seconds).
  * @return bool True if request is allowed, false if rate limit exceeded.
  */
-function lakecity_check_rate_limit( string $action, int $max_requests = 10, int $time_window = 60 ): bool {
+function byrde_check_rate_limit( string $action, int $max_requests = 10, int $time_window = 60 ): bool {
 	$user_id = get_current_user_id();
 
 	// Not logged in users can't be rate limited (they shouldn't access protected endpoints anyway)
@@ -28,7 +28,7 @@ function lakecity_check_rate_limit( string $action, int $max_requests = 10, int 
 		return false;
 	}
 
-	$transient_key = "lakecity_rate_limit_{$action}_{$user_id}";
+	$transient_key = "byrde_rate_limit_{$action}_{$user_id}";
 	$requests      = get_transient( $transient_key );
 
 	if ( false === $requests ) {
@@ -56,14 +56,14 @@ function lakecity_check_rate_limit( string $action, int $max_requests = 10, int 
  * @param int    $max_requests Maximum allowed requests.
  * @return int Number of remaining requests.
  */
-function lakecity_get_remaining_requests( string $action, int $max_requests = 10 ): int {
+function byrde_get_remaining_requests( string $action, int $max_requests = 10 ): int {
 	$user_id = get_current_user_id();
 
 	if ( ! $user_id ) {
 		return 0;
 	}
 
-	$transient_key = "lakecity_rate_limit_{$action}_{$user_id}";
+	$transient_key = "byrde_rate_limit_{$action}_{$user_id}";
 	$requests      = get_transient( $transient_key );
 
 	if ( false === $requests ) {
@@ -82,7 +82,7 @@ function lakecity_get_remaining_requests( string $action, int $max_requests = 10
  * @param int    $user_id User ID (defaults to current user).
  * @return bool True on success.
  */
-function lakecity_reset_rate_limit( string $action, int $user_id = 0 ): bool {
+function byrde_reset_rate_limit( string $action, int $user_id = 0 ): bool {
 	if ( ! $user_id ) {
 		$user_id = get_current_user_id();
 	}
@@ -91,6 +91,6 @@ function lakecity_reset_rate_limit( string $action, int $user_id = 0 ): bool {
 		return false;
 	}
 
-	$transient_key = "lakecity_rate_limit_{$action}_{$user_id}";
+	$transient_key = "byrde_rate_limit_{$action}_{$user_id}";
 	return delete_transient( $transient_key );
 }

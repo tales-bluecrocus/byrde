@@ -9,6 +9,7 @@ import { useState, useMemo, useCallback, memo } from 'react';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent, type BadgeIconType } from '../context/ContentContext';
+import { renderHeadlineStyled } from '../utils/renderHeadline';
 import { useSettings } from '../hooks/useSettings';
 import { useFormTracking } from '../hooks/useAnalytics';
 import { trackFormSubmitted, trackFormError, trackPhoneClick, getAttributionForSubmission } from '../lib/analytics';
@@ -40,8 +41,8 @@ const LIGHT_FALLBACKS = {
   borderColor: '#d4d4d4',
 } as const;
 
-// Default benefits (fallback if not in content)
-const DEFAULT_BENEFITS = [
+// Fallback benefits (used if content.benefits is empty/missing)
+const FALLBACK_BENEFITS = [
   'Fully Licensed & Insured Pros',
   'Same-Day Services Available',
   'Locally Owned & Operated',
@@ -397,12 +398,12 @@ export default function Hero() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/wp-json/lakecity/v1/contact', {
+      const response = await fetch('/wp-json/byrde/v1/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          _honeypot: (document.getElementById('lakecity_hp') as HTMLInputElement)?.value || '',
+          _honeypot: (document.getElementById('byrde_hp') as HTMLInputElement)?.value || '',
           attribution: getAttributionForSubmission(),
         }),
       });
@@ -484,7 +485,7 @@ export default function Hero() {
 
             {/* Heading */}
             <h1 className="font-[var(--font-display)] text-4xl sm:text-5xl lg:text-6xl font-bold section-text-primary leading-[1.1] mb-6">
-              {content.headline}
+              {renderHeadlineStyled(content.headline, { color: themeStyles.accentColor })}
             </h1>
 
             {/* Subheadline */}
@@ -494,7 +495,7 @@ export default function Hero() {
 
             {/* Benefits */}
             <ul className="space-y-4 mb-8">
-              {DEFAULT_BENEFITS.map((benefit, index) => (
+              {(content.benefits?.length ? content.benefits : FALLBACK_BENEFITS).map((benefit, index) => (
                 <BenefitItem
                   key={benefit}
                   benefit={benefit}
@@ -554,10 +555,10 @@ export default function Hero() {
                 {/* Form Header */}
                 <div className="text-center mb-8">
                   <h2 className="font-[var(--font-display)] text-2xl font-bold section-text-primary mb-2">
-                    Fill Out This Form for Your Free Estimate
+                    {content.formTitle || 'Fill Out This Form for Your Free Estimate'}
                   </h2>
                   <p className="section-text-secondary text-sm mb-4">
-                    We'll get back to you within 30 minutes
+                    {content.formSubtitle || "We'll get back to you within 30 minutes"}
                   </p>
                   {/* Quick Call CTA for phone-preferring users */}
                   {settings.phone_raw && (
@@ -588,10 +589,10 @@ export default function Hero() {
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Honeypot - hidden from humans */}
-                    <label htmlFor="lakecity_hp" className="sr-only">Leave this empty</label>
+                    <label htmlFor="byrde_hp" className="sr-only">Leave this empty</label>
                     <input
                       type="text"
-                      id="lakecity_hp"
+                      id="byrde_hp"
                       name="_honeypot"
                       tabIndex={-1}
                       autoComplete="off"
@@ -739,7 +740,7 @@ export default function Hero() {
                           Sending...
                         </span>
                       ) : (
-                        'Get My Free Quote'
+                        content.formSubmitText || 'Get My Free Quote'
                       )}
                     </button>
 

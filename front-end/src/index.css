@@ -54,7 +54,7 @@
 }
 
 /* Editor mode isolation: prevent body from interfering with theme preview */
-body.wp-theme-lakecity {
+body.wp-theme-byrde {
   background: transparent !important;
   color: inherit !important;
 }

@@ -1,7 +1,7 @@
 import { useSettings } from '../hooks/useSettings';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
-import logoFallback from "../assets/images/lake-city-hauling-logo.webp";
+import logoFallback from "../assets/images/byrde-logo.webp";
 
 const FacebookIcon = () => (
   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

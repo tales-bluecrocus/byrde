@@ -1,4 +1,4 @@
-# 🚀 LakeCity Theme - Security & ACF Migration Implementation
+# 🚀 Byrde Theme - Security & ACF Migration Implementation
 
 **Date:** February 4, 2026
 **Status:** ✅ **COMPLETE** - Ready for testing
@@ -8,7 +8,7 @@
 
 ## 📊 Executive Summary
 
-Successfully implemented **4 major phases** of improvements to the LakeCity WordPress headless theme:
+Successfully implemented **4 major phases** of improvements to the Byrde WordPress headless theme:
 
 | Phase | Status | Items | Impact |
 |-------|--------|-------|--------|
@@ -36,11 +36,11 @@ Successfully implemented **4 major phases** of improvements to the LakeCity Word
 
 ```typescript
 // BEFORE (VULNERABLE)
-window.parent?.postMessage({ type: 'lakecity-save-status', status: 'saving' }, '*');
+window.parent?.postMessage({ type: 'byrde-save-status', status: 'saving' }, '*');
 
 // AFTER (SECURE)
 const targetOrigin = window.location.origin;
-window.parent?.postMessage({ type: 'lakecity-save-status', status: 'saving' }, targetOrigin);
+window.parent?.postMessage({ type: 'byrde-save-status', status: 'saving' }, targetOrigin);
 ```
 
 **Impact:** Eliminated XSS attack vector
@@ -59,11 +59,11 @@ window.parent?.postMessage({ type: 'lakecity-save-status', status: 'saving' }, t
 - Array size limits (50 services, 100 testimonials, etc.)
 
 **Functions:**
-- `lakecity_validate_theme_config()` - Validates structure
-- `lakecity_sanitize_theme_config()` - Recursive sanitization
-- `lakecity_validate_content()` - Content validation
-- `lakecity_sanitize_content()` - Content sanitization
-- `lakecity_validate_image_upload()` - Secure file validation
+- `byrde_validate_theme_config()` - Validates structure
+- `byrde_sanitize_theme_config()` - Recursive sanitization
+- `byrde_validate_content()` - Content validation
+- `byrde_sanitize_content()` - Content sanitization
+- `byrde_validate_image_upload()` - Secure file validation
 
 ---
 
@@ -79,7 +79,7 @@ window.parent?.postMessage({ type: 'lakecity-save-status', status: 'saving' }, t
 **Example:**
 ```php
 // Validate content structure
-$errors = lakecity_validate_content( $content );
+$errors = byrde_validate_content( $content );
 if ( ! empty( $errors ) ) {
     return new WP_Error(
         'validation_failed',
@@ -89,10 +89,10 @@ if ( ! empty( $errors ) ) {
 }
 
 // Sanitize
-$sanitized = lakecity_sanitize_content( $content );
+$sanitized = byrde_sanitize_content( $content );
 
 // Save
-$saved = update_post_meta( $page_id, '_lakecity_content', $sanitized );
+$saved = update_post_meta( $page_id, '_byrde_content', $sanitized );
 ```
 
 ---
@@ -131,14 +131,14 @@ if ( $image_info === false ) {
 ```php
 // BEFORE (BUGGY)
 $can_edit = $is_logged_in && $can_edit_pages;
-if ( $lakecity_page_id && $can_edit ) {
-    $can_edit = current_user_can( 'edit_post', $lakecity_page_id );
+if ( $byrde_page_id && $can_edit ) {
+    $can_edit = current_user_can( 'edit_post', $byrde_page_id );
 }
 
 // AFTER (CORRECT)
 if ( $is_logged_in ) {
-    if ( $lakecity_page_id ) {
-        $can_edit = current_user_can( 'edit_post', $lakecity_page_id );
+    if ( $byrde_page_id ) {
+        $can_edit = current_user_can( 'edit_post', $byrde_page_id );
     } else {
         $can_edit = $can_edit_pages;
     }
@@ -154,7 +154,7 @@ if ( $is_logged_in ) {
 
 ```php
 <?php if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) : ?>
-    console.log('[LakeCity] Admin context injected:', window.lakecityAdmin);
+    console.log('[Byrde] Admin context injected:', window.byrdeAdmin);
 <?php endif; ?>
 ```
 
@@ -174,9 +174,9 @@ if ( $is_logged_in ) {
 - Automatic cleanup after time window
 
 **Functions:**
-- `lakecity_check_rate_limit( $action, $max_requests, $time_window )`
-- `lakecity_get_remaining_requests( $action )`
-- `lakecity_reset_rate_limit( $action )`
+- `byrde_check_rate_limit( $action, $max_requests, $time_window )`
+- `byrde_get_remaining_requests( $action )`
+- `byrde_reset_rate_limit( $action )`
 
 **Applied to:**
 - Theme save: 10 requests/minute
@@ -215,7 +215,7 @@ const data = await response.json();
 ### 2.3 Created Atomic Save Endpoint
 **File:** `inc/page-theme-editor.php`
 
-**Endpoint:** `PUT /wp-json/lakecity/v1/pages/{id}/save-all`
+**Endpoint:** `PUT /wp-json/byrde/v1/pages/{id}/save-all`
 
 **Features:**
 - Saves theme + content in single request
@@ -244,9 +244,9 @@ const response = await fetch(`${apiUrl}/pages/${pageId}/save-all`, {
 **File:** `inc/constants.php` (NEW)
 
 **Defines:**
-- Post meta keys: `LAKECITY_META_THEME_CONFIG`, `LAKECITY_META_CONTENT`
-- Options keys: `LAKECITY_OPTION_THEME_SETTINGS`
-- REST namespace: `LAKECITY_REST_NAMESPACE`
+- Post meta keys: `BYRDE_META_THEME_CONFIG`, `BYRDE_META_CONTENT`
+- Options keys: `BYRDE_OPTION_THEME_SETTINGS`
+- REST namespace: `BYRDE_REST_NAMESPACE`
 - Allowed sections array
 - Validation limits (file sizes, array sizes)
 - Rate limiting defaults
@@ -262,7 +262,7 @@ const response = await fetch(`${apiUrl}/pages/${pageId}/save-all`, {
 
 **Features:**
 - **Complete ACF replacement** - no external dependencies
-- Stores all 39 fields in single option: `lakecity_theme_settings`
+- Stores all 39 fields in single option: `byrde_theme_settings`
 - Nested structure with 8 categories:
   - `brand` (logo, phone, email)
   - `google_reviews` (rating, count, URL)
@@ -274,15 +274,15 @@ const response = await fetch(`${apiUrl}/pages/${pageId}/save-all`, {
   - `legal` (privacy policy, terms, cookies)
 
 **Functions:**
-- `lakecity_get_theme_settings()` - Get nested settings
-- `lakecity_update_theme_settings()` - Update settings
-- `lakecity_sanitize_theme_settings()` - Sanitize all fields
-- `lakecity_get_all_settings()` - Get flattened (ACF-compatible)
-- `lakecity_array_merge_recursive_distinct()` - Deep merge
+- `byrde_get_theme_settings()` - Get nested settings
+- `byrde_update_theme_settings()` - Update settings
+- `byrde_sanitize_theme_settings()` - Sanitize all fields
+- `byrde_get_all_settings()` - Get flattened (ACF-compatible)
+- `byrde_array_merge_recursive_distinct()` - Deep merge
 
 **REST API:**
-- `GET /wp-json/lakecity/v1/settings` - Public endpoint
-- `PUT /wp-json/lakecity/v1/settings` - Admin only (rate limited)
+- `GET /wp-json/byrde/v1/settings` - Public endpoint
+- `PUT /wp-json/byrde/v1/settings` - Admin only (rate limited)
 
 ---
 
@@ -293,17 +293,17 @@ const response = await fetch(`${apiUrl}/pages/${pageId}/save-all`, {
 
 **Option 1: Via WP-CLI** (Recommended)
 ```bash
-wp eval-file wp-content/themes/lakecity/inc/migrate-acf-to-options.php
+wp eval-file wp-content/themes/byrde/inc/migrate-acf-to-options.php
 ```
 
 **Option 2: Via Browser**
 ```
-Navigate to: /wp-admin/?lakecity_migrate_acf=1
+Navigate to: /wp-admin/?byrde_migrate_acf=1
 ```
 
 **Option 3: Via Code**
 ```php
-$results = lakecity_migrate_acf_to_native();
+$results = byrde_migrate_acf_to_native();
 ```
 
 **Features:**
@@ -316,7 +316,7 @@ $results = lakecity_migrate_acf_to_native();
 **Output Example:**
 ```
 ✅ Migration Successful!
-Migrated 39 fields to lakecity_theme_settings
+Migrated 39 fields to byrde_theme_settings
 
 📊 Statistics:
 • Fields migrated: 39
@@ -329,8 +329,8 @@ Migrated 39 fields to lakecity_theme_settings
 ### 4.3 Updated Files to Remove ACF Dependency
 
 **Files Updated:**
-1. ✅ `inc/analytics.php` - All `get_field()` → `lakecity_get_all_settings()`
-2. ✅ `inc/seo.php` - Already uses `lakecity_get_all_settings()`
+1. ✅ `inc/analytics.php` - All `get_field()` → `byrde_get_all_settings()`
+2. ✅ `inc/seo.php` - Already uses `byrde_get_all_settings()`
 3. ✅ `functions.php` - Commented out ACF include
 
 **Changes:**
@@ -339,7 +339,7 @@ Migrated 39 fields to lakecity_theme_settings
 $ga_id = get_field( 'ga_measurement_id', 'option' );
 
 // AFTER
-$settings = lakecity_get_all_settings();
+$settings = byrde_get_all_settings();
 $ga_id = $settings['ga_measurement_id'] ?? '';
 ```
 
@@ -393,10 +393,10 @@ $ga_id = $settings['ga_measurement_id'] ?? '';
 - [ ] Test current site functionality
 
 ### Migration Steps
-1. [ ] Access migration page: `/wp-admin/?lakecity_migrate_acf=1`
+1. [ ] Access migration page: `/wp-admin/?byrde_migrate_acf=1`
 2. [ ] Verify "✅ Migration Successful" message
 3. [ ] Check migrated fields count (should be 39)
-4. [ ] Verify API endpoint: `/wp-json/lakecity/v1/settings`
+4. [ ] Verify API endpoint: `/wp-json/byrde/v1/settings`
 
 ### Post-Migration Testing
 - [ ] Test frontend - all settings display correctly
@@ -480,7 +480,7 @@ If something goes wrong:
 
 #### Get Settings
 ```http
-GET /wp-json/lakecity/v1/settings
+GET /wp-json/byrde/v1/settings
 ```
 **Response:**
 ```json
@@ -496,7 +496,7 @@ GET /wp-json/lakecity/v1/settings
 
 #### Update Settings (Admin Only)
 ```http
-PUT /wp-json/lakecity/v1/settings
+PUT /wp-json/byrde/v1/settings
 Content-Type: application/json
 X-WP-Nonce: <nonce>
 
@@ -510,7 +510,7 @@ X-WP-Nonce: <nonce>
 
 #### Atomic Save
 ```http
-PUT /wp-json/lakecity/v1/pages/123/save-all
+PUT /wp-json/byrde/v1/pages/123/save-all
 Content-Type: application/json
 X-WP-Nonce: <nonce>
 
@@ -572,7 +572,7 @@ X-WP-Nonce: <nonce>
 If you encounter issues:
 
 1. **Check Migration Log:** Review the detailed log from migration page
-2. **Verify API Response:** Check `/wp-json/lakecity/v1/settings`
+2. **Verify API Response:** Check `/wp-json/byrde/v1/settings`
 3. **Check Browser Console:** Look for JavaScript errors
 4. **Check PHP Error Log:** Review WordPress debug.log
 5. **Rollback:** Follow rollback plan above
@@ -581,7 +581,7 @@ If you encounter issues:
 
 ## 🎉 Conclusion
 
-Successfully transformed the LakeCity theme into a **secure, independent, cost-effective** solution:
+Successfully transformed the Byrde theme into a **secure, independent, cost-effective** solution:
 
 - ✅ **6 critical security vulnerabilities** eliminated
 - ✅ **ACF Pro dependency** completely removed

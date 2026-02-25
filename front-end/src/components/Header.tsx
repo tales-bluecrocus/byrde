@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import logoFallback from "../assets/images/lake-city-hauling-logo.webp";
+import logoFallback from "../assets/images/byrde-logo.webp";
 import { useHeaderConfig } from "../context/HeaderConfigContext";
 import { useGlobalConfig } from "../context/GlobalConfigContext";
 import { useSectionTheme } from "../context/SectionThemeContext";

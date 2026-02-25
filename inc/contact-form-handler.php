@@ -5,7 +5,7 @@
  * Registers CPT for leads, REST endpoint for form submission,
  * and sends email notifications via Postmark.
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Allowed services (must match Hero.tsx SERVICE_OPTIONS)
-define( 'LAKECITY_ALLOWED_SERVICES', array(
+define( 'BYRDE_ALLOWED_SERVICES', array(
     'junk-removal',
     'demolition',
     'estate-cleanout',
@@ -26,8 +26,8 @@ define( 'LAKECITY_ALLOWED_SERVICES', array(
 // 1. REGISTER CUSTOM POST TYPE: LEADS
 // ========================================
 
-function lakecity_register_leads_cpt(): void {
-    register_post_type( 'lakecity_lead', array(
+function byrde_register_leads_cpt(): void {
+    register_post_type( 'byrde_lead', array(
         'labels'       => array(
             'name'               => 'Leads',
             'singular_name'      => 'Lead',
@@ -50,13 +50,13 @@ function lakecity_register_leads_cpt(): void {
         'map_meta_cap' => true,
     ) );
 }
-add_action( 'init', 'lakecity_register_leads_cpt' );
+add_action( 'init', 'byrde_register_leads_cpt' );
 
 // ========================================
 // 2. CUSTOM ADMIN COLUMNS FOR LEADS
 // ========================================
 
-function lakecity_leads_columns( array $columns ): array {
+function byrde_leads_columns( array $columns ): array {
     $new_columns = array();
     $new_columns['cb']      = $columns['cb'];
     $new_columns['title']   = 'Name';
@@ -67,9 +67,9 @@ function lakecity_leads_columns( array $columns ): array {
     $new_columns['date']    = 'Date';
     return $new_columns;
 }
-add_filter( 'manage_lakecity_lead_posts_columns', 'lakecity_leads_columns' );
+add_filter( 'manage_byrde_lead_posts_columns', 'byrde_leads_columns' );
 
-function lakecity_leads_column_content( string $column, int $post_id ): void {
+function byrde_leads_column_content( string $column, int $post_id ): void {
     switch ( $column ) {
         case 'email':
             $email = get_post_meta( $post_id, '_lead_email', true );
@@ -104,37 +104,37 @@ function lakecity_leads_column_content( string $column, int $post_id ): void {
             break;
     }
 }
-add_action( 'manage_lakecity_lead_posts_custom_column', 'lakecity_leads_column_content', 10, 2 );
+add_action( 'manage_byrde_lead_posts_custom_column', 'byrde_leads_column_content', 10, 2 );
 
-function lakecity_leads_sortable_columns( array $columns ): array {
+function byrde_leads_sortable_columns( array $columns ): array {
     $columns['service'] = 'service';
     return $columns;
 }
-add_filter( 'manage_edit-lakecity_lead_sortable_columns', 'lakecity_leads_sortable_columns' );
+add_filter( 'manage_edit-byrde_lead_sortable_columns', 'byrde_leads_sortable_columns' );
 
 // ========================================
 // 3. LEAD DETAIL META BOX
 // ========================================
 
-function lakecity_add_lead_meta_box(): void {
+function byrde_add_lead_meta_box(): void {
     add_meta_box(
-        'lakecity_lead_details',
+        'byrde_lead_details',
         'Lead Details',
-        'lakecity_render_lead_meta_box',
-        'lakecity_lead',
+        'byrde_render_lead_meta_box',
+        'byrde_lead',
         'normal',
         'high'
     );
 }
-add_action( 'add_meta_boxes', 'lakecity_add_lead_meta_box' );
+add_action( 'add_meta_boxes', 'byrde_add_lead_meta_box' );
 
-function lakecity_render_lead_meta_box( WP_Post $post ): void {
-    $email       = get_post_meta( $post->ID, '_lead_email', true );
-    $phone       = get_post_meta( $post->ID, '_lead_phone', true );
-    $service     = get_post_meta( $post->ID, '_lead_service', true );
-    $message     = get_post_meta( $post->ID, '_lead_message', true );
-    $ip          = get_post_meta( $post->ID, '_lead_ip', true );
-    $source      = get_post_meta( $post->ID, '_lead_source', true );
+function byrde_render_lead_meta_box( WP_Post $post ): void {
+    $email       = (string) get_post_meta( $post->ID, '_lead_email', true );
+    $phone       = (string) get_post_meta( $post->ID, '_lead_phone', true );
+    $service     = (string) get_post_meta( $post->ID, '_lead_service', true );
+    $message     = (string) get_post_meta( $post->ID, '_lead_message', true );
+    $ip          = (string) get_post_meta( $post->ID, '_lead_ip', true );
+    $source      = (string) get_post_meta( $post->ID, '_lead_source', true );
     $attribution = get_post_meta( $post->ID, '_lead_attribution', true );
     ?>
     <table class="form-table">
@@ -202,16 +202,16 @@ function lakecity_render_lead_meta_box( WP_Post $post ): void {
 // 4. REST API ENDPOINT
 // ========================================
 
-function lakecity_register_contact_endpoint(): void {
-    register_rest_route( LAKECITY_REST_NAMESPACE, '/contact', array(
+function byrde_register_contact_endpoint(): void {
+    register_rest_route( BYRDE_REST_NAMESPACE, '/contact', array(
         'methods'             => 'POST',
-        'callback'            => 'lakecity_handle_contact_form',
+        'callback'            => 'byrde_handle_contact_form',
         'permission_callback' => '__return_true',
     ) );
 }
-add_action( 'rest_api_init', 'lakecity_register_contact_endpoint' );
+add_action( 'rest_api_init', 'byrde_register_contact_endpoint' );
 
-function lakecity_handle_contact_form( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+function byrde_handle_contact_form( WP_REST_Request $request ): WP_REST_Response|WP_Error {
     $params = $request->get_json_params();
 
     // --- Honeypot check ---
@@ -221,8 +221,8 @@ function lakecity_handle_contact_form( WP_REST_Request $request ): WP_REST_Respo
     }
 
     // --- IP-based rate limiting ---
-    $ip = lakecity_get_client_ip();
-    if ( ! lakecity_contact_rate_limit( $ip, 3, 300 ) ) {
+    $ip = byrde_get_client_ip();
+    if ( ! byrde_contact_rate_limit( $ip, 3, 300 ) ) {
         return new WP_Error(
             'rate_limit',
             'Too many submissions. Please try again in a few minutes.',
@@ -253,7 +253,7 @@ function lakecity_handle_contact_form( WP_REST_Request $request ): WP_REST_Respo
         $errors['phone'] = 'A valid phone number is required.';
     }
 
-    if ( empty( $service ) || ! in_array( $service, LAKECITY_ALLOWED_SERVICES, true ) ) {
+    if ( empty( $service ) || ! in_array( $service, BYRDE_ALLOWED_SERVICES, true ) ) {
         $errors['service'] = 'Please select a valid service.';
     }
 
@@ -267,7 +267,7 @@ function lakecity_handle_contact_form( WP_REST_Request $request ): WP_REST_Respo
 
     // --- Save as CPT ---
     $post_id = wp_insert_post( array(
-        'post_type'   => 'lakecity_lead',
+        'post_type'   => 'byrde_lead',
         'post_title'  => $name,
         'post_status' => 'publish',
     ) );
@@ -307,11 +307,11 @@ function lakecity_handle_contact_form( WP_REST_Request $request ): WP_REST_Respo
     }
 
     // --- Send email via Postmark ---
-    $email_sent = lakecity_send_postmark_email( $name, $email, $phone, $service, $message );
+    $email_sent = byrde_send_postmark_email( $name, $email, $phone, $service, $message );
 
     // Fallback to wp_mail if Postmark fails
     if ( ! $email_sent ) {
-        lakecity_send_fallback_email( $name, $email, $phone, $service, $message );
+        byrde_send_fallback_email( $name, $email, $phone, $service, $message );
     }
 
     return rest_ensure_response( array( 'success' => true ) );
@@ -321,8 +321,8 @@ function lakecity_handle_contact_form( WP_REST_Request $request ): WP_REST_Respo
 // 5. IP-BASED RATE LIMITING (for anonymous)
 // ========================================
 
-function lakecity_contact_rate_limit( string $ip, int $max_requests = 3, int $window = 300 ): bool {
-    $key      = 'lakecity_contact_' . md5( $ip );
+function byrde_contact_rate_limit( string $ip, int $max_requests = 3, int $window = 300 ): bool {
+    $key      = 'byrde_contact_' . md5( $ip );
     $requests = get_transient( $key );
 
     if ( false === $requests ) {
@@ -338,7 +338,7 @@ function lakecity_contact_rate_limit( string $ip, int $max_requests = 3, int $wi
     return true;
 }
 
-function lakecity_get_client_ip(): string {
+function byrde_get_client_ip(): string {
     $headers = array(
         'HTTP_CF_CONNECTING_IP', // Cloudflare
         'HTTP_X_FORWARDED_FOR',
@@ -359,15 +359,15 @@ function lakecity_get_client_ip(): string {
 // 6. POSTMARK EMAIL
 // ========================================
 
-function lakecity_send_postmark_email( string $name, string $email, string $phone, string $service, string $message ): bool {
-    $api_token  = lakecity_get_setting( 'postmark_api_token' );
-    $to_email   = lakecity_get_setting( 'contact_form_to_email' );
-    $from_email = lakecity_get_setting( 'contact_form_from_email' );
-    $subject    = lakecity_get_setting( 'contact_form_subject', 'New Lead from Website' );
+function byrde_send_postmark_email( string $name, string $email, string $phone, string $service, string $message ): bool {
+    $api_token  = byrde_get_setting( 'postmark_api_token' );
+    $to_email   = byrde_get_setting( 'contact_form_to_email' );
+    $from_email = byrde_get_setting( 'contact_form_from_email' );
+    $subject    = byrde_get_setting( 'contact_form_subject', 'New Lead from Website' );
 
     if ( empty( $api_token ) || empty( $to_email ) || empty( $from_email ) ) {
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( '[LakeCity] Postmark not configured. Missing api_token, to_email, or from_email.' );
+            error_log( '[Byrde] Postmark not configured. Missing api_token, to_email, or from_email.' );
         }
         return false;
     }
@@ -384,7 +384,7 @@ function lakecity_send_postmark_email( string $name, string $email, string $phon
     $service_label = $service_labels[ $service ] ?? $service;
 
     // Build HTML email
-    $html_body = lakecity_build_lead_email_html( $name, $email, $phone, $service_label, $message );
+    $html_body = byrde_build_lead_email_html( $name, $email, $phone, $service_label, $message );
 
     // Plain text version
     $text_body  = "New Lead from Website\n\n";
@@ -420,7 +420,7 @@ function lakecity_send_postmark_email( string $name, string $email, string $phon
 
     if ( is_wp_error( $response ) ) {
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( '[LakeCity] Postmark error: ' . $response->get_error_message() );
+            error_log( '[Byrde] Postmark error: ' . $response->get_error_message() );
         }
         return false;
     }
@@ -429,7 +429,7 @@ function lakecity_send_postmark_email( string $name, string $email, string $phon
 
     if ( $code !== 200 ) {
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( '[LakeCity] Postmark HTTP ' . $code . ': ' . wp_remote_retrieve_body( $response ) );
+            error_log( '[Byrde] Postmark HTTP ' . $code . ': ' . wp_remote_retrieve_body( $response ) );
         }
         return false;
     }
@@ -437,7 +437,7 @@ function lakecity_send_postmark_email( string $name, string $email, string $phon
     return true;
 }
 
-function lakecity_build_lead_email_html( string $name, string $email, string $phone, string $service, string $message ): string {
+function byrde_build_lead_email_html( string $name, string $email, string $phone, string $service, string $message ): string {
     $phone_raw = preg_replace( '/\D/', '', $phone );
     $site_name = get_bloginfo( 'name' );
 
@@ -516,8 +516,8 @@ function lakecity_build_lead_email_html( string $name, string $email, string $ph
 // 7. FALLBACK EMAIL (wp_mail)
 // ========================================
 
-function lakecity_send_fallback_email( string $name, string $email, string $phone, string $service, string $message ): void {
-    $to_email = lakecity_get_setting( 'contact_form_to_email' );
+function byrde_send_fallback_email( string $name, string $email, string $phone, string $service, string $message ): void {
+    $to_email = byrde_get_setting( 'contact_form_to_email' );
 
     if ( empty( $to_email ) ) {
         $to_email = get_option( 'admin_email' );

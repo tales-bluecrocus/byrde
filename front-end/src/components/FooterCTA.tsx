@@ -1,6 +1,7 @@
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent } from '../context/ContentContext';
+import { renderHeadlineStyled } from '../utils/renderHeadline';
 import { getContrastColor, withAlpha } from '../utils/colorUtils';
 import { trackPhoneClick } from '../lib/analytics';
 
@@ -81,8 +82,7 @@ export default function FooterCTA() {
           className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
           style={{ color: textPrimary }}
         >
-          {content.headline}{' '}
-          <span style={{ color: accentColor }}>{content.highlightText}</span>
+          {renderHeadlineStyled(content.headline, { color: accentColor })}
         </h2>
 
         {/* Subheadline */}
@@ -112,7 +112,7 @@ export default function FooterCTA() {
           className="mt-6 text-sm font-medium"
           style={{ color: textSecondary, opacity: 0.6 }}
         >
-          No obligation &middot; Free estimates &middot; Fast response
+          {content.reassuranceText}
         </p>
       </div>
     </div>

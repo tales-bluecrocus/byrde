@@ -4,7 +4,7 @@
  *
  * Injects GA4 and Facebook Pixel scripts based on Theme Settings.
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Inject Google Analytics 4 (gtag.js)
  */
-function lakecity_inject_ga4(): void {
-    $settings = lakecity_get_all_settings();
+function byrde_inject_ga4(): void {
+    $settings = byrde_get_all_settings();
     $ga_id    = $settings['ga_measurement_id'] ?? '';
 
     if ( empty( $ga_id ) ) {
@@ -23,7 +23,7 @@ function lakecity_inject_ga4(): void {
     }
 
     // Don't track in preview mode or admin
-    if ( is_admin() || isset( $_GET['lakecity_preview'] ) ) {
+    if ( is_admin() || isset( $_GET['byrde_preview'] ) ) {
         return;
     }
     ?>
@@ -41,20 +41,20 @@ function lakecity_inject_ga4(): void {
     </script>
     <?php
 }
-add_action( 'wp_head', 'lakecity_inject_ga4', 1 );
+add_action( 'wp_head', 'byrde_inject_ga4', 1 );
 
 /**
  * Inject Facebook/Meta Pixel
  */
-function lakecity_inject_fb_pixel(): void {
-    $settings    = lakecity_get_all_settings();
+function byrde_inject_fb_pixel(): void {
+    $settings    = byrde_get_all_settings();
     $fb_pixel_id = $settings['fb_pixel_id'] ?? '';
     if ( empty( $fb_pixel_id ) ) {
         return;
     }
 
     // Don't track in preview mode or admin
-    if ( is_admin() || isset( $_GET['lakecity_preview'] ) ) {
+    if ( is_admin() || isset( $_GET['byrde_preview'] ) ) {
         return;
     }
     ?>
@@ -77,13 +77,13 @@ function lakecity_inject_fb_pixel(): void {
     <!-- End Meta Pixel Code -->
     <?php
 }
-add_action( 'wp_head', 'lakecity_inject_fb_pixel', 2 );
+add_action( 'wp_head', 'byrde_inject_fb_pixel', 2 );
 
 /**
  * Pass analytics settings to React app
  */
-function lakecity_analytics_localize_script(): void {
-    $settings = lakecity_get_all_settings();
+function byrde_analytics_localize_script(): void {
+    $settings = byrde_get_all_settings();
 
     $analytics_settings = array(
         'ga_measurement_id'     => $settings['ga_measurement_id'] ?? '',
@@ -95,7 +95,7 @@ function lakecity_analytics_localize_script(): void {
     $analytics_settings = array_filter( $analytics_settings );
 
     if ( ! empty( $analytics_settings ) ) {
-        wp_localize_script( 'lakecity-app', 'lakecityAnalytics', $analytics_settings );
+        wp_localize_script( 'byrde-app', 'byrdeAnalytics', $analytics_settings );
     }
 }
-add_action( 'wp_enqueue_scripts', 'lakecity_analytics_localize_script', 20 );
+add_action( 'wp_enqueue_scripts', 'byrde_analytics_localize_script', 20 );

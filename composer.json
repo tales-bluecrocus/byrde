@@ -1,0 +1,14 @@
+{
+    "name": "byrde/byrde",
+    "description": "WordPress theme Byrde",
+    "type": "wordpress-theme",
+    "require": {
+        "php": ">=8.0",
+        "yahnis-elsts/plugin-update-checker": "^5.6"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

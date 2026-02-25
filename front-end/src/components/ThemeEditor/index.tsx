@@ -46,7 +46,7 @@ export function ThemeEditor() {
   const { sectionContent } = useContent();
   const { toast } = useToast();
 
-  const wpAdmin = typeof window !== 'undefined' ? window.lakecityAdmin : null;
+  const wpAdmin = typeof window !== 'undefined' ? window.byrdeAdmin : null;
 
   const handleSelectSection = useCallback((id: SectionId | 'global') => {
     setSelectedSection(id);

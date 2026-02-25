@@ -5,7 +5,7 @@
  * Creates a WordPress admin page for global theme settings
  * (replacement for ACF options page)
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -15,30 +15,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Add Theme Settings menu to WordPress admin
  */
-function lakecity_add_settings_menu(): void {
+function byrde_add_settings_menu(): void {
 	add_menu_page(
 		'Theme Settings',           // Page title
 		'Theme Settings',           // Menu title
 		'manage_options',           // Capability
-		'lakecity-theme-settings',  // Menu slug
-		'lakecity_render_settings_page', // Callback
+		'byrde-theme-settings',  // Menu slug
+		'byrde_render_settings_page', // Callback
 		'dashicons-admin-generic',  // Icon
 		30                          // Position
 	);
 }
-add_action( 'admin_menu', 'lakecity_add_settings_menu' );
+add_action( 'admin_menu', 'byrde_add_settings_menu' );
 
 /**
  * Render the settings page
  */
-function lakecity_render_settings_page(): void {
+function byrde_render_settings_page(): void {
 	// Check permissions
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die( 'Unauthorized', 403 );
 	}
 
 	// Get settings
-	$settings = lakecity_get_all_settings();
+	$settings = byrde_get_all_settings();
 	?>
 	<!DOCTYPE html>
 	<html>
@@ -110,8 +110,8 @@ function lakecity_render_settings_page(): void {
 					}
 
 					$editor_url = $homepage
-						? admin_url( 'admin.php?page=lakecity-editor&lakecity_page_id=' . $homepage )
-						: admin_url( 'admin.php?page=lakecity-editor' );
+						? admin_url( 'admin.php?page=byrde-editor&byrde_page_id=' . $homepage )
+						: admin_url( 'admin.php?page=byrde-editor' );
 					?>
 					<a href="<?php echo esc_url( $editor_url ); ?>" class="editor-link">
 						🎨 Open Theme Editor

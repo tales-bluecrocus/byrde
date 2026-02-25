@@ -65,7 +65,7 @@ export interface ThemeConfig {
 // ADMIN CONTEXT (injected in editor mode)
 // ============================================
 
-export interface LakecityAdmin {
+export interface ByrdeAdmin {
   isAdmin: boolean;
   canSave: boolean;
   apiUrl: string;
@@ -144,10 +144,10 @@ export interface Gtag {
 declare global {
   interface Window {
     // WordPress Theme Data
-    lakecityAdmin?: LakecityAdmin;
-    lakecityConfig?: ThemeConfig;
-    lakecityContent?: Partial<Record<ContentSectionId, SectionContent>>;
-    lakecitySettings?: Partial<ACFSettings>;
+    byrdeAdmin?: ByrdeAdmin;
+    byrdeConfig?: ThemeConfig;
+    byrdeContent?: Partial<Record<ContentSectionId, SectionContent>>;
+    byrdeSettings?: Partial<ACFSettings>;
 
     // WordPress Media Library
     wp?: WPMedia;

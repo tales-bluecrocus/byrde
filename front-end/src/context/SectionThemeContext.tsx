@@ -101,13 +101,13 @@ const getWpSectionsConfig = (): Record<string, unknown> | null => {
   if (typeof window === 'undefined') return null;
 
   // Check admin config first (CORRECT KEY: sectionThemes)
-  if (window.lakecityAdmin?.config?.sectionThemes) {
-    return window.lakecityAdmin.config.sectionThemes as Record<string, unknown>;
+  if (window.byrdeAdmin?.config?.sectionThemes) {
+    return window.byrdeAdmin.config.sectionThemes as Record<string, unknown>;
   }
 
   // Check public page config (CORRECT KEY: sectionThemes)
-  if (window.lakecityConfig?.sectionThemes) {
-    return window.lakecityConfig.sectionThemes as Record<string, unknown>;
+  if (window.byrdeConfig?.sectionThemes) {
+    return window.byrdeConfig.sectionThemes as Record<string, unknown>;
   }
 
   return null;

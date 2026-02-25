@@ -7,10 +7,10 @@
  *
  * Usage:
  * 1. Via WP-CLI: wp eval-file inc/migrate-acf-to-options.php
- * 2. Via Admin: Access /wp-admin/?lakecity_migrate_acf=1 (admin only)
- * 3. Via Code: Call lakecity_migrate_acf_to_native()
+ * 2. Via Admin: Access /wp-admin/?byrde_migrate_acf=1 (admin only)
+ * 3. Via Code: Call byrde_migrate_acf_to_native()
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return array Migration results with counts and errors.
  */
-function lakecity_migrate_acf_to_native(): array {
+function byrde_migrate_acf_to_native(): array {
 	$results = array(
 		'success'        => false,
 		'fields_migrated' => 0,
@@ -103,7 +103,7 @@ function lakecity_migrate_acf_to_native(): array {
 				);
 			} else {
 				// Set nested value
-				lakecity_set_nested_value( $new_settings, $path, $value );
+				byrde_set_nested_value( $new_settings, $path, $value );
 			}
 
 			$results['fields_migrated']++;
@@ -112,11 +112,11 @@ function lakecity_migrate_acf_to_native(): array {
 	}
 
 	// Save to WordPress options
-	$saved = lakecity_update_theme_settings( $new_settings );
+	$saved = byrde_update_theme_settings( $new_settings );
 
 	if ( $saved ) {
 		$results['success'] = true;
-		$results['log'][]   = "Successfully saved {$results['fields_migrated']} fields to " . LAKECITY_OPTION_THEME_SETTINGS;
+		$results['log'][]   = "Successfully saved {$results['fields_migrated']} fields to " . BYRDE_OPTION_THEME_SETTINGS;
 	} else {
 		$results['errors'][] = 'Failed to save settings to database';
 		$results['log'][]    = 'ERROR: Could not save to wp_options';
@@ -132,7 +132,7 @@ function lakecity_migrate_acf_to_native(): array {
  * @param array $path Path array (e.g., ['brand', 'phone']).
  * @param mixed $value Value to set.
  */
-function lakecity_set_nested_value( array &$array, array $path, $value ): void {
+function byrde_set_nested_value( array &$array, array $path, $value ): void {
 	$current = &$array;
 
 	foreach ( $path as $key ) {
@@ -148,11 +148,11 @@ function lakecity_set_nested_value( array &$array, array $path, $value ): void {
 /**
  * Admin page handler for migration
  *
- * Access via: /wp-admin/?lakecity_migrate_acf=1
+ * Access via: /wp-admin/?byrde_migrate_acf=1
  */
-function lakecity_maybe_run_migration(): void {
+function byrde_maybe_run_migration(): void {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	if ( ! isset( $_GET['lakecity_migrate_acf'] ) ) {
+	if ( ! isset( $_GET['byrde_migrate_acf'] ) ) {
 		return;
 	}
 
@@ -162,7 +162,7 @@ function lakecity_maybe_run_migration(): void {
 	}
 
 	// Run migration
-	$results = lakecity_migrate_acf_to_native();
+	$results = byrde_migrate_acf_to_native();
 
 	// Display results
 	?>
@@ -187,7 +187,7 @@ function lakecity_maybe_run_migration(): void {
 		<?php if ( $results['success'] ) : ?>
 			<div class="success">
 				<strong>✅ Migration Successful!</strong><br>
-				Migrated <?php echo esc_html( $results['fields_migrated'] ); ?> fields to <code><?php echo esc_html( LAKECITY_OPTION_THEME_SETTINGS ); ?></code>
+				Migrated <?php echo esc_html( $results['fields_migrated'] ); ?> fields to <code><?php echo esc_html( BYRDE_OPTION_THEME_SETTINGS ); ?></code>
 			</div>
 		<?php else : ?>
 			<div class="error">
@@ -215,7 +215,7 @@ function lakecity_maybe_run_migration(): void {
 		<?php if ( $results['success'] ) : ?>
 			<h2>✅ Next Steps</h2>
 			<ol>
-				<li>Verify the migrated data at <code>/wp-json/lakecity/v1/settings</code></li>
+				<li>Verify the migrated data at <code>/wp-json/byrde/v1/settings</code></li>
 				<li>Test the frontend to ensure all settings display correctly</li>
 				<li>Once verified, you can deactivate <strong>ACF Pro</strong> plugin</li>
 				<li>Remove <code>inc/acf-theme-settings.php</code> from <code>functions.php</code></li>
@@ -228,15 +228,15 @@ function lakecity_maybe_run_migration(): void {
 	<?php
 	exit;
 }
-add_action( 'admin_init', 'lakecity_maybe_run_migration' );
+add_action( 'admin_init', 'byrde_maybe_run_migration' );
 
 /**
  * WP-CLI command for migration
  *
- * Usage: wp eval-file wp-content/themes/lakecity/inc/migrate-acf-to-options.php
+ * Usage: wp eval-file wp-content/themes/byrde/inc/migrate-acf-to-options.php
  */
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	$results = lakecity_migrate_acf_to_native();
+	$results = byrde_migrate_acf_to_native();
 
 	if ( $results['success'] ) {
 		WP_CLI::success( "Migrated {$results['fields_migrated']} fields successfully!" );

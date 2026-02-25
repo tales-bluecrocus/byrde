@@ -1,8 +1,8 @@
 <?php
 /**
- * Lake City Theme Functions
+ * Byrde Theme Functions
  *
- * @package LakeCity
+ * @package Byrde
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,77 +25,139 @@ require_once get_template_directory() . '/inc/rest-content-api.php';
 require_once get_template_directory() . '/inc/contact-form-handler.php';
 require_once get_template_directory() . '/inc/analytics.php';
 require_once get_template_directory() . '/inc/seo.php';
+require_once get_template_directory() . '/inc/update-checker.php';
 
 /**
- * Get the front-end build assets (JS and CSS filenames with hashes)
+ * Get the theme directory URI relative to the network root.
+ *
+ * In multisite subdirectory installs, get_template_directory_uri() includes
+ * the subsite prefix (e.g. /lp/wp-content/...) which causes 404s since
+ * wp-content lives at the root. This helper uses network_site_url() to
+ * generate the correct path from the installation root.
  */
-function lakecity_get_assets(): array {
-    $assets_dir = get_template_directory() . '/front-end/dist/assets';
-
-    if ( ! is_dir( $assets_dir ) ) {
-        return array( 'js' => '', 'css' => '' );
+function byrde_theme_uri(): string {
+    if ( is_multisite() ) {
+        return network_site_url( 'wp-content/themes/' . get_template() );
     }
-
-    $files = scandir( $assets_dir );
-    $js = '';
-    $css = '';
-
-    foreach ( $files as $file ) {
-        if ( str_starts_with( $file, 'index-' ) && str_ends_with( $file, '.js' ) ) {
-            $js = 'assets/' . $file;
-        }
-        if ( str_starts_with( $file, 'index-' ) && str_ends_with( $file, '.css' ) ) {
-            $css = 'assets/' . $file;
-        }
-    }
-
-    return array( 'js' => $js, 'css' => $css );
+    return get_template_directory_uri();
 }
 
 /**
- * Enqueue front-end assets
+ * Get the logo URL and alt text (ACF or bundled fallback).
+ * Shared between preload, shell render, and wp_localize_script.
+ *
+ * @return array{url: string, alt: string}
  */
-function lakecity_enqueue_assets(): void {
-    $assets = lakecity_get_assets();
-    $dist_uri = get_template_directory_uri() . '/front-end/dist';
+function byrde_get_logo_data(): array {
+    $site_name = get_bloginfo( 'name' );
+    $logo      = byrde_get_setting( 'logo' );
 
-    if ( ! empty( $assets['css'] ) ) {
-        wp_enqueue_style(
-            'lakecity-main',
-            $dist_uri . '/' . $assets['css'],
-            array(),
-            null
+    if ( $logo && is_array( $logo ) ) {
+        $url = $logo['sizes']['logo'] ?? $logo['sizes']['thumbnail'] ?? $logo['url'] ?? '';
+        $alt = $logo['alt'] ?? $site_name;
+        if ( ! empty( $url ) ) {
+            return array(
+                'url' => $url,
+                'alt' => $alt ?: $site_name,
+            );
+        }
+    }
+
+    // Fallback to bundled logo
+    $dist_dir = get_template_directory() . '/front-end/dist';
+    if ( file_exists( $dist_dir . '/assets/byrde-logo.webp' ) ) {
+        return array(
+            'url' => byrde_theme_uri() . '/front-end/dist/assets/byrde-logo.webp',
+            'alt' => $site_name,
         );
     }
 
-    if ( ! empty( $assets['js'] ) ) {
-        wp_enqueue_script(
-            'lakecity-main',
-            $dist_uri . '/' . $assets['js'],
+    return array( 'url' => '', 'alt' => $site_name );
+}
+
+/**
+ * Render an HTML shell inside #root so the browser can paint and discover
+ * the LCP image (logo) before React loads. React's createRoot() replaces
+ * this content on mount.
+ */
+function byrde_render_shell(): void {
+    // Skip in editor preview — React handles everything there
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    if ( ! empty( $_GET['byrde_preview'] ) ) {
+        return;
+    }
+
+    $logo = byrde_get_logo_data();
+    $phone = (string) byrde_get_setting( 'phone' );
+    ?>
+    <div style="min-height:100vh;background:#0a0a0a">
+        <header style="padding:1rem 1.5rem">
+            <div style="max-width:80rem;margin:0 auto;display:flex;align-items:center;justify-content:space-between">
+                <?php if ( ! empty( $logo['url'] ) ) : ?>
+                    <img
+                        src="<?php echo esc_url( $logo['url'] ); ?>"
+                        alt="<?php echo esc_attr( $logo['alt'] ); ?>"
+                        width="64"
+                        height="64"
+                        fetchpriority="high"
+                        style="height:3.5rem;width:auto"
+                    />
+                <?php endif; ?>
+                <?php if ( $phone ) : ?>
+                    <a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $phone ) ); ?>" style="display:none"></a>
+                <?php endif; ?>
+            </div>
+        </header>
+    </div>
+    <?php
+}
+
+/**
+ * Enqueue front-end assets (fixed filenames, version-based cache busting)
+ */
+function byrde_enqueue_assets(): void {
+    $dist_dir = get_template_directory() . '/front-end/dist';
+    $dist_uri = byrde_theme_uri() . '/front-end/dist';
+    $version  = wp_get_theme()->get( 'Version' );
+
+    if ( file_exists( $dist_dir . '/assets/style.css' ) ) {
+        wp_enqueue_style(
+            'byrde-main',
+            $dist_uri . '/assets/style.css',
             array(),
-            null,
+            $version
+        );
+    }
+
+    if ( file_exists( $dist_dir . '/assets/main.js' ) ) {
+        wp_enqueue_script(
+            'byrde-main',
+            $dist_uri . '/assets/main.js',
+            array(),
+            $version,
             true
         );
 
         // Pass theme settings to React
-        wp_localize_script( 'lakecity-main', 'lakecitySettings', lakecity_get_all_settings() );
+        wp_localize_script( 'byrde-main', 'byrdeSettings', byrde_get_all_settings() );
     }
 }
-add_action( 'wp_enqueue_scripts', 'lakecity_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'byrde_enqueue_assets' );
 
 /**
  * Preload critical resources: JS module, Google Fonts, LCP logo image
  * Outputs early in <head> so browser discovers resources ASAP.
  */
-function lakecity_preload_resources(): void {
-    $assets = lakecity_get_assets();
-    $dist_uri = get_template_directory_uri() . '/front-end/dist';
+function byrde_preload_resources(): void {
+    $dist_dir = get_template_directory() . '/front-end/dist';
+    $dist_uri = byrde_theme_uri() . '/front-end/dist';
+    $version  = wp_get_theme()->get( 'Version' );
 
     // Modulepreload JS bundle — browser downloads in parallel with CSS (breaks sequential chain)
-    if ( ! empty( $assets['js'] ) ) {
+    if ( file_exists( $dist_dir . '/assets/main.js' ) ) {
         printf(
             '<link rel="modulepreload" href="%s">' . "\n",
-            esc_url( $dist_uri . '/' . $assets['js'] )
+            esc_url( $dist_uri . '/assets/main.js?ver=' . $version )
         );
     }
 
@@ -107,47 +169,74 @@ function lakecity_preload_resources(): void {
     echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Outfit:wght@100..900&amp;display=swap" media="print" onload="this.media=\'all\'">' . "\n";
     echo '<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Outfit:wght@100..900&amp;display=swap"></noscript>' . "\n";
 
-    // Preload LCP logo image with fetchpriority=high (use 'logo' 128px size)
-    $logo = lakecity_get_setting( 'logo' );
-    if ( $logo && is_array( $logo ) ) {
-        $logo_url = $logo['sizes']['logo'] ?? $logo['sizes']['thumbnail'] ?? $logo['url'] ?? '';
-        if ( ! empty( $logo_url ) ) {
-            printf(
-                '<link rel="preload" as="image" href="%s" fetchpriority="high">' . "\n",
-                esc_url( $logo_url )
-            );
-        }
+    // Preload LCP logo image (ACF or bundled fallback)
+    $logo = byrde_get_logo_data();
+    if ( ! empty( $logo['url'] ) ) {
+        printf(
+            '<link rel="preload" as="image" href="%s" fetchpriority="high">' . "\n",
+            esc_url( $logo['url'] )
+        );
+    }
+
+    // Favicon — use ACF logo (or fallback). Skipped when WP has a site icon set.
+    if ( ! has_site_icon() && ! empty( $logo['url'] ) ) {
+        printf(
+            '<link rel="icon" href="%s" type="%s">' . "\n",
+            esc_url( $logo['url'] ),
+            esc_attr( byrde_image_mime( $logo['url'] ) )
+        );
+        printf(
+            '<link rel="apple-touch-icon" href="%s">' . "\n",
+            esc_url( $logo['url'] )
+        );
     }
 }
-add_action( 'wp_head', 'lakecity_preload_resources', 1 );
+add_action( 'wp_head', 'byrde_preload_resources', 1 );
+
+/**
+ * Guess MIME type from image URL extension.
+ */
+function byrde_image_mime( string $url ): string {
+    $ext = strtolower( pathinfo( wp_parse_url( $url, PHP_URL_PATH ) ?: '', PATHINFO_EXTENSION ) );
+    $map = array(
+        'webp' => 'image/webp',
+        'png'  => 'image/png',
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif'  => 'image/gif',
+        'svg'  => 'image/svg+xml',
+        'ico'  => 'image/x-icon',
+    );
+    return $map[ $ext ] ?? 'image/png';
+}
 
 /**
  * Add module type to our script
  */
-function lakecity_script_type( string $tag, string $handle ): string {
-    if ( 'lakecity-main' === $handle ) {
+function byrde_script_type( string $tag, string $handle ): string {
+    if ( 'byrde-main' === $handle ) {
         return str_replace( '<script ', '<script type="module" ', $tag );
     }
     return $tag;
 }
-add_filter( 'script_loader_tag', 'lakecity_script_type', 10, 2 );
+add_filter( 'script_loader_tag', 'byrde_script_type', 10, 2 );
 
 /**
  * Theme setup
  */
-function lakecity_setup(): void {
+function byrde_setup(): void {
     add_theme_support( 'title-tag' );
     add_theme_support( 'html5', array( 'script', 'style' ) );
 
     // Custom image size for logo (displayed at 64-98px, 128px = 2x retina)
     add_image_size( 'logo', 128, 128, false );
 }
-add_action( 'after_setup_theme', 'lakecity_setup' );
+add_action( 'after_setup_theme', 'byrde_setup' );
 
 /**
  * Create default pages on theme activation
  */
-function lakecity_activate(): void {
+function byrde_activate(): void {
     $pages = array(
         array(
             'title' => 'Home',
@@ -199,4 +288,4 @@ function lakecity_activate(): void {
         update_option( 'page_on_front', $front_page_id );
     }
 }
-add_action( 'after_switch_theme', 'lakecity_activate' );
+add_action( 'after_switch_theme', 'byrde_activate' );

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { SectionId } from './SectionThemeContext';
+import { migrateHeadline } from '../utils/renderHeadline';
 
 // ============================================
 // CONTENT TYPES FOR EACH SECTION
@@ -36,6 +37,12 @@ export interface HeroContent {
   subheadline: string;
   ctaText: string;
   ctaLink: string;
+  // Benefits list (bullet points)
+  benefits: string[];
+  // Contact form texts
+  formTitle: string;
+  formSubtitle: string;
+  formSubmitText: string;
   // Hero badge (above headline)
   heroBadgeText: string;
   showHeroBadge: boolean;
@@ -51,6 +58,8 @@ export interface HeroContent {
 }
 
 export interface FeaturedTestimonialContent {
+  badgeText: string;
+  verifiedText: string;
   quote: string;
   authorName: string;
   authorTitle: string;
@@ -61,16 +70,24 @@ export interface FeaturedTestimonialContent {
 
 export interface ServiceItem {
   id: string;
-  icon: string; // Icon identifier
+  icon: string; // Lucide icon name or custom SVG
+  iconType: 'lucide' | 'image'; // Icon source type
+  iconImage?: string; // WordPress media URL (when iconType is 'image')
   title: string;
   description: string;
 }
 
 export interface ServicesContent {
-  headline: string;
-  highlightText: string;
+  badgeText: string; // Small uppercase text above heading
+  headline: string; // Use <strong> for accent color
   subheadline: string;
   services: ServiceItem[];
+}
+
+export interface FeatureItem {
+  id: string;
+  icon: string; // Lucide icon name
+  text: string;
 }
 
 export interface MidCtaContent {
@@ -79,19 +96,22 @@ export interface MidCtaContent {
   subheadline: string;
   ctaText: string;
   ctaLink: string;
-  features: string[];
+  features: FeatureItem[];
 }
 
 export interface AreaItem {
   id: string;
   name: string;
   state: string;
+  highlighted: boolean;
 }
 
 export interface ServiceAreasContent {
-  headline: string;
-  highlightText: string;
+  badgeText: string;
+  headline: string; // Use <strong> for accent color
   subheadline: string;
+  locationsHeading: string;
+  missingAreaText: string;
   areas: AreaItem[];
   ctaText: string;
   ctaLink: string;
@@ -106,9 +126,10 @@ export interface TestimonialItem {
 }
 
 export interface TestimonialsContent {
-  headline: string;
-  highlightText: string;
+  badgeText: string;
+  headline: string; // Use <strong> for accent color
   subheadline: string;
+  reviewLabel: string;
   testimonials: TestimonialItem[];
   ctaText: string;
   ctaLink: string;
@@ -121,8 +142,8 @@ export interface FaqItem {
 }
 
 export interface FaqContent {
-  headline: string;
-  highlightText: string;
+  badgeText: string;
+  headline: string; // Use <strong> for accent color
   subheadline: string;
   contactTitle: string;
   contactDescription: string;
@@ -132,9 +153,9 @@ export interface FaqContent {
 }
 
 export interface FooterCtaContent {
-  headline: string;
-  highlightText: string;
+  headline: string; // Use <strong> for accent color
   subheadline: string;
+  reassuranceText: string;
   ctaText: string;
   ctaLink: string;
 }
@@ -187,6 +208,17 @@ const DEFAULT_HERO_CONTENT: HeroContent = {
   subheadline: 'Professional junk removal services in North Idaho and Spokane. Licensed, insured, and locally owned.',
   ctaText: 'Call For Free Quote',
   ctaLink: 'tel:2089980054',
+  // Benefits
+  benefits: [
+    'Fully Licensed & Insured Pros',
+    'Same-Day Services Available',
+    'Locally Owned & Operated',
+    'Honest & Upfront Pricing',
+  ],
+  // Contact form
+  formTitle: 'Fill Out This Form for Your Free Estimate',
+  formSubtitle: "We'll get back to you within 30 minutes",
+  formSubmitText: 'Get My Free Quote',
   // Hero badge
   heroBadgeText: 'Fully Insured. Peace of Mind.',
   showHeroBadge: true,
@@ -202,6 +234,8 @@ const DEFAULT_HERO_CONTENT: HeroContent = {
 };
 
 const DEFAULT_FEATURED_TESTIMONIAL_CONTENT: FeaturedTestimonialContent = {
+  badgeText: 'Featured Review',
+  verifiedText: 'Verified Google Review',
   quote: '"Great bunch of hard working guys. I had a 100 year old shed that had a roof which fell in 30 years ago. It was full of unknown junk. The gave me a fair quote. They showed up the next day and he and his team leveled the shed. They loaded up everything and charged me what we had agreed to."',
   authorName: 'Joshua Smith',
   authorTitle: 'Verified Customer',
@@ -211,14 +245,14 @@ const DEFAULT_FEATURED_TESTIMONIAL_CONTENT: FeaturedTestimonialContent = {
 };
 
 const DEFAULT_SERVICES_CONTENT: ServicesContent = {
-  headline: 'Our',
-  highlightText: 'Services',
-  subheadline: 'Comprehensive solutions for all your junk removal and hauling needs.',
+  badgeText: 'Full-Service Junk Removal & More',
+  headline: 'Full-Service <strong>Junk Removal & More</strong>',
+  subheadline: 'From household clutter to light demolition, we have the heavy equipment and manpower to handle any job safely, efficiently, and professionally.',
   services: [
-    { id: '1', icon: 'trash', title: 'Junk Removal', description: 'Full-service junk removal for homes, offices, and construction sites.' },
-    { id: '2', icon: 'home', title: 'Estate Cleanouts', description: 'Compassionate estate and foreclosure cleanout services.' },
-    { id: '3', icon: 'building', title: 'Commercial Services', description: 'Reliable commercial waste removal and recycling solutions.' },
-    { id: '4', icon: 'truck', title: 'Dumpster Rentals', description: 'Convenient 14, 15, and 20-yard dumpster rentals for your DIY clean-up projects.' },
+    { id: '1', icon: 'trash', iconType: 'lucide', title: 'Junk Removal', description: 'Full-service junk removal for homes, offices, and construction sites.' },
+    { id: '2', icon: 'home', iconType: 'lucide', title: 'Estate Cleanouts', description: 'Compassionate estate and foreclosure cleanout services.' },
+    { id: '3', icon: 'building', iconType: 'lucide', title: 'Commercial Services', description: 'Reliable commercial waste removal and recycling solutions.' },
+    { id: '4', icon: 'truck', iconType: 'lucide', title: 'Dumpster Rentals', description: 'Convenient 14, 15, and 20-yard dumpster rentals for your DIY clean-up projects.' },
   ],
 };
 
@@ -228,42 +262,49 @@ const DEFAULT_MID_CTA_CONTENT: MidCtaContent = {
   subheadline: 'Fast response, fair pricing, and professional service. We make junk removal easy.',
   ctaText: 'Call Now',
   ctaLink: 'tel:2089980054',
-  features: ['Free Estimates', 'Same-Day Service', 'Upfront Pricing'],
+  features: [
+    { id: '1', icon: 'ShieldCheck', text: 'Free Estimates' },
+    { id: '2', icon: 'Clock', text: 'Same-Day Service' },
+    { id: '3', icon: 'CheckCircle', text: 'Upfront Pricing' },
+  ],
 };
 
 const DEFAULT_SERVICE_AREAS_CONTENT: ServiceAreasContent = {
-  headline: 'Serving',
-  highlightText: 'North Idaho',
+  badgeText: 'Areas We Serve',
+  headline: 'Serving <strong>North Idaho</strong>',
   subheadline: 'Professional junk removal across the region.',
+  locationsHeading: 'Service Locations',
+  missingAreaText: "Don't see your area? Contact us - we may still be able to help!",
   areas: [
-    { id: '1', name: "Coeur d'Alene", state: 'ID' },
-    { id: '2', name: 'Post Falls', state: 'ID' },
-    { id: '3', name: 'Hayden', state: 'ID' },
-    { id: '4', name: 'Rathdrum', state: 'ID' },
-    { id: '5', name: 'Sandpoint', state: 'ID' },
-    { id: '6', name: 'Harrison', state: 'ID' },
-    { id: '7', name: 'Athol', state: 'ID' },
+    { id: '1', name: "Coeur d'Alene", state: 'ID', highlighted: true },
+    { id: '2', name: 'Post Falls', state: 'ID', highlighted: true },
+    { id: '3', name: 'Hayden', state: 'ID', highlighted: true },
+    { id: '4', name: 'Rathdrum', state: 'ID', highlighted: false },
+    { id: '5', name: 'Sandpoint', state: 'ID', highlighted: false },
+    { id: '6', name: 'Harrison', state: 'ID', highlighted: false },
+    { id: '7', name: 'Athol', state: 'ID', highlighted: false },
   ],
   ctaText: 'Get Service In Your Area',
   ctaLink: 'tel:2089980054',
 };
 
 const DEFAULT_TESTIMONIALS_CONTENT: TestimonialsContent = {
-  headline: 'Trusted By',
-  highlightText: 'Your Neighbors',
+  badgeText: 'Testimonials',
+  headline: 'Trusted By <strong>Your Neighbors</strong>',
   subheadline: 'See why homeowners consistently love our fast response, fair pricing, and spotless results.',
+  reviewLabel: 'Google Review',
   testimonials: [
     { id: '1', quote: 'Caleb and team did an excellent job at removing all the stuff from my duplex.', authorName: 'Sharene May', rating: 5 },
-    { id: '2', quote: 'Lake City Hauling made everything so easy for me. Caleb is a great guy.', authorName: 'Brady Coker', rating: 5 },
-    { id: '3', quote: "Lake city Hauling is the only hauling company I'll use.", authorName: 'Makaila Wallace', rating: 5 },
+    { id: '2', quote: 'Byrde made everything so easy for me. Caleb is a great guy.', authorName: 'Brady Coker', rating: 5 },
+    { id: '3', quote: "Byrde is the only hauling company I'll use.", authorName: 'Makaila Wallace', rating: 5 },
   ],
   ctaText: 'Call To Get Started',
   ctaLink: 'tel:2089980054',
 };
 
 const DEFAULT_FAQ_CONTENT: FaqContent = {
-  headline: 'Clear answers to',
-  highlightText: 'common concerns',
+  badgeText: 'Frequently Asked Questions',
+  headline: 'Clear answers to <strong>common concerns</strong>',
   subheadline: 'Clear answers to common concerns so you can book with confidence.',
   contactTitle: 'Still have questions?',
   contactDescription: 'Our team is ready to help. Give us a call and we\'ll answer any questions you have.',
@@ -277,16 +318,16 @@ const DEFAULT_FAQ_CONTENT: FaqContent = {
 };
 
 const DEFAULT_FOOTER_CTA_CONTENT: FooterCtaContent = {
-  headline: 'Ready to',
-  highlightText: 'Clear the Clutter?',
+  headline: 'Ready to <strong>Clear the Clutter?</strong>',
   subheadline: 'Get your free quote today. Fast response, fair pricing, professional service.',
+  reassuranceText: 'No obligation \u00b7 Free estimates \u00b7 Fast response',
   ctaText: 'Call For Free Quote',
   ctaLink: 'tel:2089980054',
 };
 
 const DEFAULT_FOOTER_CONTENT: FooterContent = {
   description: 'Fast, reliable junk removal services in North Idaho and Spokane. Licensed, insured, and locally owned.',
-  copyright: '© 2024 Lake City Hauling. All rights reserved.',
+  copyright: '\u00a9 2024 Byrde. All rights reserved.',
   privacyLabel: 'Privacy Policy',
   privacyLink: '/privacy',
   termsLabel: 'Terms & Conditions',
@@ -308,6 +349,62 @@ const DEFAULT_CONTENT: Record<ContentSectionId, SectionContent> = {
 };
 
 // ============================================
+// MIGRATION (backward compat with old data)
+// ============================================
+
+/**
+ * Migrate old content format to new format.
+ * Handles: headline+highlightText → single headline with <strong>,
+ * features string[] → FeatureItem[], areas without highlighted, etc.
+ */
+function migrateContent(raw: Record<string, unknown>): Record<string, unknown> {
+  const content = { ...raw };
+
+  // Helper to migrate headline+highlightText → single headline
+  const migrateSection = (key: string) => {
+    const section = content[key] as Record<string, unknown> | undefined;
+    if (!section) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const s = section as any;
+    if (s.highlightText && typeof s.headline === 'string') {
+      s.headline = migrateHeadline(s.headline, s.highlightText);
+      delete s.highlightText;
+    }
+  };
+
+  // Migrate headlines for all sections that used highlightText
+  migrateSection('services');
+  migrateSection('service-areas');
+  migrateSection('testimonials');
+  migrateSection('faq');
+  migrateSection('footer-cta');
+
+  // Migrate mid-cta features: string[] → FeatureItem[]
+  const midCta = content['mid-cta'] as Record<string, unknown> | undefined;
+  if (midCta?.features && Array.isArray(midCta.features) && midCta.features.length > 0) {
+    if (typeof midCta.features[0] === 'string') {
+      const defaultIcons = ['ShieldCheck', 'Clock', 'CheckCircle'];
+      midCta.features = (midCta.features as string[]).map((text, i) => ({
+        id: String(i + 1),
+        icon: defaultIcons[i] || 'CheckCircle',
+        text,
+      }));
+    }
+  }
+
+  // Migrate service-areas: add highlighted if missing
+  const serviceAreas = content['service-areas'] as Record<string, unknown> | undefined;
+  if (serviceAreas?.areas && Array.isArray(serviceAreas.areas)) {
+    serviceAreas.areas = (serviceAreas.areas as Record<string, unknown>[]).map((area, i) => ({
+      ...area,
+      highlighted: area.highlighted ?? (i < 3),
+    }));
+  }
+
+  return content;
+}
+
+// ============================================
 // CONTEXT
 // ============================================
 
@@ -326,8 +423,9 @@ const ContentContext = createContext<ContentContextType | null>(null);
 // Load initial content from PHP injection or defaults
 function loadContent(): Record<ContentSectionId, SectionContent> {
   // Check for PHP-injected content (public pages)
-  if (typeof window !== 'undefined' && window.lakecityContent) {
-    return { ...DEFAULT_CONTENT, ...window.lakecityContent };
+  if (typeof window !== 'undefined' && window.byrdeContent) {
+    const migrated = migrateContent(window.byrdeContent as Record<string, unknown>);
+    return { ...DEFAULT_CONTENT, ...migrated } as Record<ContentSectionId, SectionContent>;
   }
   return { ...DEFAULT_CONTENT };
 }
@@ -337,7 +435,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   // Fetch content from API when in editor mode
   useEffect(() => {
-    const wpAdmin = window.lakecityAdmin;
+    const wpAdmin = window.byrdeAdmin;
     if (!wpAdmin?.pageId || !wpAdmin?.apiUrl) return;
 
     const fetchContent = async () => {
@@ -355,14 +453,13 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         const data = await response.json();
 
         if (data.success && data.content) {
-          setSectionContent(prev => ({ ...prev, ...data.content }));
+          const migrated = migrateContent(data.content as Record<string, unknown>);
+          setSectionContent(prev => ({ ...prev, ...migrated } as Record<ContentSectionId, SectionContent>));
         } else {
           throw new Error('Invalid response format from server');
         }
       } catch (error) {
         console.error('[ContentContext] Failed to fetch content:', error);
-        // TODO: Show user-facing error notification
-        // toast.error('Failed to load content. Please refresh the page.');
       }
     };
 

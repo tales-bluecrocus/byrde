@@ -133,13 +133,13 @@ const getWpConfig = (): GlobalConfig | null => {
   if (typeof window === 'undefined') return null;
 
   // Check admin config first (has apiUrl, nonce, etc.) - CORRECT KEY: globalConfig
-  if (window.lakecityAdmin?.config?.globalConfig) {
-    return window.lakecityAdmin.config.globalConfig as GlobalConfig;
+  if (window.byrdeAdmin?.config?.globalConfig) {
+    return window.byrdeAdmin.config.globalConfig as GlobalConfig;
   }
 
   // Check public page config (just the config object) - CORRECT KEY: globalConfig
-  if (window.lakecityConfig?.globalConfig) {
-    return window.lakecityConfig.globalConfig as GlobalConfig;
+  if (window.byrdeConfig?.globalConfig) {
+    return window.byrdeConfig.globalConfig as GlobalConfig;
   }
 
   return null;
