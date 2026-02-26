@@ -19,25 +19,23 @@ export function GlobalPanel() {
   const { toast } = useToast();
 
   return (
-    <div className="space-y-6 text-zinc-100">
+    <div className="space-y-5 text-zinc-200">
       {/* Theme Mode */}
-      <Card className="bg-zinc-800 border-zinc-700">
-        <CardContent className="flex items-center justify-between p-4">
+      <Card className="bg-zinc-800/50 border-zinc-800">
+        <CardContent className="flex items-center justify-between p-3">
           <div className="flex items-center gap-3">
-            {globalConfig.brand.mode === 'dark' ? (
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-700">
-                <Moon className="h-5 w-5 text-slate-300" />
-              </div>
-            ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/20">
-                <Sun className="h-5 w-5 text-amber-400" />
-              </div>
-            )}
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-800">
+              {globalConfig.brand.mode === 'dark' ? (
+                <Moon className="h-4 w-4 text-zinc-400" />
+              ) : (
+                <Sun className="h-4 w-4 text-zinc-400" />
+              )}
+            </div>
             <div>
-              <Label className="text-sm font-semibold text-zinc-100">
+              <Label className="text-xs font-medium text-zinc-200">
                 {globalConfig.brand.mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
               </Label>
-              <p className="text-xs text-zinc-400">Global theme appearance</p>
+              <p className="text-[10px] text-zinc-500">Theme appearance</p>
             </div>
           </div>
           <Switch
@@ -47,7 +45,7 @@ export function GlobalPanel() {
         </CardContent>
       </Card>
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       {/* Brand Colors */}
       <div>
@@ -67,7 +65,7 @@ export function GlobalPanel() {
         </div>
       </div>
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       {/* Logo Settings */}
       <div>
@@ -89,13 +87,13 @@ export function GlobalPanel() {
               onValueChange={(val) => val && updateLogo({ shape: val as 'rectangle' | 'square' | 'circle' })}
               className="w-full bg-zinc-800 p-1 rounded-lg"
             >
-              <ToggleGroupItem value="rectangle" className="flex-1 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+              <ToggleGroupItem value="rectangle" className="flex-1 text-zinc-400 data-[state=on]:bg-zinc-800/60 data-[state=on]:text-zinc-100">
                 <RectangleHorizontal className="h-4 w-4" />
               </ToggleGroupItem>
-              <ToggleGroupItem value="square" className="flex-1 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+              <ToggleGroupItem value="square" className="flex-1 text-zinc-400 data-[state=on]:bg-zinc-800/60 data-[state=on]:text-zinc-100">
                 <Square className="h-4 w-4" />
               </ToggleGroupItem>
-              <ToggleGroupItem value="circle" className="flex-1 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+              <ToggleGroupItem value="circle" className="flex-1 text-zinc-400 data-[state=on]:bg-zinc-800/60 data-[state=on]:text-zinc-100">
                 <Circle className="h-4 w-4" />
               </ToggleGroupItem>
             </ToggleGroup>
@@ -103,7 +101,7 @@ export function GlobalPanel() {
         </div>
       </div>
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       {/* Generate Palettes */}
       <Button
@@ -111,14 +109,14 @@ export function GlobalPanel() {
           generatePalettes();
           toast('Palettes generated!', 'success');
         }}
-        className={`w-full ${needsRegeneration ? 'bg-green-500 hover:bg-green-600 text-white' : 'border-zinc-600 text-zinc-300 hover:bg-zinc-800'}`}
+        className={`w-full ${needsRegeneration ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'}`}
         variant={needsRegeneration ? 'default' : 'outline'}
       >
         <RefreshCw className="h-4 w-4 mr-2" />
         {needsRegeneration ? 'Generate Palettes' : 'Regenerate Palettes'}
       </Button>
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       {/* Reset */}
       <Button

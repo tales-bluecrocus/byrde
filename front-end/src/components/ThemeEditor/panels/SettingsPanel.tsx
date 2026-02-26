@@ -110,24 +110,24 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
   };
 
   return (
-    <div className="space-y-6 text-zinc-100">
+    <div className="space-y-5 text-zinc-200">
       {/* Visibility Toggle (not shown for header - always visible) */}
       {!isHeader && (
-        <Card className="bg-zinc-800 border-zinc-700">
-          <CardContent className="flex items-center justify-between p-4">
+        <Card className="bg-zinc-800/50 border-zinc-800">
+          <CardContent className="flex items-center justify-between p-3">
             <div className="flex items-center gap-3">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${effectiveVisible ? 'bg-green-500' : 'bg-zinc-700'}`}>
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-800">
                 {effectiveVisible ? (
-                  <Eye className="h-5 w-5 text-white" />
+                  <Eye className="h-4 w-4 text-zinc-400" />
                 ) : (
-                  <EyeOff className="h-5 w-5 text-zinc-400" />
+                  <EyeOff className="h-4 w-4 text-zinc-500" />
                 )}
               </div>
               <div>
-                <Label className="text-sm font-semibold text-zinc-100">
+                <Label className="text-xs font-medium text-zinc-200">
                   {isTopheader ? 'Topbar Visibility' : 'Section Visibility'}
                 </Label>
-                <p className="text-xs text-zinc-400">
+                <p className="text-[10px] text-zinc-500">
                   {effectiveVisible ? 'Visible on page' : 'Hidden from page'}
                 </p>
               </div>
@@ -139,42 +139,42 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
 
       {/* Header-specific settings */}
       {isHeader && (
-        <Card className="bg-zinc-800 border-zinc-700">
-          <CardContent className="p-4 space-y-4">
+        <Card className="bg-zinc-800/50 border-zinc-800">
+          <CardContent className="p-3 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-sm font-medium text-zinc-100">Fixed on Scroll</Label>
-                <p className="text-xs text-zinc-400">Header sticks to top when scrolling</p>
+                <Label className="text-xs font-medium text-zinc-200">Fixed on Scroll</Label>
+                <p className="text-[10px] text-zinc-500">Header sticks to top when scrolling</p>
               </div>
               <Switch checked={headerConfig.isFixed} onCheckedChange={(v) => updateHeaderConfig({ isFixed: v })} />
             </div>
 
-            <Separator className="bg-zinc-700" />
+            <Separator className="bg-zinc-800/60" />
 
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-sm font-medium text-zinc-100">Show Topbar</Label>
-                <p className="text-xs text-zinc-400">Colored bar above header</p>
+                <Label className="text-xs font-medium text-zinc-200">Show Topbar</Label>
+                <p className="text-[10px] text-zinc-500">Colored bar above header</p>
               </div>
               <Switch checked={headerConfig.showTopbar} onCheckedChange={(v) => updateHeaderConfig({ showTopbar: v })} />
             </div>
 
-            <Separator className="bg-zinc-700" />
+            <Separator className="bg-zinc-800/60" />
 
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-sm font-medium text-zinc-100">Show Phone CTA</Label>
-                <p className="text-xs text-zinc-400">Phone button on desktop</p>
+                <Label className="text-xs font-medium text-zinc-200">Show Phone CTA</Label>
+                <p className="text-[10px] text-zinc-500">Phone button on desktop</p>
               </div>
               <Switch checked={headerConfig.showPhone} onCheckedChange={(v) => updateHeaderConfig({ showPhone: v })} />
             </div>
 
-            <Separator className="bg-zinc-700" />
+            <Separator className="bg-zinc-800/60" />
 
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-sm font-medium text-zinc-100">Show Reviews Badge</Label>
-                <p className="text-xs text-zinc-400">Google reviews badge</p>
+                <Label className="text-xs font-medium text-zinc-200">Show Reviews Badge</Label>
+                <p className="text-[10px] text-zinc-500">Google reviews badge</p>
               </div>
               <Switch checked={headerConfig.showBadge} onCheckedChange={(v) => updateHeaderConfig({ showBadge: v })} />
             </div>
@@ -183,8 +183,8 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
               <>
                 <div className="flex items-center justify-between pl-4">
                   <div>
-                    <Label className="text-sm font-medium text-zinc-100">Show Review Count</Label>
-                    <p className="text-xs text-zinc-400">Number of reviews</p>
+                    <Label className="text-xs font-medium text-zinc-200">Show Review Count</Label>
+                    <p className="text-[10px] text-zinc-500">Number of reviews</p>
                   </div>
                   <Switch checked={headerConfig.showReviewCount} onCheckedChange={(v) => updateHeaderConfig({ showReviewCount: v })} />
                 </div>
@@ -195,7 +195,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
                     <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001]">
+                    <SelectContent className="bg-zinc-800 border-zinc-800 z-[10001]">
                       <SelectItem value="light" className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">Light</SelectItem>
                       <SelectItem value="dark" className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">Dark</SelectItem>
                     </SelectContent>
@@ -204,7 +204,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
               </>
             )}
 
-            <Separator className="bg-zinc-700" />
+            <Separator className="bg-zinc-800/60" />
 
             <div className="space-y-2">
               <Label className="text-xs font-medium text-zinc-400">Header Padding</Label>
@@ -212,7 +212,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
                 <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001]">
+                <SelectContent className="bg-zinc-800 border-zinc-800 z-[10001]">
                   <SelectItem value="compact" className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">Compact</SelectItem>
                   <SelectItem value="default" className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">Default</SelectItem>
                   <SelectItem value="spacious" className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">Spacious</SelectItem>
@@ -223,7 +223,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
         </Card>
       )}
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       {/* Background Image */}
       <div>
@@ -237,7 +237,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
         {hasBgImage ? (
           <div className="space-y-4">
             {/* Image Preview */}
-            <Card className="overflow-hidden border-zinc-700">
+            <Card className="overflow-hidden border-zinc-800">
               <div
                 className="h-32 bg-cover bg-center relative"
                 style={{
@@ -271,7 +271,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
                     max={1}
                     step={0.05}
                     onValueChange={([val]) => updateSectionTheme(sectionId, { bgImageOpacity: val })}
-                    className="flex-1 [&_[data-slot=slider-track]]:bg-gray-200 [&_[data-slot=slider-track]]:h-2 [&_[data-slot=slider-range]]:bg-green-500 [&_[data-slot=slider-thumb]]:border-green-500"
+                    className="flex-1 [&_[data-slot=slider-track]]:bg-gray-200 [&_[data-slot=slider-track]]:h-2 [&_[data-slot=slider-range]]:bg-emerald-600 [&_[data-slot=slider-thumb]]:border-emerald-600"
                   />
                   <span className="text-xs w-10 text-right text-zinc-400">
                     {Math.round((theme.bgImageOpacity ?? 1) * 100)}%
@@ -289,7 +289,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
                     <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001]">
+                    <SelectContent className="bg-zinc-800 border-zinc-800 z-[10001]">
                       {BG_POSITION_OPTIONS.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value} className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">
                           {opt.label}
@@ -308,7 +308,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
                     <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001]">
+                    <SelectContent className="bg-zinc-800 border-zinc-800 z-[10001]">
                       {BG_SIZE_OPTIONS.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value} className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">
                           {opt.label}
@@ -329,14 +329,14 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
             </div>
           </div>
         ) : (
-          <Card className="bg-zinc-800 border-zinc-700">
+          <Card className="bg-zinc-800/50 border-zinc-800">
             <CardContent className="p-4 space-y-4">
-              <div className="flex flex-col items-center py-6">
-                <div className="h-12 w-12 rounded-lg flex items-center justify-center mb-3 bg-zinc-700">
-                  <Image className="h-6 w-6 text-zinc-400" />
+              <div className="flex flex-col items-center py-4">
+                <div className="h-10 w-10 rounded-md flex items-center justify-center mb-3 bg-zinc-800">
+                  <Image className="h-5 w-5 text-zinc-500" />
                 </div>
-                <p className="text-sm font-medium text-zinc-100">No background image</p>
-                <p className="text-xs mt-1 text-zinc-400">Upload or enter a URL below</p>
+                <p className="text-xs font-medium text-zinc-300">No background image</p>
+                <p className="text-[10px] mt-1 text-zinc-500">Upload or enter a URL below</p>
               </div>
 
               <div className="space-y-3">
@@ -352,7 +352,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
                     placeholder="Enter image URL..."
                     className="flex-1 bg-zinc-800 border-zinc-600 text-zinc-100 placeholder:text-zinc-500"
                   />
-                  <Button onClick={handleSetImageUrl} disabled={!imageUrl.trim()} size="sm" className="bg-green-500 hover:bg-green-600 text-white">
+                  <Button onClick={handleSetImageUrl} disabled={!imageUrl.trim()} size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
                     Set
                   </Button>
                 </div>
@@ -362,13 +362,13 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
         )}
       </div>
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       {/* Section Info */}
-      <Card className="bg-zinc-800 border-zinc-700">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2 text-zinc-100">
-            <Settings2 className="h-4 w-4" />
+      <Card className="bg-zinc-800/50 border-zinc-800">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xs font-medium flex items-center gap-2 text-zinc-400">
+            <Settings2 className="h-3.5 w-3.5" />
             Section Info
           </CardTitle>
         </CardHeader>

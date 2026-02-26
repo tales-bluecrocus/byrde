@@ -966,7 +966,7 @@ function TopbarContentEditor() {
         </div>
       </div>
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       <div>
         <SectionTitle>Icon</SectionTitle>
@@ -1003,7 +1003,7 @@ function TopbarContentEditor() {
         </div>
       </div>
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       <div>
         <SectionTitle>Layout</SectionTitle>
@@ -1023,7 +1023,7 @@ function TopbarContentEditor() {
         </div>
       </div>
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       <div>
         <SectionTitle>Contact Info</SectionTitle>
@@ -1033,7 +1033,7 @@ function TopbarContentEditor() {
               <Phone className="h-4 w-4 text-zinc-400" />
               <Label className="text-sm font-medium text-zinc-100">Show Phone</Label>
             </div>
-            <Switch checked={topbarConfig.showPhone} onCheckedChange={(v) => updateTopbarConfig({ showPhone: v })} className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-zinc-600" />
+            <Switch checked={topbarConfig.showPhone} onCheckedChange={(v) => updateTopbarConfig({ showPhone: v })} className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-600" />
           </div>
 
           <div className="flex items-center justify-between">
@@ -1041,7 +1041,7 @@ function TopbarContentEditor() {
               <Mail className="h-4 w-4 text-zinc-400" />
               <Label className="text-sm font-medium text-zinc-100">Show Email</Label>
             </div>
-            <Switch checked={topbarConfig.showEmail} onCheckedChange={(v) => updateTopbarConfig({ showEmail: v })} className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-zinc-600" />
+            <Switch checked={topbarConfig.showEmail} onCheckedChange={(v) => updateTopbarConfig({ showEmail: v })} className="data-[state=checked]:bg-emerald-600 data-[state=unchecked]:bg-zinc-600" />
           </div>
         </div>
       </div>

@@ -46,17 +46,17 @@ export function StylePanel({ sectionId }: StylePanelProps) {
   };
 
   return (
-    <div className="space-y-6 text-zinc-100">
+    <div className="space-y-5 text-zinc-200">
       {/* Override Toggle */}
-      <Card className="bg-zinc-800 border-zinc-700">
-        <CardContent className="flex items-center justify-between p-4">
+      <Card className="bg-zinc-800/50 border-zinc-800">
+        <CardContent className="flex items-center justify-between p-3">
           <div className="flex items-center gap-3">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${overrideGlobal ? 'bg-green-500' : 'bg-zinc-700'}`}>
-              <Palette className={`h-5 w-5 ${overrideGlobal ? 'text-white' : 'text-zinc-400'}`} />
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-800">
+              <Palette className="h-4 w-4 text-zinc-400" />
             </div>
             <div>
-              <Label className="text-sm font-semibold text-zinc-100">Custom Colors</Label>
-              <p className="text-xs text-zinc-400">
+              <Label className="text-xs font-medium text-zinc-200">Custom Colors</Label>
+              <p className="text-[10px] text-zinc-500">
                 {overrideGlobal ? 'Using custom colors' : 'Using global colors'}
               </p>
             </div>
@@ -67,7 +67,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
 
       {overrideGlobal && (
         <>
-          <Separator className="bg-zinc-700" />
+          <Separator className="bg-zinc-800/60" />
 
           {/* Dark Palettes */}
           <div>
@@ -83,7 +83,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
                     key={palette.id}
                     onClick={() => handleSelectPalette(palette.id)}
                     className={`relative rounded-lg overflow-hidden h-12 transition-all duration-150 hover:scale-105 border ${
-                      isSelected ? 'border-2 border-green-500 ring-2 ring-green-500/20' : 'border-zinc-700'
+                      isSelected ? 'border-2 border-emerald-500 ring-2 ring-emerald-500/20' : 'border-zinc-800'
                     }`}
                     title={palette.name}
                   >
@@ -93,7 +93,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
                       <div className="w-2" style={{ backgroundColor: palette.colors.accent }} />
                     </div>
                     {isSelected && (
-                      <div className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full flex items-center justify-center bg-green-500">
+                      <div className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full flex items-center justify-center bg-emerald-600">
                         <Check className="h-2.5 w-2.5 text-white" />
                       </div>
                     )}
@@ -117,7 +117,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
                     key={palette.id}
                     onClick={() => handleSelectPalette(palette.id)}
                     className={`relative rounded-lg overflow-hidden h-12 transition-all duration-150 hover:scale-105 border ${
-                      isSelected ? 'border-2 border-green-500 ring-2 ring-green-500/20' : 'border-zinc-700'
+                      isSelected ? 'border-2 border-emerald-500 ring-2 ring-emerald-500/20' : 'border-zinc-800'
                     }`}
                     title={palette.name}
                   >
@@ -127,7 +127,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
                       <div className="w-2" style={{ backgroundColor: palette.colors.accent }} />
                     </div>
                     {isSelected && (
-                      <div className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full flex items-center justify-center bg-green-500">
+                      <div className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full flex items-center justify-center bg-emerald-600">
                         <Check className="h-2.5 w-2.5 text-white" />
                       </div>
                     )}
@@ -137,7 +137,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
             </div>
           </div>
 
-          <Separator className="bg-zinc-700" />
+          <Separator className="bg-zinc-800/60" />
 
           {/* Custom Colors */}
           <div>
@@ -196,7 +196,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
             <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
               Preview
             </Label>
-            <Card className="mt-3 overflow-hidden border-zinc-700">
+            <Card className="mt-3 overflow-hidden border-zinc-800">
               <div
                 className="p-4"
                 style={{ backgroundColor: theme.bgPrimary || globalConfig.brand.primary }}
@@ -233,14 +233,14 @@ export function StylePanel({ sectionId }: StylePanelProps) {
         </>
       )}
 
-      <Separator className="bg-zinc-700" />
+      <Separator className="bg-zinc-800/60" />
 
       {/* Reset */}
       <Button
         variant="outline"
         size="sm"
         onClick={handleReset}
-        className="w-full border-zinc-600 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+        className="w-full border-zinc-700 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30"
       >
         <RotateCcw className="h-4 w-4 mr-2" />
         Reset Section
