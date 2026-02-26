@@ -66,6 +66,15 @@ export type SectionId =
   | 'footer-cta'
   | 'footer';
 
+// Reorderable sections (rendered dynamically in StaticHomePage)
+export const DEFAULT_SECTION_ORDER: SectionId[] = [
+  'hero', 'featured-testimonial', 'services', 'mid-cta', 'service-areas', 'testimonials', 'faq',
+];
+
+// Fixed sections (not reorderable)
+export const FIXED_TOP_SECTIONS: SectionId[] = ['topheader', 'header'];
+export const FIXED_BOTTOM_SECTIONS: SectionId[] = ['footer-cta', 'footer'];
+
 export const SECTION_LABELS: Record<SectionId, string> = {
   'topheader': 'Top Header',
   'header': 'Header',
@@ -83,6 +92,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
 interface SectionThemeContextType {
   sectionThemes: Record<SectionId, SectionTheme>;
   sectionVisibility: Record<SectionId, boolean>;
+  sectionOrder: SectionId[];
   updateSectionTheme: (sectionId: SectionId, theme: Partial<SectionTheme>) => void;
   resetSectionTheme: (sectionId: SectionId) => void;
   resetAllSectionThemes: () => void;
@@ -92,6 +102,7 @@ interface SectionThemeContextType {
   setOverrideGlobalColors: (sectionId: SectionId, override: boolean) => void;
   setSectionVisibility: (sectionId: SectionId, visible: boolean) => void;
   isSectionVisible: (sectionId: SectionId) => boolean;
+  setSectionOrder: (order: SectionId[]) => void;
 }
 
 const SectionThemeContext = createContext<SectionThemeContextType | null>(null);
@@ -141,6 +152,18 @@ const getWpVisibility = (): Record<SectionId, boolean> | null => {
   return visibility as Record<SectionId, boolean>;
 };
 
+// Load section order from WordPress config
+function loadSectionOrder(): SectionId[] {
+  if (typeof window === 'undefined') return DEFAULT_SECTION_ORDER;
+
+  const config = window.byrdeAdmin?.config || window.byrdeConfig;
+  if (config?.sectionOrder && Array.isArray(config.sectionOrder) && config.sectionOrder.length > 0) {
+    return config.sectionOrder as SectionId[];
+  }
+
+  return DEFAULT_SECTION_ORDER;
+}
+
 // Load themes from WordPress config
 function loadThemes(): Record<SectionId, SectionTheme> {
   const wpThemes = getWpSections();
@@ -163,6 +186,7 @@ function loadVisibility(): Record<SectionId, boolean> {
 export function SectionThemeProvider({ children }: { children: ReactNode }) {
   const [sectionThemes, setSectionThemes] = useState<Record<SectionId, SectionTheme>>(loadThemes);
   const [sectionVisibility, setSectionVisibilityState] = useState<Record<SectionId, boolean>>(loadVisibility);
+  const [sectionOrder, setSectionOrder] = useState<SectionId[]>(loadSectionOrder);
 
   const updateSectionTheme = useCallback((sectionId: SectionId, theme: Partial<SectionTheme>) => {
     setSectionThemes(prev => ({
@@ -185,6 +209,7 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
   const resetAllSectionThemes = useCallback(() => {
     setSectionThemes({} as Record<SectionId, SectionTheme>);
     setSectionVisibilityState({} as Record<SectionId, boolean>);
+    setSectionOrder(DEFAULT_SECTION_ORDER);
   }, []);
 
   // Set palette for a section - receives the full palette object (dynamically generated)
@@ -364,6 +389,7 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
       value={{
         sectionThemes,
         sectionVisibility,
+        sectionOrder,
         updateSectionTheme,
         resetSectionTheme,
         resetAllSectionThemes,
@@ -373,6 +399,7 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
         setOverrideGlobalColors,
         setSectionVisibility,
         isSectionVisible,
+        setSectionOrder,
       }}
     >
       {children}

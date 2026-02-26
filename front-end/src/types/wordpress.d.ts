@@ -55,6 +55,7 @@ export interface ThemeConfig {
   header?: Partial<HeaderConfig>;
   topbar?: Partial<TopbarConfig>;
   sectionThemes?: Record<SectionId, SectionTheme & { visible?: boolean }>;
+  sectionOrder?: SectionId[];
   _meta?: {
     savedAt: string;
     version: string;

@@ -15,7 +15,7 @@ interface SidebarContextType {
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-export const SIDEBAR_WIDTH = 380; // Level 1 navigator
+export const SIDEBAR_WIDTH = 200; // Level 1 navigator (compact)
 export const DRAWER_WIDTH = 420; // Level 2 config drawer
 
 export function SidebarProvider({ children }: { children: ReactNode }) {

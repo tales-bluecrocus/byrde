@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense, type ComponentType } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import FeaturedTestimonial from './components/FeaturedTestimonial';
@@ -12,7 +12,7 @@ import Footer from './components/Footer';
 import ThemedSection from './components/ThemedSection';
 import PaletteInjector from './components/PaletteInjector';
 import { ToastProvider } from './components/Toast';
-import { SectionThemeProvider } from './context/SectionThemeContext';
+import { SectionThemeProvider, useSectionTheme, type SectionId } from './context/SectionThemeContext';
 import { HeaderConfigProvider } from './context/HeaderConfigContext';
 import { GlobalConfigProvider } from './context/GlobalConfigContext';
 import { SidebarProvider, useSidebar } from './context/SidebarContext';
@@ -20,6 +20,17 @@ import { ContentProvider } from './context/ContentContext';
 import { useSettings } from './hooks/useSettings';
 import { useScrollDepthTracking, useAdAttributionCapture } from './hooks/useAnalytics';
 import { trackPhoneClick } from './lib/analytics';
+
+// Map section IDs to their components
+const SECTION_COMPONENTS: Record<string, ComponentType> = {
+  'hero': Hero,
+  'featured-testimonial': FeaturedTestimonial,
+  'services': ServicesGrid,
+  'mid-cta': MidPageCTA,
+  'service-areas': ServiceAreas,
+  'testimonials': TestimonialsGrid,
+  'faq': FAQ,
+};
 
 // Lazy-load editor-only code (ThemeEditor + react-colorful, shadcn Sheet/Tabs etc.)
 const ThemeEditor = lazy(() => import('./components/ThemeEditor'));
@@ -91,31 +102,21 @@ function FloatingPhoneButton() {
   );
 }
 
-// Static home page layout
+// Dynamic home page layout - renders sections based on sectionOrder
 function StaticHomePage() {
+  const { sectionOrder } = useSectionTheme();
+
   return (
     <main>
-      <ThemedSection id="hero" index={0}>
-        <Hero />
-      </ThemedSection>
-      <ThemedSection id="featured-testimonial" index={1}>
-        <FeaturedTestimonial />
-      </ThemedSection>
-      <ThemedSection id="services" index={2}>
-        <ServicesGrid />
-      </ThemedSection>
-      <ThemedSection id="mid-cta" index={3}>
-        <MidPageCTA />
-      </ThemedSection>
-      <ThemedSection id="service-areas" index={4}>
-        <ServiceAreas />
-      </ThemedSection>
-      <ThemedSection id="testimonials" index={5}>
-        <TestimonialsGrid />
-      </ThemedSection>
-      <ThemedSection id="faq" index={6}>
-        <FAQ />
-      </ThemedSection>
+      {sectionOrder.map((id, index) => {
+        const Component = SECTION_COMPONENTS[id];
+        if (!Component) return null;
+        return (
+          <ThemedSection key={id} id={id as SectionId} index={index}>
+            <Component />
+          </ThemedSection>
+        );
+      })}
     </main>
   );
 }
