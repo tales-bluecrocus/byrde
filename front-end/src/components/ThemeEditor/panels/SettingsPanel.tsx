@@ -153,16 +153,6 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
 
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-xs font-medium text-zinc-200">Show Topbar</Label>
-                <p className="text-[10px] text-zinc-500">Colored bar above header</p>
-              </div>
-              <Switch checked={headerConfig.showTopbar} onCheckedChange={(v) => updateHeaderConfig({ showTopbar: v })} />
-            </div>
-
-            <Separator className="bg-zinc-800/60" />
-
-            <div className="flex items-center justify-between">
-              <div>
                 <Label className="text-xs font-medium text-zinc-200">Show Phone CTA</Label>
                 <p className="text-[10px] text-zinc-500">Phone button on desktop</p>
               </div>

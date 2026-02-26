@@ -3,7 +3,6 @@
  * Light theme with explicit Tailwind colors
  */
 
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -13,14 +12,14 @@ import { useSectionTheme, type SectionId } from '../../../context/SectionThemeCo
 import { useGlobalConfig } from '../../../context/GlobalConfigContext';
 import type { SectionPalette } from '../../../config/sectionPalettes';
 import { useToast } from '../../Toast';
-import { RotateCcw, Check, Palette } from 'lucide-react';
+import { Check, Palette } from 'lucide-react';
 
 interface StylePanelProps {
   sectionId: SectionId;
 }
 
 export function StylePanel({ sectionId }: StylePanelProps) {
-  const { sectionThemes, updateSectionTheme, resetSectionTheme, setOverrideGlobalColors, setSectionPalette } = useSectionTheme();
+  const { sectionThemes, updateSectionTheme, setOverrideGlobalColors, setSectionPalette } = useSectionTheme();
   const { globalConfig, generatedPalettes } = useGlobalConfig();
   const { toast } = useToast();
 
@@ -38,11 +37,6 @@ export function StylePanel({ sectionId }: StylePanelProps) {
       setSectionPalette(sectionId, palette);
       toast(`Applied ${palette.name} palette`, 'success');
     }
-  };
-
-  const handleReset = () => {
-    resetSectionTheme(sectionId);
-    toast('Section reset to defaults', 'info');
   };
 
   return (
@@ -233,18 +227,6 @@ export function StylePanel({ sectionId }: StylePanelProps) {
         </>
       )}
 
-      <Separator className="bg-zinc-800/60" />
-
-      {/* Reset */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleReset}
-        className="w-full border-zinc-700 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30"
-      >
-        <RotateCcw className="h-4 w-4 mr-2" />
-        Reset Section
-      </Button>
     </div>
   );
 }

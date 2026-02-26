@@ -416,6 +416,7 @@ interface ContentContextType {
   ) => void;
   resetSectionContent: (sectionId: ContentSectionId) => void;
   getContent: <T extends ContentSectionId>(sectionId: T) => SectionContentMap[T];
+  replaceAllContent: (content: Record<ContentSectionId, SectionContent>) => void;
 }
 
 const ContentContext = createContext<ContentContextType | null>(null);
@@ -490,6 +491,10 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     return (sectionContent[sectionId] || DEFAULT_CONTENT[sectionId]) as SectionContentMap[T];
   }, [sectionContent]);
 
+  const replaceAllContent = useCallback((content: Record<ContentSectionId, SectionContent>) => {
+    setSectionContent(content);
+  }, []);
+
   return (
     <ContentContext.Provider
       value={{
@@ -497,6 +502,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         updateSectionContent,
         resetSectionContent,
         getContent,
+        replaceAllContent,
       }}
     >
       {children}

@@ -10,41 +10,11 @@ import type { HeaderConfig, TopbarConfig } from '../context/HeaderConfigContext'
 import type { SectionContent, ContentSectionId } from '../context/ContentContext';
 
 // ============================================
-// ACF SETTINGS (from Theme Settings page)
+// THEME SETTINGS (from byrde_theme_settings option)
 // ============================================
 
-export interface ACFSettings {
-  // Brand
-  logo?: string;
-  logo_id?: number;
-  phone?: string;
-  phone_raw?: string;
-  email?: string;
-
-  // Google Reviews
-  google_rating?: number;
-  google_reviews_count?: number;
-  google_reviews_url?: string;
-
-  // Footer
-  footer_tagline?: string;
-  footer_description?: string;
-  address?: string;
-  hours?: string;
-  copyright?: string;
-
-  // Social
-  facebook_url?: string;
-  instagram_url?: string;
-  youtube_url?: string;
-  yelp_url?: string;
-
-  // SEO
-  site_name?: string;
-  site_tagline?: string;
-  site_description?: string;
-  og_image?: string;
-}
+// Note: ThemeSettings interface is defined in hooks/useSettings.ts
+// window.byrdeSettings uses Partial<ThemeSettings> from useSettings.ts
 
 // ============================================
 // THEME CONFIG (stored in post meta)
@@ -148,7 +118,7 @@ declare global {
     byrdeAdmin?: ByrdeAdmin;
     byrdeConfig?: ThemeConfig;
     byrdeContent?: Partial<Record<ContentSectionId, SectionContent>>;
-    byrdeSettings?: Partial<ACFSettings>;
+    byrdeSettings?: Partial<import('../hooks/useSettings').ThemeSettings>;
 
     // WordPress Media Library
     wp?: WPMedia;

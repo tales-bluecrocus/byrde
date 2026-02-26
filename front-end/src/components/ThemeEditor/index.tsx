@@ -26,6 +26,11 @@ import { GlobalPanel } from './panels/GlobalPanel';
 import { StylePanel } from './panels/StylePanel';
 import { ContentPanel } from './panels/ContentPanel';
 import { SettingsPanel } from './panels/SettingsPanel';
+import { AdvancedPanel } from './panels/AdvancedPanel';
+import { PageAdvancedPanel } from './panels/PageAdvancedPanel';
+import { SiteSettingsPanel } from './panels/SiteSettingsPanel';
+import { useSettingsContext } from '../../context/SettingsContext';
+import type { ThemeSettings } from '../../hooks/useSettings';
 import {
   ChevronRight,
   ChevronLeft,
@@ -33,13 +38,14 @@ import {
   Save,
   Loader2,
   RotateCcw,
-  Globe,
   EyeOff,
   Palette,
   FileText,
   Settings2,
   GripVertical,
   PanelLeftOpen,
+  Code,
+  Building,
 } from 'lucide-react';
 import {
   DndContext,
@@ -156,16 +162,70 @@ function FixedSectionItem({
   );
 }
 
+// Convert flat ThemeSettings to nested structure for PHP API
+function flatToNestedSettings(flat: ThemeSettings) {
+  return {
+    brand: {
+      logo: { url: flat.logo, alt: flat.logo_alt },
+      phone: flat.phone,
+      email: flat.email,
+    },
+    google_reviews: {
+      rating: flat.google_rating,
+      count: flat.google_reviews_count,
+      reviews_url: flat.google_reviews_url,
+    },
+    footer: {
+      tagline: flat.footer_tagline,
+      description: flat.footer_description,
+      address: flat.address,
+      business_hours: flat.business_hours,
+      copyright: flat.copyright,
+    },
+    social: {
+      facebook_url: flat.facebook_url,
+      instagram_url: flat.instagram_url,
+      youtube_url: flat.youtube_url,
+      yelp_url: flat.yelp_url,
+    },
+    seo: {
+      site_name: flat.site_name,
+      site_tagline: flat.site_tagline,
+      site_description: flat.site_description,
+      site_keywords: flat.site_keywords,
+      site_url: flat.site_url,
+      og_image: flat.og_image,
+    },
+    analytics: {
+      ga_measurement_id: flat.ga_measurement_id,
+      fb_pixel_id: flat.fb_pixel_id,
+      gads_conversion_label: flat.gads_conversion_label,
+    },
+    legal: {
+      privacy_policy_url: flat.privacy_policy_url,
+      terms_url: flat.terms_url,
+      cookie_settings_url: flat.cookie_settings_url,
+    },
+    contact_form: {
+      postmark_api_token: flat.postmark_api_token,
+      to_email: flat.contact_form_to_email,
+      from_email: flat.contact_form_from_email,
+      subject: flat.contact_form_subject,
+    },
+  };
+}
+
 export function ThemeEditor() {
   const { isOpen, setIsOpen } = useSidebar();
-  const [selectedSection, setSelectedSection] = useState<SectionId | 'global' | null>(null);
+  const [selectedSection, setSelectedSection] = useState<SectionId | 'page-design' | 'site-settings' | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const { sectionThemes, isSectionVisible, resetAllSectionThemes, sectionOrder, setSectionOrder } = useSectionTheme();
+  const { sectionThemes, isSectionVisible, resetAllSectionThemes, resetSectionTheme, sectionOrder, setSectionOrder } = useSectionTheme();
   const { globalConfig, resetGlobalConfig } = useGlobalConfig();
   const { headerConfig, topbarConfig } = useHeaderConfig();
   const { sectionContent } = useContent();
+  const { settings } = useSettingsContext();
   const { toast } = useToast();
 
   const wpAdmin = typeof window !== 'undefined' ? window.byrdeAdmin : null;
@@ -175,10 +235,10 @@ export function ThemeEditor() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  const handleSelectSection = useCallback((id: SectionId | 'global') => {
+  const handleSelectSection = useCallback((id: SectionId | 'page-design' | 'site-settings') => {
     setSelectedSection(id);
     setPanelOpen(true);
-    if (id !== 'global') {
+    if (id !== 'page-design' && id !== 'site-settings') {
       requestAnimationFrame(() => {
         document.getElementById(`${id}-section`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
@@ -216,29 +276,37 @@ export function ThemeEditor() {
         version: Date.now(),
       };
 
-      const minDelay = new Promise((r) => setTimeout(r, 600));
+      const settingsPayload = flatToNestedSettings(settings);
 
-      const [themeRes, contentRes] = await Promise.all([
+      console.group('🔧 Byrde Save Payload');
+      console.log('Theme Config:', JSON.parse(JSON.stringify(configPayload)));
+      console.log('Content:', JSON.parse(JSON.stringify(sectionContent)));
+      console.log('Settings:', JSON.parse(JSON.stringify(settingsPayload)));
+      console.groupEnd();
+
+      const minDelay = new Promise((r) => setTimeout(r, 600));
+      const headers = { 'Content-Type': 'application/json', 'X-WP-Nonce': wpAdmin.nonce };
+
+      const [themeRes, contentRes, settingsRes] = await Promise.all([
         fetch(`${wpAdmin.apiUrl}/pages/${wpAdmin.pageId}/theme`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-WP-Nonce': wpAdmin.nonce,
-          },
+          headers,
           body: JSON.stringify(configPayload),
         }),
         fetch(`${wpAdmin.apiUrl}/pages/${wpAdmin.pageId}/content`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-WP-Nonce': wpAdmin.nonce,
-          },
+          headers,
           body: JSON.stringify(sectionContent),
+        }),
+        fetch(`${wpAdmin.apiUrl}/settings`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(settingsPayload),
         }),
         minDelay,
       ]);
 
-      if (!themeRes.ok || !contentRes.ok) {
+      if (!themeRes.ok || !contentRes.ok || !settingsRes.ok) {
         throw new Error('Failed to save');
       }
 
@@ -248,7 +316,7 @@ export function ThemeEditor() {
     } finally {
       setIsSaving(false);
     }
-  }, [wpAdmin, globalConfig, sectionThemes, sectionOrder, headerConfig, topbarConfig, sectionContent, toast]);
+  }, [wpAdmin, globalConfig, sectionThemes, sectionOrder, headerConfig, topbarConfig, sectionContent, settings, toast]);
 
   const handleResetAll = useCallback(() => {
     resetGlobalConfig();
@@ -256,8 +324,13 @@ export function ThemeEditor() {
     toast('All settings reset to defaults', 'info');
   }, [resetGlobalConfig, resetAllSectionThemes, toast]);
 
-  const isGlobal = selectedSection === 'global';
-  const panelLabel = isGlobal ? 'Global Settings' : (selectedSection ? SECTION_LABELS[selectedSection] : '');
+  const isPageDesign = selectedSection === 'page-design';
+  const isSiteSettings = selectedSection === 'site-settings';
+  const panelLabel = isPageDesign
+    ? 'Page Design'
+    : isSiteSettings
+      ? 'Site Settings'
+      : (selectedSection ? SECTION_LABELS[selectedSection] : '');
 
   return (
     <>
@@ -299,20 +372,21 @@ export function ThemeEditor() {
           {/* Section List */}
           <ScrollArea className="flex-1">
             <div className="p-1.5">
-              {/* Global Settings */}
+              {/* Page Design */}
               <button
-                onClick={() => handleSelectSection('global')}
-                className={`w-full flex items-center gap-2 p-2 rounded-lg transition-colors mb-1 ${
-                  selectedSection === 'global' && panelOpen
-                    ? 'bg-zinc-800'
-                    : 'hover:bg-zinc-900'
+                onClick={() => handleSelectSection('page-design')}
+                className={`w-full flex items-center gap-2 p-2 rounded-lg transition-colors ${
+                  isPageDesign && panelOpen ? 'bg-zinc-800' : 'hover:bg-zinc-900'
                 }`}
               >
                 <div className="w-6 h-6 rounded-md flex items-center justify-center bg-zinc-800">
-                  <Globe className="h-3.5 w-3.5 text-zinc-400" />
+                  <Palette className="h-3.5 w-3.5 text-zinc-400" />
                 </div>
-                <span className="text-xs font-medium flex-1 text-left">Global</span>
-                <ChevronRight className="h-3 w-3 text-zinc-600" />
+                <div className="flex-1 min-w-0 text-left">
+                  <span className="text-xs font-medium block">Page Design</span>
+                  <span className="text-[9px] text-zinc-500 block">Colors, palettes, SEO, logo</span>
+                </div>
+                <ChevronRight className="h-3 w-3 text-zinc-600 shrink-0" />
               </button>
 
               <Separator className="my-1.5 bg-zinc-800/60" />
@@ -377,28 +451,52 @@ export function ThemeEditor() {
             </div>
           </ScrollArea>
 
-          {/* Footer Actions */}
-          <div className="shrink-0 p-2 space-y-1.5 border-t border-zinc-800">
-            <Button
-              onClick={handleSaveConfig}
-              disabled={isSaving}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-70 text-xs h-8"
-              size="sm"
-            >
-              {isSaving ? (
-                <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Saving...</>
-              ) : (
-                <><Save className="h-3.5 w-3.5 mr-1.5" /> Save</>
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleResetAll}
-              className="w-full text-zinc-500 hover:text-red-400 hover:bg-zinc-900 text-xs h-7"
-            >
-              <RotateCcw className="h-3 w-3 mr-1.5" /> Reset All
-            </Button>
+          {/* Footer: Site Settings + Save */}
+          <div className="shrink-0 border-t border-zinc-800">
+            {/* Site Settings — prominent button above save */}
+            <div className="p-2 pb-0">
+              <button
+                onClick={() => handleSelectSection('site-settings')}
+                className={`w-full flex items-center gap-2.5 p-2.5 rounded-lg border transition-colors ${
+                  isSiteSettings && panelOpen
+                    ? 'bg-zinc-800 border-zinc-700'
+                    : 'bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800 hover:border-zinc-700'
+                }`}
+              >
+                <div className="w-7 h-7 rounded-md flex items-center justify-center bg-zinc-800 border border-zinc-700">
+                  <Building className="h-3.5 w-3.5 text-zinc-300" />
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <span className="text-xs font-semibold text-zinc-200 block">Site Settings</span>
+                  <span className="text-[9px] text-zinc-500 block">Brand, analytics, social</span>
+                </div>
+                <ChevronRight className="h-3.5 w-3.5 text-zinc-500 shrink-0" />
+              </button>
+            </div>
+
+            {/* Save + Reset */}
+            <div className="p-2 space-y-1.5">
+              <Button
+                onClick={handleSaveConfig}
+                disabled={isSaving}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-70 text-xs h-8"
+                size="sm"
+              >
+                {isSaving ? (
+                  <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Saving...</>
+                ) : (
+                  <><Save className="h-3.5 w-3.5 mr-1.5" /> Save</>
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetAll}
+                className="w-full text-zinc-500 hover:text-red-400 hover:bg-zinc-900 text-xs h-7"
+              >
+                <RotateCcw className="h-3 w-3 mr-1.5" /> Reset All
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -423,43 +521,155 @@ export function ThemeEditor() {
           </div>
 
           {/* Panel content */}
-          {isGlobal ? (
-            <ScrollArea className="flex-1">
-              <div className="p-4">
-                <GlobalPanel />
+          {isPageDesign ? (
+            <>
+              <Tabs defaultValue="design" className="flex-1 flex flex-col min-h-0">
+                <div className="px-3 pt-2">
+                  <TabsList className="w-full grid grid-cols-2 bg-zinc-800/60 h-8">
+                    <TabsTrigger value="design" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
+                      <Palette className="h-3 w-3" />
+                      Design
+                    </TabsTrigger>
+                    <TabsTrigger value="advanced" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
+                      <Code className="h-3 w-3" />
+                      Advanced
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                <ScrollArea className="flex-1">
+                  <TabsContent value="design" className="m-0 p-4">
+                    <GlobalPanel />
+                  </TabsContent>
+                  <TabsContent value="advanced" className="m-0 p-4">
+                    <PageAdvancedPanel />
+                  </TabsContent>
+                </ScrollArea>
+              </Tabs>
+              <div className="shrink-0 p-2 space-y-1.5 border-t border-zinc-800">
+                <Button
+                  onClick={handleSaveConfig}
+                  disabled={isSaving}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-70 text-xs h-8"
+                  size="sm"
+                >
+                  {isSaving ? (
+                    <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Saving...</>
+                  ) : (
+                    <><Save className="h-3.5 w-3.5 mr-1.5" /> Save</>
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    resetGlobalConfig();
+                    toast('Design reset to defaults', 'info');
+                  }}
+                  className="w-full text-zinc-500 hover:text-red-400 hover:bg-zinc-900 text-xs h-7"
+                >
+                  <RotateCcw className="h-3 w-3 mr-1.5" /> Reset Design
+                </Button>
               </div>
-            </ScrollArea>
+            </>
+          ) : isSiteSettings ? (
+            <>
+              <Tabs defaultValue="site" className="flex-1 flex flex-col min-h-0">
+                <div className="px-3 pt-2">
+                  <TabsList className="w-full grid grid-cols-2 bg-zinc-800/60 h-8">
+                    <TabsTrigger value="site" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
+                      <Building className="h-3 w-3" />
+                      Site
+                    </TabsTrigger>
+                    <TabsTrigger value="advanced" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
+                      <Code className="h-3 w-3" />
+                      Advanced
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                <ScrollArea className="flex-1">
+                  <TabsContent value="site" className="m-0 p-4">
+                    <SiteSettingsPanel />
+                  </TabsContent>
+                  <TabsContent value="advanced" className="m-0 p-4">
+                    <AdvancedPanel />
+                  </TabsContent>
+                </ScrollArea>
+              </Tabs>
+              <div className="shrink-0 p-2 border-t border-zinc-800">
+                <Button
+                  onClick={handleSaveConfig}
+                  disabled={isSaving}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-70 text-xs h-8"
+                  size="sm"
+                >
+                  {isSaving ? (
+                    <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Saving...</>
+                  ) : (
+                    <><Save className="h-3.5 w-3.5 mr-1.5" /> Save</>
+                  )}
+                </Button>
+              </div>
+            </>
           ) : (
-            <Tabs defaultValue="style" className="flex-1 flex flex-col min-h-0">
-              <div className="px-3 pt-2">
-                <TabsList className="w-full grid grid-cols-3 bg-zinc-800/60 h-8">
-                  <TabsTrigger value="style" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
-                    <Palette className="h-3 w-3" />
-                    Style
-                  </TabsTrigger>
-                  <TabsTrigger value="content" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
-                    <FileText className="h-3 w-3" />
-                    Content
-                  </TabsTrigger>
-                  <TabsTrigger value="settings" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
-                    <Settings2 className="h-3 w-3" />
-                    Settings
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+            <>
+              <Tabs defaultValue="style" className="flex-1 flex flex-col min-h-0">
+                <div className="px-3 pt-2">
+                  <TabsList className="w-full grid grid-cols-3 bg-zinc-800/60 h-8">
+                    <TabsTrigger value="style" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
+                      <Palette className="h-3 w-3" />
+                      Style
+                    </TabsTrigger>
+                    <TabsTrigger value="content" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
+                      <FileText className="h-3 w-3" />
+                      Content
+                    </TabsTrigger>
+                    <TabsTrigger value="settings" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
+                      <Settings2 className="h-3 w-3" />
+                      Settings
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
 
-              <ScrollArea className="flex-1">
-                <TabsContent value="style" className="m-0 p-4">
-                  <StylePanel sectionId={selectedSection} />
-                </TabsContent>
-                <TabsContent value="content" className="m-0 p-4">
-                  <ContentPanel sectionId={selectedSection} />
-                </TabsContent>
-                <TabsContent value="settings" className="m-0 p-4">
-                  <SettingsPanel sectionId={selectedSection} />
-                </TabsContent>
-              </ScrollArea>
-            </Tabs>
+                <ScrollArea className="flex-1">
+                  <TabsContent value="style" className="m-0 p-4">
+                    <StylePanel sectionId={selectedSection} />
+                  </TabsContent>
+                  <TabsContent value="content" className="m-0 p-4">
+                    <ContentPanel sectionId={selectedSection} />
+                  </TabsContent>
+                  <TabsContent value="settings" className="m-0 p-4">
+                    <SettingsPanel sectionId={selectedSection} />
+                  </TabsContent>
+                </ScrollArea>
+              </Tabs>
+
+              {/* Fixed footer for section panels */}
+              <div className="shrink-0 p-2 space-y-1.5 border-t border-zinc-800">
+                <Button
+                  onClick={handleSaveConfig}
+                  disabled={isSaving}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-70 text-xs h-8"
+                  size="sm"
+                >
+                  {isSaving ? (
+                    <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Saving...</>
+                  ) : (
+                    <><Save className="h-3.5 w-3.5 mr-1.5" /> Save</>
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    resetSectionTheme(selectedSection);
+                    toast('Section reset to defaults', 'info');
+                  }}
+                  className="w-full text-zinc-500 hover:text-red-400 hover:bg-zinc-900 text-xs h-7"
+                >
+                  <RotateCcw className="h-3 w-3 mr-1.5" /> Reset Section
+                </Button>
+              </div>
+            </>
           )}
         </div>
       )}

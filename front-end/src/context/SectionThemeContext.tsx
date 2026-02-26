@@ -68,12 +68,12 @@ export type SectionId =
 
 // Reorderable sections (rendered dynamically in StaticHomePage)
 export const DEFAULT_SECTION_ORDER: SectionId[] = [
-  'hero', 'featured-testimonial', 'services', 'mid-cta', 'service-areas', 'testimonials', 'faq',
+  'hero', 'featured-testimonial', 'services', 'mid-cta', 'service-areas', 'testimonials', 'faq', 'footer-cta',
 ];
 
 // Fixed sections (not reorderable)
 export const FIXED_TOP_SECTIONS: SectionId[] = ['topheader', 'header'];
-export const FIXED_BOTTOM_SECTIONS: SectionId[] = ['footer-cta', 'footer'];
+export const FIXED_BOTTOM_SECTIONS: SectionId[] = ['footer'];
 
 export const SECTION_LABELS: Record<SectionId, string> = {
   'topheader': 'Top Header',
@@ -103,6 +103,7 @@ interface SectionThemeContextType {
   setSectionVisibility: (sectionId: SectionId, visible: boolean) => void;
   isSectionVisible: (sectionId: SectionId) => boolean;
   setSectionOrder: (order: SectionId[]) => void;
+  importSectionData: (themes: Record<SectionId, SectionTheme>, visibility: Record<SectionId, boolean>, order: SectionId[]) => void;
 }
 
 const SectionThemeContext = createContext<SectionThemeContextType | null>(null);
@@ -158,7 +159,10 @@ function loadSectionOrder(): SectionId[] {
 
   const config = window.byrdeAdmin?.config || window.byrdeConfig;
   if (config?.sectionOrder && Array.isArray(config.sectionOrder) && config.sectionOrder.length > 0) {
-    return config.sectionOrder as SectionId[];
+    const saved = config.sectionOrder as SectionId[];
+    // Append any new sections from DEFAULT_SECTION_ORDER that aren't in the saved order
+    const missing = DEFAULT_SECTION_ORDER.filter(id => !saved.includes(id));
+    return missing.length > 0 ? [...saved, ...missing] : saved;
   }
 
   return DEFAULT_SECTION_ORDER;
@@ -384,6 +388,17 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
     return sectionVisibility[sectionId] ?? true;
   }, [sectionVisibility]);
 
+  // Bulk import for export/import feature
+  const importSectionData = useCallback((
+    themes: Record<SectionId, SectionTheme>,
+    visibility: Record<SectionId, boolean>,
+    order: SectionId[],
+  ) => {
+    setSectionThemes(themes);
+    setSectionVisibilityState(visibility);
+    setSectionOrder(order);
+  }, []);
+
   return (
     <SectionThemeContext.Provider
       value={{
@@ -400,6 +415,7 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
         setSectionVisibility,
         isSectionVisible,
         setSectionOrder,
+        importSectionData,
       }}
     >
       {children}

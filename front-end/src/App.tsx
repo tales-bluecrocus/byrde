@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, type ComponentType } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense, type ComponentType } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import FeaturedTestimonial from './components/FeaturedTestimonial';
@@ -17,6 +17,7 @@ import { HeaderConfigProvider } from './context/HeaderConfigContext';
 import { GlobalConfigProvider } from './context/GlobalConfigContext';
 import { SidebarProvider, useSidebar } from './context/SidebarContext';
 import { ContentProvider } from './context/ContentContext';
+import { SettingsProvider } from './context/SettingsContext';
 import { useSettings } from './hooks/useSettings';
 import { useScrollDepthTracking, useAdAttributionCapture } from './hooks/useAnalytics';
 import { trackPhoneClick } from './lib/analytics';
@@ -30,6 +31,7 @@ const SECTION_COMPONENTS: Record<string, ComponentType> = {
   'service-areas': ServiceAreas,
   'testimonials': TestimonialsGrid,
   'faq': FAQ,
+  'footer-cta': FooterCTA,
 };
 
 // Lazy-load editor-only code (ThemeEditor + react-colorful, shadcn Sheet/Tabs etc.)
@@ -137,9 +139,6 @@ function ProductionLayout() {
       >
         <Header />
         <StaticHomePage />
-        <ThemedSection id="footer-cta" index={98}>
-          <FooterCTA />
-        </ThemedSection>
         <ThemedSection id="footer" as="footer" index={99}>
           <Footer />
         </ThemedSection>
@@ -154,10 +153,24 @@ function ProductionLayout() {
 function EditorLayout() {
   const { isOpen, totalWidth } = useSidebar();
 
+  // Prevent all link navigation in editor mode to avoid editor-within-editor
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    const target = (e.target as HTMLElement).closest('a');
+    if (!target) return;
+
+    // Allow links inside the editor sidebar (z-50+)
+    const editorPanel = (e.target as HTMLElement).closest('[class*="z-50"], [class*="z-[51]"]');
+    if (editorPanel) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
   return (
     <>
       <div
         className="min-h-screen transition-all duration-300 ease-in-out"
+        onClick={handleClick}
         style={{
           backgroundColor: 'var(--color-dark-950)',
           marginLeft: isOpen ? `${totalWidth}px` : '0px',
@@ -165,9 +178,6 @@ function EditorLayout() {
       >
         <Header />
         <StaticHomePage />
-        <ThemedSection id="footer-cta" index={98}>
-          <FooterCTA />
-        </ThemedSection>
         <ThemedSection id="footer" as="footer" index={99}>
           <Footer />
         </ThemedSection>
@@ -188,20 +198,22 @@ export default function App() {
 
   return (
     <ToastProvider>
-      <GlobalConfigProvider>
-        <PaletteInjector />
-        <HeaderConfigProvider>
-          <SectionThemeProvider>
-            <ContentProvider>
-              {showSidebar ? (
-                <SidebarProvider>{content}</SidebarProvider>
-              ) : (
-                content
-              )}
-            </ContentProvider>
-          </SectionThemeProvider>
-        </HeaderConfigProvider>
-      </GlobalConfigProvider>
+      <SettingsProvider>
+        <GlobalConfigProvider>
+          <PaletteInjector />
+          <HeaderConfigProvider>
+            <SectionThemeProvider>
+              <ContentProvider>
+                {showSidebar ? (
+                  <SidebarProvider>{content}</SidebarProvider>
+                ) : (
+                  content
+                )}
+              </ContentProvider>
+            </SectionThemeProvider>
+          </HeaderConfigProvider>
+        </GlobalConfigProvider>
+      </SettingsProvider>
     </ToastProvider>
   );
 }

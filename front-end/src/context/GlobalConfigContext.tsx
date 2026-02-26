@@ -51,6 +51,14 @@ export interface FormConfig {
   buttonBg?: string;
 }
 
+// Page-level SEO configuration
+export interface SeoConfig {
+  siteName: string;
+  tagline: string;
+  description: string;
+  ogImage: string;
+}
+
 // Global configuration that applies across all sections
 // Note: Google Reviews data now comes from WordPress via useSettings()
 export interface GlobalConfig {
@@ -67,6 +75,8 @@ export interface GlobalConfig {
   };
   // Form styling
   form: FormConfig;
+  // Page-level SEO
+  seo: SeoConfig;
 }
 
 // Generated palettes type
@@ -92,7 +102,9 @@ interface GlobalConfigContextType {
   updateFooter: (updates: Partial<FooterConfig>) => void;
   updateTrustBadge: (badgeKey: 'badge1' | 'badge2', updates: Partial<TrustBadge>) => void;
   updateFormConfig: (updates: Partial<FormConfig>) => void;
+  updateSeo: (updates: Partial<SeoConfig>) => void;
   resetGlobalConfig: () => void;
+  replaceGlobalConfig: (config: GlobalConfig) => void;
 }
 
 const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
@@ -125,6 +137,12 @@ const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
   },
   form: {
     // All optional - uses defaults when undefined
+  },
+  seo: {
+    siteName: '',
+    tagline: '',
+    description: '',
+    ogImage: '',
   },
 };
 
@@ -262,8 +280,19 @@ export function GlobalConfigProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const updateSeo = useCallback((updates: Partial<SeoConfig>) => {
+    setGlobalConfig((prev) => ({
+      ...prev,
+      seo: { ...prev.seo, ...updates },
+    }));
+  }, []);
+
   const resetGlobalConfig = useCallback(() => {
     setGlobalConfig(DEFAULT_GLOBAL_CONFIG);
+  }, []);
+
+  const replaceGlobalConfig = useCallback((config: GlobalConfig) => {
+    setGlobalConfig(config);
   }, []);
 
   return (
@@ -280,7 +309,9 @@ export function GlobalConfigProvider({ children }: { children: ReactNode }) {
         updateFooter,
         updateTrustBadge,
         updateFormConfig,
+        updateSeo,
         resetGlobalConfig,
+        replaceGlobalConfig,
       }}
     >
       {children}

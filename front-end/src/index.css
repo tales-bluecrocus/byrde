@@ -16,13 +16,13 @@
   --color-muted-foreground: #a1a1aa;     /* zinc-400 */
   --color-input: #52525b;               /* zinc-600 - visible borders & switch tracks */
   --color-border: #3f3f46;              /* zinc-700 */
-  --color-ring: #22c55e;                /* green-500 */
+  --color-ring: #52525b;                /* zinc-600 - subtle focus ring */
   --color-destructive: #f87171;          /* red-400 */
   --color-accent: #27272a;              /* zinc-800 */
   --color-accent-foreground: #f4f4f5;    /* zinc-100 */
   --color-secondary: #27272a;            /* zinc-800 */
   --color-secondary-foreground: #f4f4f5; /* zinc-100 */
-  --color-primary: #22c55e;             /* green-500 */
+  --color-primary: #059669;             /* emerald-600 */
   --color-primary-foreground: #ffffff;
   --color-popover: #18181b;             /* zinc-900 */
   --color-popover-foreground: #f4f4f5;   /* zinc-100 */
@@ -31,7 +31,7 @@
 /* Switches in editor: make checked/unchecked clearly distinct */
 .editor-dark [data-slot="switch"][data-state="checked"],
 .editor-dark button[role="switch"][data-state="checked"] {
-  background-color: #22c55e !important; /* green-500 */
+  background-color: #059669 !important; /* emerald-600 */
 }
 .editor-dark [data-slot="switch"][data-state="unchecked"],
 .editor-dark button[role="switch"][data-state="unchecked"] {
@@ -258,10 +258,13 @@ body {
   color: white;
 }
 
-/* Focus Styles */
+/* Focus Styles - only for public site, editor uses shadcn ring styles */
 *:focus-visible {
   outline: 2px solid var(--color-primary-500);
   outline-offset: 2px;
+}
+.editor-dark *:focus-visible {
+  outline: none;
 }
 
 /* Stagger Animation */

@@ -907,9 +907,6 @@ function FooterContentEditor({ content, onChange }: { content: FooterContent; on
           <FormField label="Description">
             <Textarea value={content.description} onChange={(e) => onChange({ description: e.target.value })} placeholder="Company description..." rows={3} />
           </FormField>
-          <FormField label="Copyright">
-            <Input value={content.copyright} onChange={(e) => onChange({ copyright: e.target.value })} placeholder="© 2024 Company Name. All rights reserved." />
-          </FormField>
         </div>
       </div>
       <Separator />

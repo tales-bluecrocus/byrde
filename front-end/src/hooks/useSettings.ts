@@ -1,8 +1,10 @@
 /**
  * WordPress Theme Settings Hook
  *
- * Access theme settings injected from WordPress via wp_localize_script
+ * Reads from SettingsContext (reactive) for editor live-updates.
  */
+
+import { useSettingsContext } from '../context/SettingsContext';
 
 export interface ThemeSettings {
   // Brand
@@ -48,6 +50,12 @@ export interface ThemeSettings {
   terms_url: string;
   cookie_settings_url: string;
 
+  // Contact Form (admin-only, not exposed publicly)
+  postmark_api_token: string;
+  contact_form_to_email: string;
+  contact_form_from_email: string;
+  contact_form_subject: string;
+
   // API
   apiUrl: string;
 }
@@ -58,7 +66,7 @@ declare global {
   }
 }
 
-const DEFAULT_SETTINGS: ThemeSettings = {
+export const DEFAULT_SETTINGS: ThemeSettings = {
   // Brand - NO defaults, must be configured
   logo: '',
   logo_alt: '',
@@ -102,18 +110,22 @@ const DEFAULT_SETTINGS: ThemeSettings = {
   terms_url: '/terms-and-conditions',
   cookie_settings_url: '/cookie-settings',
 
+  // Contact Form
+  postmark_api_token: '',
+  contact_form_to_email: '',
+  contact_form_from_email: '',
+  contact_form_subject: 'New Lead from Website',
+
   // API
   apiUrl: '/wp-json/byrde/v1',
 };
 
 /**
- * Get all theme settings
+ * Get all theme settings (reactive via context)
  */
 export function useSettings(): ThemeSettings {
-  return {
-    ...DEFAULT_SETTINGS,
-    ...window.byrdeSettings,
-  } as ThemeSettings;
+  const { settings } = useSettingsContext();
+  return settings;
 }
 
 /**
@@ -123,7 +135,8 @@ export function useSetting<K extends keyof ThemeSettings>(
   key: K,
   fallback?: ThemeSettings[K]
 ): ThemeSettings[K] {
-  return window.byrdeSettings?.[key] ?? fallback ?? DEFAULT_SETTINGS[key];
+  const { settings } = useSettingsContext();
+  return settings[key] ?? fallback ?? DEFAULT_SETTINGS[key];
 }
 
 /**

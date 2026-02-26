@@ -52,6 +52,8 @@ interface HeaderConfigContextType {
   updateHeaderStyle: (updates: Partial<HeaderStyle>) => void;
   updateTopbarConfig: (updates: Partial<TopbarConfig>) => void;
   resetHeaderConfig: () => void;
+  replaceHeaderConfig: (config: HeaderConfig) => void;
+  replaceTopbarConfig: (config: TopbarConfig) => void;
 }
 
 const DEFAULT_HEADER_CONFIG: HeaderConfig = {
@@ -137,6 +139,14 @@ export function HeaderConfigProvider({ children }: { children: ReactNode }) {
     setTopbarConfig(DEFAULT_TOPBAR_CONFIG);
   }, []);
 
+  const replaceHeaderConfig = useCallback((config: HeaderConfig) => {
+    setHeaderConfig(config);
+  }, []);
+
+  const replaceTopbarConfig = useCallback((config: TopbarConfig) => {
+    setTopbarConfig(config);
+  }, []);
+
   return (
     <HeaderConfigContext.Provider
       value={{
@@ -146,6 +156,8 @@ export function HeaderConfigProvider({ children }: { children: ReactNode }) {
         updateHeaderStyle,
         updateTopbarConfig,
         resetHeaderConfig,
+        replaceHeaderConfig,
+        replaceTopbarConfig,
       }}
     >
       {children}
