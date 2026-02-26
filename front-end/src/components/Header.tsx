@@ -335,7 +335,7 @@ export default function Header() {
 								{headerConfig.showPhone && (
 									<a
 										href={`tel:${settings.phone_raw}`}
-										className="hidden sm:inline-flex group relative items-center gap-2 px-6 py-3 rounded-full font-semibold text-base shadow-lg shadow-black/25 transition-all duration-300 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 hover:brightness-110 active:scale-95 active:shadow-md"
+										className="hidden sm:inline-flex btn-themed group relative items-center gap-2 px-6 py-3 rounded-full font-semibold text-base shadow-lg shadow-black/25"
 										style={{
 											backgroundColor: accentColor,
 											color: getContrastColor(accentColor),

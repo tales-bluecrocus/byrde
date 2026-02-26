@@ -96,7 +96,7 @@ export default function FooterCTA() {
         {/* CTA Button */}
         <a
           href={content.ctaLink}
-          className="inline-flex items-center gap-3 px-10 py-5 rounded-full font-semibold text-lg shadow-2xl shadow-black/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-3xl hover:brightness-110 active:scale-95"
+          className="inline-flex items-center gap-3 btn-section px-8 py-4 rounded-full font-semibold text-lg shadow-2xl shadow-black/25"
           style={{
             backgroundColor: buttonBg,
             color: buttonText,

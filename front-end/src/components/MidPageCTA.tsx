@@ -136,7 +136,7 @@ export default function MidPageCTA() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href={content.ctaLink}
-            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-lg shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-3xl"
+            className="group inline-flex items-center gap-3 btn-section px-8 py-4 rounded-full font-semibold text-lg shadow-2xl"
             style={{
               backgroundColor: buttonBg,
               color: buttonText,

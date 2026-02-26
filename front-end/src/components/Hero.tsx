@@ -731,13 +731,11 @@ export default function Hero() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full py-4 rounded-xl font-semibold text-lg shadow-lg shadow-black/25 hover:shadow-xl hover:shadow-black/30 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                      className="btn-themed w-full py-4 rounded-xl font-semibold text-lg shadow-lg shadow-black/25"
                       style={{
                         backgroundColor: themeStyles.buttonBg,
                         color: getContrastColor(themeStyles.buttonBg),
                       }}
-                      onMouseEnter={(e) => { if (!isSubmitting) e.currentTarget.style.backgroundColor = themeStyles.buttonHoverBg; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = themeStyles.buttonBg; }}
                     >
                       {isSubmitting ? (
                         <span className="flex items-center justify-center gap-2">
