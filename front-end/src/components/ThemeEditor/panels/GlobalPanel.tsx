@@ -1,27 +1,28 @@
 /**
- * Global Panel - Brand colors, logo settings, presets
- * Light theme with explicit Tailwind colors
+ * Global Panel - Page theme mode + page SEO
  */
 
 import { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Card, CardContent } from '@/components/ui/card';
-import { ColorPicker } from '@/components/ui/color-picker';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useGlobalConfig } from '../../../context/GlobalConfigContext';
+import { useSettingsContext } from '../../../context/SettingsContext';
 import { useToast } from '../../Toast';
-import { Moon, Sun, RefreshCw, Search, Image } from 'lucide-react';
+import { Moon, Sun, Monitor, Search, Image } from 'lucide-react';
 
 const inputCls = "bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 text-xs h-8";
 const textareaCls = "w-full rounded-md bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder:text-zinc-600 text-xs p-2 resize-y min-h-[60px] focus:outline-none focus:border-zinc-600";
 
 export function GlobalPanel() {
-  const { globalConfig, updateBrand, updateSeo, needsRegeneration, generatePalettes } = useGlobalConfig();
+  const { globalConfig, updateBrand, updateSeo } = useGlobalConfig();
+  const { settings } = useSettingsContext();
   const { toast } = useToast();
   const seo = globalConfig.seo;
+  const modeOverride = globalConfig.brand.modeOverride ?? null;
+  const siteDefault = (settings.brand_mode || 'dark') as 'dark' | 'light';
 
   const handleUploadOgImage = useCallback(() => {
     if (window.wp?.media) {
@@ -41,70 +42,50 @@ export function GlobalPanel() {
     }
   }, [updateSeo, toast]);
 
+  // Determine the toggle value: 'default' | 'dark' | 'light'
+  const toggleValue = modeOverride ?? 'default';
+
   return (
     <div className="space-y-5 text-zinc-200">
       {/* Theme Mode */}
-      <Card className="bg-zinc-800/50 border-zinc-800">
-        <CardContent className="flex items-center justify-between p-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-800">
-              {globalConfig.brand.mode === 'dark' ? (
-                <Moon className="h-4 w-4 text-zinc-400" />
-              ) : (
-                <Sun className="h-4 w-4 text-zinc-400" />
-              )}
-            </div>
-            <div>
-              <Label className="text-xs font-medium text-zinc-200">
-                {globalConfig.brand.mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
-              </Label>
-              <p className="text-[10px] text-zinc-500">Theme appearance</p>
-            </div>
-          </div>
-          <Switch
-            checked={globalConfig.brand.mode === 'light'}
-            onCheckedChange={(checked) => updateBrand({ mode: checked ? 'light' : 'dark' })}
-          />
-        </CardContent>
-      </Card>
-
-      <Separator className="bg-zinc-800/60" />
-
-      {/* Brand Colors */}
       <div>
         <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-          Brand Colors
+          Page Theme Mode
         </Label>
-        <p className="text-xs mb-3 text-zinc-400">Primary brand colors used throughout</p>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label className="text-xs font-medium text-zinc-400">Primary Color</Label>
-            <ColorPicker value={globalConfig.brand.primary} onChange={(val) => updateBrand({ primary: val })} />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-xs font-medium text-zinc-400">Accent Color</Label>
-            <ColorPicker value={globalConfig.brand.accent} onChange={(val) => updateBrand({ accent: val })} />
-          </div>
-        </div>
+        <ToggleGroup
+          type="single"
+          value={toggleValue}
+          onValueChange={(val) => {
+            if (!val) return;
+            if (val === 'default') {
+              updateBrand({ modeOverride: null, mode: siteDefault });
+            } else {
+              updateBrand({ modeOverride: val as 'dark' | 'light', mode: val as 'dark' | 'light' });
+            }
+          }}
+          className="w-full bg-zinc-800 p-1 rounded-lg mt-2"
+        >
+          <ToggleGroupItem value="default" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+            <Monitor className="h-3.5 w-3.5" />
+            Default
+          </ToggleGroupItem>
+          <ToggleGroupItem value="dark" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+            <Moon className="h-3.5 w-3.5" />
+            Dark
+          </ToggleGroupItem>
+          <ToggleGroupItem value="light" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+            <Sun className="h-3.5 w-3.5" />
+            Light
+          </ToggleGroupItem>
+        </ToggleGroup>
+        <p className="text-[10px] mt-1.5 text-zinc-500">
+          {modeOverride
+            ? `Overriding: ${modeOverride === 'dark' ? 'Dark' : 'Light'}`
+            : `Using site default (${siteDefault === 'dark' ? 'Dark' : 'Light'})`}
+        </p>
       </div>
 
-      {/* Generate Palettes */}
-      <Button
-        onClick={() => {
-          generatePalettes();
-          toast('Palettes generated!', 'success');
-        }}
-        className={`w-full ${needsRegeneration ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'}`}
-        variant={needsRegeneration ? 'default' : 'outline'}
-      >
-        <RefreshCw className="h-4 w-4 mr-2" />
-        {needsRegeneration ? 'Generate Palettes' : 'Regenerate Palettes'}
-      </Button>
-
-      {/* Divider between page design and page SEO */}
-      <div className="py-1">
-        <Separator className="bg-zinc-700" />
-      </div>
+      <Separator className="bg-zinc-800/60" />
 
       {/* SEO / Meta */}
       <div>

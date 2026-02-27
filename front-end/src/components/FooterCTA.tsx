@@ -1,5 +1,6 @@
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
+import { useSectionPalette } from '../hooks/useSectionPalette';
 import { useContent } from '../context/ContentContext';
 import { renderHeadlineStyled } from '../utils/renderHeadline';
 import { getContrastColor, withAlpha } from '../utils/colorUtils';
@@ -12,8 +13,9 @@ const PhoneIcon = () => (
 );
 
 export default function FooterCTA() {
-  const { globalConfig, palette } = useGlobalConfig();
+  const { globalConfig } = useGlobalConfig();
   const { sectionThemes } = useSectionTheme();
+  const palette = useSectionPalette('footer-cta');
   const { getContent } = useContent();
   const content = getContent('footer-cta');
   const ctaTheme = sectionThemes['footer-cta'] || {};
@@ -21,13 +23,13 @@ export default function FooterCTA() {
   const isOverriding = ctaTheme.overrideGlobalColors ?? false;
   const hasBgImage = !!ctaTheme.bgImage;
 
-  // Follow same pattern as MidPageCTA — use section bg, not primary as bg
+  // Section palette already reflects paletteMode
   const bgPrimary = isOverriding
     ? (ctaTheme.bgPrimary || palette.background.primary)
     : palette.background.primary;
   const accentColor = isOverriding
-    ? (ctaTheme.accent || globalConfig.brand.accent)
-    : globalConfig.brand.accent;
+    ? (ctaTheme.accent || palette.accent[500])
+    : palette.accent[500];
   const textPrimary = isOverriding
     ? (ctaTheme.textPrimary || palette.text.primary)
     : palette.text.primary;
@@ -35,10 +37,10 @@ export default function FooterCTA() {
     ? (ctaTheme.textSecondary || palette.text.secondary)
     : palette.text.secondary;
 
-  const sectionIsLight = isOverriding && ctaTheme.paletteMode === 'light';
-  const isLightMode = isOverriding ? sectionIsLight : globalConfig.brand.mode === 'light';
+  const effectiveMode = ctaTheme.paletteMode || globalConfig.brand.mode;
+  const isLightMode = effectiveMode === 'light';
 
-  const buttonBg = accentColor;
+  const buttonBg = ctaTheme.buttonStyle === 2 ? accentColor : palette.primary[500];
   const buttonText = getContrastColor(buttonBg);
 
   const dividerColor = isLightMode ? withAlpha('#000000', 0.1) : withAlpha('#ffffff', 0.1);

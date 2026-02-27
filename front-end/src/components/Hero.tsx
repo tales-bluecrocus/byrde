@@ -8,6 +8,7 @@
 import { useState, useMemo, useCallback, memo } from 'react';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
+import { useSectionPalette } from '../hooks/useSectionPalette';
 import { useContent, type BadgeIconType } from '../context/ContentContext';
 import { renderHeadlineStyled } from '../utils/renderHeadline';
 import { useSettings } from '../hooks/useSettings';
@@ -23,12 +24,12 @@ import * as LucideIcons from 'lucide-react';
 
 // Dark mode fallback colors
 const DARK_FALLBACKS = {
-  bgPrimary: '#0a0a0a',
-  bgSecondary: '#141414',
-  bgTertiary: '#1f1f1f',
-  textPrimary: '#ffffff',
+  bgPrimary: '#171717',
+  bgSecondary: '#1f1f1f',
+  bgTertiary: '#262626',
+  textPrimary: '#efefef',
   textSecondary: '#a3a3a3',
-  borderColor: '#2a2a2a',
+  borderColor: '#333333',
 } as const;
 
 // Light mode fallback colors
@@ -36,7 +37,7 @@ const LIGHT_FALLBACKS = {
   bgPrimary: '#ffffff',
   bgSecondary: '#f8f8f8',
   bgTertiary: '#f0f0f0',
-  textPrimary: '#111827',
+  textPrimary: '#2a2a2a',
   textSecondary: '#4b5563',
   borderColor: '#d4d4d4',
 } as const;
@@ -206,6 +207,8 @@ function validateForm(formData: FormData): FormErrors {
 
   if (!formData.name.trim()) {
     errors.name = 'Name is required';
+  } else if (!formData.name.trim().includes(' ')) {
+    errors.name = 'Please include your last name';
   }
 
   if (!formData.phone.trim()) {
@@ -276,8 +279,9 @@ BenefitItem.displayName = 'BenefitItem';
 // ============================================
 
 export default function Hero() {
-  const { globalConfig, palette } = useGlobalConfig();
+  const { globalConfig } = useGlobalConfig();
   const { sectionThemes } = useSectionTheme();
+  const palette = useSectionPalette('hero');
   const { getContent } = useContent();
   const settings = useSettings();
   const content = getContent('hero');
@@ -298,11 +302,12 @@ export default function Hero() {
   // Memoized theme calculations
   const themeStyles = useMemo(() => {
     const isOverriding = heroTheme.overrideGlobalColors ?? false;
-    const sectionIsLight = isOverriding && heroTheme.paletteMode === 'light';
-    const sectionIsDark = isOverriding && heroTheme.paletteMode === 'dark';
-    const fallbacks = sectionIsDark ? DARK_FALLBACKS : (sectionIsLight ? LIGHT_FALLBACKS : DARK_FALLBACKS);
+    // Effective mode: section paletteMode > page mode
+    const effectiveMode = heroTheme.paletteMode || globalConfig.brand.mode;
+    const isLightMode = effectiveMode === 'light';
+    const fallbacks = isLightMode ? LIGHT_FALLBACKS : DARK_FALLBACKS;
 
-    const accentColor = isOverriding ? (heroTheme.accent || globalConfig.brand.accent) : globalConfig.brand.accent;
+    const accentColor = isOverriding ? (heroTheme.accent || palette.accent[500]) : palette.accent[500];
     const overlayColor = isOverriding ? (heroTheme.bgPrimary || fallbacks.bgPrimary) : palette.background.primary;
     const cardBgColor = isOverriding ? (heroTheme.bgSecondary || fallbacks.bgSecondary) : palette.background.secondary;
     const borderColor = isOverriding ? (heroTheme.borderColor || fallbacks.borderColor) : palette.border;
@@ -323,10 +328,10 @@ export default function Hero() {
     const labelColor = isOverriding
       ? textSecondary
       : (formConfig.labelColor || palette.text.secondary);
-    const buttonBg = formConfig.buttonBg || palette.primary[500];
+    const defaultButtonColor = heroTheme.buttonStyle === 2 ? palette.accent[500] : palette.primary[500];
+    const buttonBg = formConfig.buttonBg || defaultButtonColor;
     const buttonHoverBg = lighten(buttonBg, 15);
 
-    const isLightMode = isOverriding ? sectionIsLight : globalConfig.brand.mode === 'light';
     const hasBgImage = !!heroTheme.bgImage;
     const bgImageOpacity = heroTheme.bgImageOpacity ?? 0.5;
     const bgImageOverlayColor = heroTheme.bgImageOverlayColor || overlayColor;
@@ -441,8 +446,21 @@ export default function Hero() {
   const showBadge1 = content.showBadge1 ?? true;
   const showBadge2 = content.showBadge2 ?? true;
 
+  // Mobile marquee items (benefits + badges combined into scrolling pills)
+  const marqueeItems = useMemo(() => {
+    const items: { key: string; text: string; isRating?: boolean }[] = [];
+    const b = content.benefits?.length ? content.benefits : FALLBACK_BENEFITS;
+    b.forEach((text, i) => items.push({ key: `b${i}`, text }));
+    if (settings.google_rating) {
+      items.push({ key: 'gr', text: `${settings.google_rating} ★ ${settings.google_reviews_count || ''} Reviews`, isRating: true });
+    }
+    if (showBadge1 && content.badge1Label) items.push({ key: 'tb1', text: content.badge1Label });
+    if (showBadge2 && content.badge2Label) items.push({ key: 'tb2', text: content.badge2Label });
+    return items;
+  }, [content, settings.google_rating, settings.google_reviews_count, showBadge1, showBadge2]);
+
   return (
-    <div className={`relative min-h-screen pt-12 pb-20 overflow-hidden ${themeStyles.hasBgImage ? '' : 'section-bg-primary'}`}>
+    <div className={`relative lg:min-h-screen pt-8 pb-10 lg:pt-12 lg:pb-20 overflow-hidden ${themeStyles.hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -473,10 +491,10 @@ export default function Hero() {
       <div className="absolute top-40 left-10 w-72 h-72 rounded-full blur-3xl" style={{ backgroundColor: `${themeStyles.accentColor}1a` }} />
       <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl" style={{ backgroundColor: `${themeStyles.accentColor}0d` }} />
 
-      <div className="relative max-w-7xl mx-auto px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-20 lg:items-center">
           {/* Left Content */}
-          <div className="opacity-0 animate-[slide-right_0.8s_ease-out_0.2s_forwards]">
+          <div className="min-w-0 opacity-0 animate-[slide-right_0.8s_ease-out_0.2s_forwards]">
             {/* Hero Badge (above headline) */}
             {showHeroBadge && (
               <div
@@ -498,8 +516,48 @@ export default function Hero() {
               {content.subheadline}
             </p>
 
-            {/* Benefits */}
-            <ul className="space-y-4 mb-8">
+            {/* Mobile: Infinite scrolling marquee (benefits + trust badges) */}
+            <div
+              className="lg:hidden overflow-hidden mb-4"
+              style={{
+                maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+              }}
+            >
+              <div
+                className="flex w-max"
+                style={{ animation: 'marquee 25s linear infinite' }}
+              >
+                {[0, 1].map((setIdx) => (
+                  <div key={setIdx} className="flex shrink-0">
+                    {marqueeItems.map((item) => (
+                      <div
+                        key={`${setIdx}-${item.key}`}
+                        className="flex items-center gap-1.5 shrink-0 mx-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap"
+                        style={{
+                          backgroundColor: `${themeStyles.accentColor}1a`,
+                          color: themeStyles.textSecondary,
+                        }}
+                      >
+                        {item.isRating ? (
+                          <svg className="w-3.5 h-3.5 shrink-0" fill="#facc15" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ) : (
+                          <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke={themeStyles.accentColor} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                        {item.text}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Benefits (desktop only) */}
+            <ul className="hidden lg:block space-y-4 mb-8">
               {(content.benefits?.length ? content.benefits : FALLBACK_BENEFITS).map((benefit, index) => (
                 <BenefitItem
                   key={benefit}
@@ -511,8 +569,8 @@ export default function Hero() {
               ))}
             </ul>
 
-            {/* Trust Badges */}
-            <div className="flex flex-wrap items-center gap-6 pt-6 border-t" style={{ borderColor: themeStyles.borderColor }}>
+            {/* Trust Badges (desktop only) */}
+            <div className="hidden lg:flex flex-wrap items-center gap-6 pt-6 border-t" style={{ borderColor: themeStyles.borderColor }}>
               <GoogleReviewBadge variant="full" />
               {showBadge1 && (
                 <>

@@ -1,10 +1,13 @@
 // Color utility functions for the brand color system
 
 /**
- * Convert hex to RGB
+ * Convert hex to RGB (supports 6-char and 8-char hex with alpha)
  */
 export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  // Strip alpha channel if present (8-char hex → 6-char)
+  const clean = hex.replace(/^#/, '');
+  const rgb = clean.length === 8 ? clean.slice(0, 6) : clean;
+  const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(rgb);
   return result
     ? {
         r: parseInt(result[1], 16),
@@ -166,6 +169,50 @@ export function getContrastColor(hexColor: string): string {
 }
 
 // ============================================
+// WCAG CONTRAST VALIDATION
+// ============================================
+
+/**
+ * Get relative luminance of a color (WCAG 2.1 formula)
+ * Uses proper sRGB linearization with gamma correction
+ */
+export function getRelativeLuminance(hex: string): number {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return 0;
+  const [rs, gs, bs] = [rgb.r / 255, rgb.g / 255, rgb.b / 255].map(c =>
+    c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+  );
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+/**
+ * Get WCAG 2.1 contrast ratio between two colors
+ * Returns a value between 1:1 and 21:1
+ */
+export function getContrastRatio(hex1: string, hex2: string): number {
+  const l1 = getRelativeLuminance(hex1);
+  const l2 = getRelativeLuminance(hex2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/**
+ * Check if contrast ratio meets WCAG level
+ * AA: 4.5:1 for normal text, AAA: 7:1
+ */
+export function meetsWCAG(ratio: number, level: 'AA' | 'AAA' = 'AA'): boolean {
+  return level === 'AAA' ? ratio >= 7 : ratio >= 4.5;
+}
+
+/**
+ * Format contrast ratio as readable string (e.g. "4.5:1")
+ */
+export function formatContrastRatio(ratio: number): string {
+  return `${ratio.toFixed(1)}:1`;
+}
+
+// ============================================
 // SHADE GENERATION (Tailwind-style 50-950)
 // ============================================
 
@@ -241,13 +288,16 @@ export interface BrandPalette {
 }
 
 /**
- * Generate the complete brand palette from 2 colors + mode.
- * The primary and accent colors become the 500 shade, all others are auto-generated.
+ * Generate the complete brand palette from brand colors + mode.
+ * Primary and accent colors become the 500 shade, all others are auto-generated.
+ * Background and text colors define the surface/text; mode determines derivation direction.
  */
 export function generateBrandPalette(
   primaryColor: string,
   accentColor: string,
-  mode: ColorMode
+  mode: ColorMode,
+  backgroundColor: string = '#171717',
+  textColor: string = '#efefef',
 ): BrandPalette {
   const primary = generateShades(primaryColor);
   const accent = generateShades(accentColor);
@@ -257,33 +307,34 @@ export function generateBrandPalette(
       primary,
       accent,
       background: {
-        primary: '#0a0a0a',
-        secondary: '#111111',
-        tertiary: '#1a1a1a',
+        primary: backgroundColor,
+        secondary: lighten(backgroundColor, 4),
+        tertiary: lighten(backgroundColor, 8),
       },
       text: {
-        primary: '#ffffff',
-        secondary: '#d1d5db',
-        muted: '#9ca3af',
+        primary: textColor,
+        secondary: darken(textColor, 18),
+        muted: darken(textColor, 38),
       },
-      border: '#333333',
+      border: lighten(backgroundColor, 16),
     };
   }
 
+  // Light mode: use provided bg/text (defaults to white/dark)
   return {
     primary,
     accent,
     background: {
-      primary: '#ffffff',
-      secondary: '#fafafa',
-      tertiary: '#f0f0f0',
+      primary: backgroundColor,
+      secondary: darken(backgroundColor, 2),
+      tertiary: darken(backgroundColor, 5),
     },
     text: {
-      primary: '#111827',
-      secondary: '#374151',
-      muted: '#6b7280',
+      primary: textColor,
+      secondary: lighten(textColor, 25),
+      muted: lighten(textColor, 45),
     },
-    border: '#d4d4d4',
+    border: darken(backgroundColor, 12),
   };
 }
 
@@ -308,23 +359,33 @@ export interface GeneratedPalette {
 
 /**
  * Generate 2 dark palettes derived from brand colors.
- * 1. Dark — Neutral dark bg, primary as accent
+ * 1. Dark — Neutral dark bg (from background input), primary as accent
  * 2. Brand Dark — Subtle brand tint in bg, accent as accent
  */
-export function generateDarkPalettes(primary: string, accent: string): GeneratedPalette[] {
+export function generateDarkPalettes(
+  primary: string,
+  accent: string,
+  background: string = '#171717',
+  text: string = '#efefef',
+): GeneratedPalette[] {
+  const bgSecondary = lighten(background, 4);
+  const bgTertiary = lighten(background, 8);
+  const textSecondary = darken(text, 38);
+  const borderColor = lighten(background, 14);
+
   return [
     {
       id: 'dark',
       name: 'Dark',
       mode: 'dark',
       colors: {
-        bgPrimary: '#0a0a0a',
-        bgSecondary: '#141414',
-        bgTertiary: '#1f1f1f',
-        textPrimary: '#ffffff',
-        textSecondary: '#a1a1aa',
+        bgPrimary: background,
+        bgSecondary,
+        bgTertiary,
+        textPrimary: text,
+        textSecondary,
         accent: primary,
-        borderColor: '#27272a',
+        borderColor,
       },
     },
     {
@@ -332,13 +393,13 @@ export function generateDarkPalettes(primary: string, accent: string): Generated
       name: 'Brand Dark',
       mode: 'dark',
       colors: {
-        bgPrimary: mixColors('#0a0a0a', primary, 4),
-        bgSecondary: mixColors('#141414', primary, 6),
-        bgTertiary: mixColors('#1f1f1f', primary, 5),
-        textPrimary: '#ffffff',
-        textSecondary: mixColors('#a1a1aa', primary, 15),
+        bgPrimary: mixColors(background, primary, 4),
+        bgSecondary: mixColors(bgSecondary, primary, 6),
+        bgTertiary: mixColors(bgTertiary, primary, 5),
+        textPrimary: text,
+        textSecondary: mixColors(textSecondary, primary, 15),
         accent: accent,
-        borderColor: mixColors('#27272a', primary, 12),
+        borderColor: mixColors(borderColor, primary, 12),
       },
     },
   ];
@@ -349,20 +410,32 @@ export function generateDarkPalettes(primary: string, accent: string): Generated
  * 1. Light — Clean white bg, primary as accent
  * 2. Brand Light — Subtle brand tint in bg, accent as accent
  */
-export function generateLightPalettes(primary: string, accent: string): GeneratedPalette[] {
+export function generateLightPalettes(
+  primary: string,
+  accent: string,
+  background: string = '#ffffff',
+  text: string = '#18181b',
+): GeneratedPalette[] {
+  const bgPrimary = background;
+  const bgSecondary = darken(background, 2);
+  const bgTertiary = darken(background, 4);
+  const textPrimary = text;
+  const textSecondary = lighten(text, 30);
+  const borderColor = darken(background, 10);
+
   return [
     {
       id: 'light',
       name: 'Light',
       mode: 'light',
       colors: {
-        bgPrimary: '#ffffff',
-        bgSecondary: '#fafafa',
-        bgTertiary: '#f5f5f5',
-        textPrimary: '#18181b',
-        textSecondary: '#52525b',
+        bgPrimary,
+        bgSecondary,
+        bgTertiary,
+        textPrimary,
+        textSecondary,
         accent: primary,
-        borderColor: '#e4e4e7',
+        borderColor,
       },
     },
     {
@@ -370,13 +443,13 @@ export function generateLightPalettes(primary: string, accent: string): Generate
       name: 'Brand Light',
       mode: 'light',
       colors: {
-        bgPrimary: mixColors('#ffffff', primary, 2),
-        bgSecondary: mixColors('#fafafa', primary, 4),
-        bgTertiary: mixColors('#f5f5f5', primary, 6),
-        textPrimary: '#18181b',
-        textSecondary: mixColors('#52525b', primary, 10),
+        bgPrimary: mixColors(bgPrimary, primary, 2),
+        bgSecondary: mixColors(bgSecondary, primary, 4),
+        bgTertiary: mixColors(bgTertiary, primary, 6),
+        textPrimary,
+        textSecondary: mixColors(textSecondary, primary, 10),
         accent: accent,
-        borderColor: mixColors('#e4e4e7', primary, 10),
+        borderColor: mixColors(borderColor, primary, 10),
       },
     },
   ];
@@ -385,9 +458,14 @@ export function generateLightPalettes(primary: string, accent: string): Generate
 /**
  * Generate all palettes from brand colors (2 dark + 2 light = 4 total)
  */
-export function generateAllPalettes(primary: string, accent: string): GeneratedPalette[] {
+export function generateAllPalettes(
+  primary: string,
+  accent: string,
+  background: string = '#171717',
+  text: string = '#efefef',
+): GeneratedPalette[] {
   return [
-    ...generateDarkPalettes(primary, accent),
+    ...generateDarkPalettes(primary, accent, background, text),
     ...generateLightPalettes(primary, accent),
   ];
 }

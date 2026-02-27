@@ -1,11 +1,6 @@
 import * as React from "react"
-import { HexColorPicker } from "react-colorful"
-import { Popover, PopoverContent, PopoverTrigger } from "./popover"
-import { Button } from "./button"
-import { Input } from "./input"
-import { Label } from "./label"
+import { HexAlphaColorPicker } from "react-colorful"
 import { cn } from "@/lib/utils"
-import { Paintbrush } from "lucide-react"
 
 interface ColorPickerProps {
   value: string
@@ -14,67 +9,66 @@ interface ColorPickerProps {
   disabled?: boolean
 }
 
-const ColorPicker = React.forwardRef<HTMLButtonElement, ColorPickerProps>(
+const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
   ({ value, onChange, className, disabled }, ref) => {
     const [open, setOpen] = React.useState(false)
+    const [inputValue, setInputValue] = React.useState(value?.replace("#", "") || "")
+
+    // Sync input when value changes externally (e.g. from color picker canvas)
+    React.useEffect(() => {
+      setInputValue(value?.replace("#", "") || "")
+    }, [value])
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const hex = e.target.value.replace(/[^0-9a-fA-F]/g, "").slice(0, 8)
+      setInputValue(hex)
+      // Accept 3, 4 (with alpha), 6, or 8 (with alpha) chars
+      if (hex.length === 6 || hex.length === 8 || hex.length === 3 || hex.length === 4) {
+        onChange(`#${hex}`)
+      }
+    }
 
     return (
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            ref={ref}
-            variant="outline"
-            size="sm"
+      <div ref={ref} className={cn("space-y-1.5", className)}>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
             disabled={disabled}
+            onClick={() => !disabled && setOpen((p) => !p)}
             className={cn(
-              "w-full justify-start text-left font-normal",
-              !value && "text-muted-foreground",
-              className
+              "h-7 w-7 rounded border border-zinc-600 shrink-0 cursor-pointer",
+              "hover:ring-1 hover:ring-zinc-500 hover:ring-offset-1 hover:ring-offset-zinc-900",
+              "transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500",
+              disabled && "opacity-50 cursor-not-allowed"
             )}
-          >
-            <div className="flex w-full items-center gap-2">
-              {value ? (
-                <div
-                  className="h-4 w-4 rounded-sm border border-border"
-                  style={{ backgroundColor: value }}
-                />
-              ) : (
-                <Paintbrush className="h-4 w-4" />
+            style={{ backgroundColor: value || "#000000" }}
+          />
+          <div className="relative flex-1 min-w-0">
+            <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[11px] text-zinc-500 pointer-events-none select-none">
+              #
+            </span>
+            <input
+              value={inputValue}
+              onChange={handleInputChange}
+              disabled={disabled}
+              maxLength={8}
+              className={cn(
+                "w-full h-7 rounded border border-zinc-700 bg-zinc-800 text-zinc-100",
+                "pl-4 pr-1.5 font-mono text-[11px] uppercase",
+                "focus:outline-none focus:border-zinc-500",
+                "disabled:opacity-50 disabled:cursor-not-allowed",
               )}
-              <div className="flex-1 truncate">
-                {value || "Pick a color"}
-              </div>
-            </div>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          className="w-auto p-3 bg-popover border-border shadow-lg"
-          align="start"
-        >
-          <div className="flex flex-col gap-3">
-            <HexColorPicker color={value || "#000000"} onChange={onChange} />
-            <div className="flex items-center gap-2">
-              <Label className="text-xs text-muted-foreground">HEX</Label>
-              <div className="relative flex-1">
-                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                  #
-                </span>
-                <Input
-                  value={value?.replace("#", "") || ""}
-                  onChange={(e) => {
-                    const hex = e.target.value.replace(/[^0-9a-fA-F]/g, "").slice(0, 6)
-                    if (hex.length === 6 || hex.length === 3) {
-                      onChange(`#${hex}`)
-                    }
-                  }}
-                  className="h-8 pl-5 font-mono text-xs uppercase bg-background border-input text-foreground"
-                  maxLength={6}
-                />
-              </div>
-            </div>
+            />
           </div>
-        </PopoverContent>
-      </Popover>
+        </div>
+        {open && (
+          <HexAlphaColorPicker
+            color={value || "#000000ff"}
+            onChange={onChange}
+            style={{ width: "100%" }}
+          />
+        )}
+      </div>
     )
   }
 )

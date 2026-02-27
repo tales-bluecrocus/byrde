@@ -5,7 +5,7 @@
  * When L2 is open it slides over L1 so page content stays visible.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -31,6 +31,7 @@ import { PageAdvancedPanel } from './panels/PageAdvancedPanel';
 import { SiteSettingsPanel } from './panels/SiteSettingsPanel';
 import { useSettingsContext } from '../../context/SettingsContext';
 import type { ThemeSettings } from '../../hooks/useSettings';
+import { DEFAULT_SETTINGS } from '../../hooks/useSettings';
 import {
   ChevronRight,
   ChevronLeft,
@@ -212,7 +213,59 @@ function flatToNestedSettings(flat: ThemeSettings) {
       from_email: flat.contact_form_from_email,
       subject: flat.contact_form_subject,
     },
+    brand_colors: {
+      dark_primary: flat.brand_dark_primary,
+      dark_accent: flat.brand_dark_accent,
+      dark_bg: flat.brand_dark_bg,
+      dark_text: flat.brand_dark_text,
+      light_primary: flat.brand_light_primary,
+      light_accent: flat.brand_light_accent,
+      light_bg: flat.brand_light_bg,
+      light_text: flat.brand_light_text,
+      mode: flat.brand_mode,
+    },
   };
+}
+
+/**
+ * Bridge: syncs brand colors from SettingsContext → GlobalConfigContext
+ * so palette auto-regenerates when the user changes colors in Site Settings.
+ */
+function BrandColorSync() {
+  const { settings } = useSettingsContext();
+  const { globalConfig, updateBrand } = useGlobalConfig();
+
+  useEffect(() => {
+    const updates: Partial<import('../../context/GlobalConfigContext').BrandColors> = {
+      darkPrimary: settings.brand_dark_primary,
+      darkAccent: settings.brand_dark_accent,
+      darkBg: settings.brand_dark_bg,
+      darkText: settings.brand_dark_text,
+      lightPrimary: settings.brand_light_primary,
+      lightAccent: settings.brand_light_accent,
+      lightBg: settings.brand_light_bg,
+      lightText: settings.brand_light_text,
+    };
+    // When no per-page override, sync mode from site default
+    if (!globalConfig.brand.modeOverride) {
+      updates.mode = (settings.brand_mode || 'dark') as 'dark' | 'light';
+    }
+    updateBrand(updates);
+  }, [
+    settings.brand_dark_primary,
+    settings.brand_dark_accent,
+    settings.brand_dark_bg,
+    settings.brand_dark_text,
+    settings.brand_light_primary,
+    settings.brand_light_accent,
+    settings.brand_light_bg,
+    settings.brand_light_text,
+    settings.brand_mode,
+    globalConfig.brand.modeOverride,
+    updateBrand,
+  ]);
+
+  return null;
 }
 
 export function ThemeEditor() {
@@ -225,8 +278,23 @@ export function ThemeEditor() {
   const { globalConfig, resetGlobalConfig } = useGlobalConfig();
   const { headerConfig, topbarConfig } = useHeaderConfig();
   const { sectionContent } = useContent();
-  const { settings } = useSettingsContext();
+  const { settings, updateSettings } = useSettingsContext();
   const { toast } = useToast();
+
+  // Brand color defaults for resetting SettingsContext
+  const resetBrandColors = useCallback(() => {
+    updateSettings({
+      brand_dark_primary: DEFAULT_SETTINGS.brand_dark_primary,
+      brand_dark_accent: DEFAULT_SETTINGS.brand_dark_accent,
+      brand_dark_bg: DEFAULT_SETTINGS.brand_dark_bg,
+      brand_dark_text: DEFAULT_SETTINGS.brand_dark_text,
+      brand_light_primary: DEFAULT_SETTINGS.brand_light_primary,
+      brand_light_accent: DEFAULT_SETTINGS.brand_light_accent,
+      brand_light_bg: DEFAULT_SETTINGS.brand_light_bg,
+      brand_light_text: DEFAULT_SETTINGS.brand_light_text,
+      brand_mode: DEFAULT_SETTINGS.brand_mode,
+    });
+  }, [updateSettings]);
 
   const wpAdmin = typeof window !== 'undefined' ? window.byrdeAdmin : null;
 
@@ -321,8 +389,9 @@ export function ThemeEditor() {
   const handleResetAll = useCallback(() => {
     resetGlobalConfig();
     resetAllSectionThemes();
+    resetBrandColors();
     toast('All settings reset to defaults', 'info');
-  }, [resetGlobalConfig, resetAllSectionThemes, toast]);
+  }, [resetGlobalConfig, resetAllSectionThemes, resetBrandColors, toast]);
 
   const isPageDesign = selectedSection === 'page-design';
   const isSiteSettings = selectedSection === 'site-settings';
@@ -334,6 +403,7 @@ export function ThemeEditor() {
 
   return (
     <>
+      <BrandColorSync />
       {/* Floating toggle button - shown when sidebar is closed */}
       {!isOpen && (
         <button
@@ -563,6 +633,7 @@ export function ThemeEditor() {
                   size="sm"
                   onClick={() => {
                     resetGlobalConfig();
+                    resetBrandColors();
                     toast('Design reset to defaults', 'info');
                   }}
                   className="w-full text-zinc-500 hover:text-red-400 hover:bg-zinc-900 text-xs h-7"

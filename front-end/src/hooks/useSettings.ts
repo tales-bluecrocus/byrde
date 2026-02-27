@@ -14,6 +14,17 @@ export interface ThemeSettings {
   phone_raw: string;
   email: string;
 
+  // Brand Colors (site-wide, per-mode)
+  brand_dark_primary: string;
+  brand_dark_accent: string;
+  brand_dark_bg: string;
+  brand_dark_text: string;
+  brand_light_primary: string;
+  brand_light_accent: string;
+  brand_light_bg: string;
+  brand_light_text: string;
+  brand_mode: string;
+
   // Google Reviews
   google_rating: string;
   google_reviews_count: string;
@@ -73,6 +84,17 @@ export const DEFAULT_SETTINGS: ThemeSettings = {
   phone: '',
   phone_raw: '',
   email: '',
+
+  // Brand Colors (per-mode)
+  brand_dark_primary: '#3ab342',
+  brand_dark_accent: '#f97316',
+  brand_dark_bg: '#171717',
+  brand_dark_text: '#efefef',
+  brand_light_primary: '#3ab342',
+  brand_light_accent: '#f97316',
+  brand_light_bg: '#ffffff',
+  brand_light_text: '#2a2a2a',
+  brand_mode: 'dark',
 
   // Google Reviews
   google_rating: '5.0',

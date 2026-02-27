@@ -1,12 +1,9 @@
-import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import {
   generateBrandPalette,
-  generateDarkPalettes,
-  generateLightPalettes,
   type ColorMode,
   type BrandPalette,
-  type GeneratedPalette,
 } from '../utils/colorUtils';
 
 // Trust badge configuration
@@ -15,11 +12,19 @@ export interface TrustBadge {
   sublabel?: string;
 }
 
-// Brand color configuration (Primary + Accent system)
+// Brand color configuration (per-mode primary, accent, bg, text)
 export interface BrandColors {
-  primary: string;
-  accent: string;  // Second color used as accent across sections
+  darkPrimary: string;
+  darkAccent: string;
+  darkBg: string;
+  darkText: string;
+  lightPrimary: string;
+  lightAccent: string;
+  lightBg: string;
+  lightText: string;
   mode: ColorMode;
+  // Per-page override: null = inherit site default, 'dark'/'light' = explicit override
+  modeOverride?: 'dark' | 'light' | null;
 }
 
 // Logo shape options
@@ -60,9 +65,8 @@ export interface SeoConfig {
 }
 
 // Global configuration that applies across all sections
-// Note: Google Reviews data now comes from WordPress via useSettings()
 export interface GlobalConfig {
-  // Brand colors system
+  // Brand colors system (from site settings)
   brand: BrandColors;
   // Logo settings (shared between header/footer)
   logo: LogoConfig;
@@ -79,23 +83,9 @@ export interface GlobalConfig {
   seo: SeoConfig;
 }
 
-// Generated palettes type
-interface GeneratedPalettesState {
-  dark: GeneratedPalette[];
-  light: GeneratedPalette[];
-  all: GeneratedPalette[];
-  generatedFrom: { primary: string; accent: string } | null;
-}
-
 interface GlobalConfigContextType {
   globalConfig: GlobalConfig;
   palette: BrandPalette;
-  // Generated palettes based on brand colors
-  generatedPalettes: GeneratedPalettesState;
-  // Check if colors have changed since last generation
-  needsRegeneration: boolean;
-  // Manually trigger palette generation
-  generatePalettes: () => void;
   updateGlobalConfig: (updates: Partial<GlobalConfig>) => void;
   updateBrand: (updates: Partial<BrandColors>) => void;
   updateLogo: (updates: Partial<LogoConfig>) => void;
@@ -109,9 +99,16 @@ interface GlobalConfigContextType {
 
 const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
   brand: {
-    primary: '#3ab342',
-    accent: '#f97316',  // Orange as default accent
+    darkPrimary: '#3ab342',
+    darkAccent: '#f97316',
+    darkBg: '#171717',
+    darkText: '#efefef',
+    lightPrimary: '#3ab342',
+    lightAccent: '#f97316',
+    lightBg: '#ffffff',
+    lightText: '#2a2a2a',
     mode: 'dark',
+    modeOverride: null,
   },
   logo: {
     bgColor: '#ffffff',
@@ -135,9 +132,7 @@ const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
       sublabel: 'Service Available',
     },
   },
-  form: {
-    // All optional - uses defaults when undefined
-  },
+  form: {},
   seo: {
     siteName: '',
     tagline: '',
@@ -150,12 +145,10 @@ const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
 const getWpConfig = (): GlobalConfig | null => {
   if (typeof window === 'undefined') return null;
 
-  // Check admin config first (has apiUrl, nonce, etc.) - CORRECT KEY: globalConfig
   if (window.byrdeAdmin?.config?.globalConfig) {
     return window.byrdeAdmin.config.globalConfig as GlobalConfig;
   }
 
-  // Check public page config (just the config object) - CORRECT KEY: globalConfig
   if (window.byrdeConfig?.globalConfig) {
     return window.byrdeConfig.globalConfig as GlobalConfig;
   }
@@ -164,79 +157,61 @@ const getWpConfig = (): GlobalConfig | null => {
 };
 
 function loadConfig(): GlobalConfig {
-  // Load from WordPress config, fall back to defaults
   const wpConfig = getWpConfig();
-  if (wpConfig) {
-    return { ...DEFAULT_GLOBAL_CONFIG, ...wpConfig };
-  }
-  return DEFAULT_GLOBAL_CONFIG;
-}
+  const base = wpConfig
+    ? { ...DEFAULT_GLOBAL_CONFIG, ...wpConfig }
+    : { ...DEFAULT_GLOBAL_CONFIG };
 
-function generateInitialPalettes(brand: BrandColors): GeneratedPalettesState {
-  const dark = generateDarkPalettes(brand.primary, brand.accent);
-  const light = generateLightPalettes(brand.primary, brand.accent);
-  return {
-    dark,
-    light,
-    all: [...dark, ...light],
-    generatedFrom: { primary: brand.primary, accent: brand.accent },
-  };
+  // Strip deprecated fields from old saved configs
+  delete (base as any).brandOverrides;
+  delete (base as any).customColors;
+
+  // Brand colors come from site settings (not page config)
+  const s = typeof window !== 'undefined' ? window.byrdeSettings : undefined;
+
+  // Resolve effective mode: page override > site default > 'dark'
+  const modeOverride = base.brand.modeOverride ?? null;
+  const siteMode = (s?.brand_mode || 'dark') as ColorMode;
+  const effectiveMode: ColorMode = modeOverride ?? siteMode;
+
+  if (s) {
+    base.brand = {
+      darkPrimary: s.brand_dark_primary || base.brand.darkPrimary,
+      darkAccent: s.brand_dark_accent || base.brand.darkAccent,
+      darkBg: s.brand_dark_bg || base.brand.darkBg,
+      darkText: s.brand_dark_text || base.brand.darkText,
+      lightPrimary: s.brand_light_primary || base.brand.lightPrimary,
+      lightAccent: s.brand_light_accent || base.brand.lightAccent,
+      lightBg: s.brand_light_bg || base.brand.lightBg,
+      lightText: s.brand_light_text || base.brand.lightText,
+      mode: effectiveMode,
+      modeOverride,
+    };
+  } else {
+    base.brand.mode = effectiveMode;
+    base.brand.modeOverride = modeOverride;
+  }
+
+  return base;
 }
 
 const GlobalConfigContext = createContext<GlobalConfigContextType | undefined>(undefined);
 
 export function GlobalConfigProvider({ children }: { children: ReactNode }) {
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(loadConfig);
-  const [generatedPalettes, setGeneratedPalettes] = useState<GeneratedPalettesState>(() =>
-    generateInitialPalettes(loadConfig().brand)
-  );
 
-  // Generate the brand palette based on current config (auto-updates for surface colors)
+  // Generate the brand palette directly from brand colors
   const palette = useMemo(() => {
+    const b = globalConfig.brand;
+    const isDark = b.mode === 'dark';
     return generateBrandPalette(
-      globalConfig.brand.primary,
-      globalConfig.brand.accent,
-      globalConfig.brand.mode
+      isDark ? b.darkPrimary : b.lightPrimary,
+      isDark ? b.darkAccent : b.lightAccent,
+      b.mode,
+      isDark ? b.darkBg : b.lightBg,
+      isDark ? b.darkText : b.lightText,
     );
   }, [globalConfig.brand]);
-
-  // Check if colors have changed since last generation
-  const needsRegeneration = useMemo(() => {
-    if (!generatedPalettes.generatedFrom) return true;
-    return (
-      generatedPalettes.generatedFrom.primary !== globalConfig.brand.primary ||
-      generatedPalettes.generatedFrom.accent !== globalConfig.brand.accent
-    );
-  }, [generatedPalettes.generatedFrom, globalConfig.brand]);
-
-  // Manual palette generation function
-  const generatePalettes = useCallback(() => {
-    const dark = generateDarkPalettes(
-      globalConfig.brand.primary,
-      globalConfig.brand.accent
-    );
-    const light = generateLightPalettes(
-      globalConfig.brand.primary,
-      globalConfig.brand.accent
-    );
-    const newPalettes: GeneratedPalettesState = {
-      dark,
-      light,
-      all: [...dark, ...light],
-      generatedFrom: {
-        primary: globalConfig.brand.primary,
-        accent: globalConfig.brand.accent,
-      },
-    };
-    setGeneratedPalettes(newPalettes);
-  }, [globalConfig.brand]);
-
-  // Auto-regenerate palettes when brand colors change
-  useEffect(() => {
-    if (needsRegeneration) {
-      generatePalettes();
-    }
-  }, [needsRegeneration, generatePalettes]);
 
   const updateGlobalConfig = useCallback((updates: Partial<GlobalConfig>) => {
     setGlobalConfig((prev) => ({ ...prev, ...updates }));
@@ -300,9 +275,6 @@ export function GlobalConfigProvider({ children }: { children: ReactNode }) {
       value={{
         globalConfig,
         palette,
-        generatedPalettes,
-        needsRegeneration,
-        generatePalettes,
         updateGlobalConfig,
         updateBrand,
         updateLogo,

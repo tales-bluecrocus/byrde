@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
+import { useSectionPalette } from '../hooks/useSectionPalette';
 import { useContent, type FeatureItem } from '../context/ContentContext';
 import { renderHeadlineStyled } from '../utils/renderHeadline';
 import { getContrastColor, withAlpha } from '../utils/colorUtils';
@@ -22,23 +23,24 @@ const FeatureIcon = memo(({ feature }: { feature: FeatureItem }) => {
 FeatureIcon.displayName = 'FeatureIcon';
 
 export default function MidPageCTA() {
-  const { globalConfig, palette } = useGlobalConfig();
+  const { globalConfig } = useGlobalConfig();
   const { sectionThemes } = useSectionTheme();
+  const palette = useSectionPalette('mid-cta');
   const { getContent } = useContent();
   const content = getContent('mid-cta');
   const ctaTheme = sectionThemes['mid-cta'] || {};
 
-  // Use CTA palette colors if overriding, otherwise fall back to global
+  // Use CTA palette colors if overriding, otherwise fall back to section palette
   const isOverriding = ctaTheme.overrideGlobalColors ?? false;
   const hasBgImage = !!ctaTheme.bgImage;
 
-  // Section colors - properly integrated with theme system
+  // Section colors - section palette already reflects paletteMode
   const bgPrimary = isOverriding
     ? (ctaTheme.bgPrimary || palette.background.primary)
     : palette.background.primary;
   const accentColor = isOverriding
-    ? (ctaTheme.accent || globalConfig.brand.primary)
-    : globalConfig.brand.primary;
+    ? (ctaTheme.accent || palette.primary[500])
+    : palette.primary[500];
   const textPrimary = isOverriding
     ? (ctaTheme.textPrimary || palette.text.primary)
     : palette.text.primary;
@@ -46,12 +48,12 @@ export default function MidPageCTA() {
     ? (ctaTheme.textSecondary || palette.text.secondary)
     : palette.text.secondary;
 
-  // Determine if section is light or dark for proper contrast
-  const sectionIsLight = isOverriding && ctaTheme.paletteMode === 'light';
-  const isLightMode = isOverriding ? sectionIsLight : globalConfig.brand.mode === 'light';
+  // Determine if section is light or dark
+  const effectiveMode = ctaTheme.paletteMode || globalConfig.brand.mode;
+  const isLightMode = effectiveMode === 'light';
 
   // Button colors with proper contrast
-  const buttonBg = accentColor;
+  const buttonBg = ctaTheme.buttonStyle === 2 ? accentColor : palette.primary[500];
   const buttonText = getContrastColor(buttonBg);
 
   // Badge colors - inverted for visibility

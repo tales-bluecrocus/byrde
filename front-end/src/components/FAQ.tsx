@@ -96,9 +96,10 @@ export default function FAQ() {
                   }`}
                 >
                   <div className="px-6 pb-6 pt-0">
-                    <p className="section-text-secondary leading-relaxed">
-                      {faq.answer}
-                    </p>
+                    <p
+                      className="section-text-secondary leading-relaxed [&_a]:text-primary-500 [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-80"
+                      dangerouslySetInnerHTML={{ __html: faq.answer }}
+                    />
                   </div>
                 </div>
               </div>

@@ -217,7 +217,7 @@ export default function Header() {
 	// Use header palette colors if overriding, otherwise fall back to global
 	const isOverriding = headerTheme.overrideGlobalColors ?? false;
 	const bgColor = isOverriding ? (headerTheme.bgPrimary || palette.background.primary) : palette.background.primary;
-	const accentColor = isOverriding ? (headerTheme.accent || globalConfig.brand.accent) : globalConfig.brand.accent;
+	const accentColor = isOverriding ? (headerTheme.accent || palette.accent[500]) : palette.accent[500];
 	const textPrimary = isOverriding ? (headerTheme.textPrimary || palette.text.primary) : palette.text.primary;
 
 	// Measure header height via ResizeObserver (avoids forced reflow from offsetHeight)

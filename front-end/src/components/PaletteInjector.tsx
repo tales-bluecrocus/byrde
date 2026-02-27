@@ -4,8 +4,6 @@ import { withAlpha } from '../utils/colorUtils';
 
 /**
  * Injects CSS variables based on the current brand palette.
- * Sets full 50-950 shade scales for primary + accent colors,
- * plus semantic tokens (button, text, background, border).
  *
  * In editor mode, injects into #root only (isolates from admin sidebar).
  */

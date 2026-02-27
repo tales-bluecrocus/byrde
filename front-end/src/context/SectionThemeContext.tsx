@@ -1,9 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import type { GeneratedPalette } from '../utils/colorUtils';
-
-// Re-export for convenience
-export type SectionPalette = GeneratedPalette;
 
 // Section theme configuration
 export interface SectionTheme {
@@ -11,6 +7,7 @@ export interface SectionTheme {
   overrideGlobalColors?: boolean; // If true, use palette colors instead of global
   paletteId?: string;             // ID of the selected palette (only used when override is true)
   paletteMode?: 'dark' | 'light'; // Individual dark/light mode for this section
+  buttonStyle?: 1 | 2;            // 1 = primary color, 2 = accent color
 
   // Palette colors (applied when overrideGlobalColors is true)
   bgPrimary?: string;
@@ -31,11 +28,10 @@ export interface SectionTheme {
   bgImageOverlayColor?: string; // Custom overlay color on top of image
 }
 
-// Resolved theme with all colors (palette + overrides)
+// Resolved theme with all colors
 export interface ResolvedSectionTheme {
   overrideGlobalColors: boolean;
   paletteId?: string;
-  palette?: SectionPalette;
   bgPrimary?: string;
   bgSecondary?: string;
   bgTertiary?: string;
@@ -98,7 +94,6 @@ interface SectionThemeContextType {
   resetAllSectionThemes: () => void;
   getSectionStyles: (sectionId: SectionId) => React.CSSProperties;
   getResolvedTheme: (sectionId: SectionId) => ResolvedSectionTheme;
-  setSectionPalette: (sectionId: SectionId, palette: SectionPalette) => void;
   setOverrideGlobalColors: (sectionId: SectionId, override: boolean) => void;
   setSectionVisibility: (sectionId: SectionId, visible: boolean) => void;
   isSectionVisible: (sectionId: SectionId) => boolean;
@@ -216,28 +211,6 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
     setSectionOrder(DEFAULT_SECTION_ORDER);
   }, []);
 
-  // Set palette for a section - receives the full palette object (dynamically generated)
-  // Automatically enables overrideGlobalColors when a palette is selected
-  const setSectionPalette = useCallback((sectionId: SectionId, palette: SectionPalette) => {
-    setSectionThemes(prev => ({
-      ...prev,
-      [sectionId]: {
-        ...prev[sectionId],
-        overrideGlobalColors: true, // Enable override when palette is selected
-        paletteId: palette.id,
-        paletteMode: palette.mode, // Auto-set mode based on palette type
-        // Apply palette colors directly from the passed palette object
-        bgPrimary: palette.colors.bgPrimary,
-        bgSecondary: palette.colors.bgSecondary,
-        bgTertiary: palette.colors.bgTertiary,
-        textPrimary: palette.colors.textPrimary,
-        textSecondary: palette.colors.textSecondary,
-        accent: palette.colors.accent,
-        borderColor: palette.colors.borderColor,
-      },
-    }));
-  }, []);
-
   // Toggle override of global colors for a section
   // When override is turned OFF, reset all palette colors to use global defaults
   const setOverrideGlobalColors = useCallback((sectionId: SectionId, override: boolean) => {
@@ -283,7 +256,6 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
     return {
       overrideGlobalColors: theme.overrideGlobalColors ?? false,
       paletteId: theme.paletteId,
-      palette: undefined, // Palette colors are stored directly in theme
       bgPrimary: theme.bgPrimary,
       bgSecondary: theme.bgSecondary,
       bgTertiary: theme.bgTertiary,
@@ -410,7 +382,6 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
         resetAllSectionThemes,
         getSectionStyles,
         getResolvedTheme,
-        setSectionPalette,
         setOverrideGlobalColors,
         setSectionVisibility,
         isSectionVisible,

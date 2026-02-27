@@ -1,232 +1,126 @@
 /**
- * Style Panel - Section color customization
- * Light theme with explicit Tailwind colors
+ * Style Panel - Per-section mode override + button style
  */
 
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Card, CardContent } from '@/components/ui/card';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { useSectionTheme, type SectionId } from '../../../context/SectionThemeContext';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Moon, Sun, Monitor, Globe } from 'lucide-react';
+import { useSectionTheme } from '../../../context/SectionThemeContext';
 import { useGlobalConfig } from '../../../context/GlobalConfigContext';
-import type { SectionPalette } from '../../../config/sectionPalettes';
-import { useToast } from '../../Toast';
-import { Check, Palette } from 'lucide-react';
+import type { SectionId } from '../../../context/SectionThemeContext';
 
 interface StylePanelProps {
   sectionId: SectionId;
 }
 
+const FIXED_SECTIONS: SectionId[] = ['topheader', 'header', 'footer'];
+
 export function StylePanel({ sectionId }: StylePanelProps) {
-  const { sectionThemes, updateSectionTheme, setOverrideGlobalColors, setSectionPalette } = useSectionTheme();
-  const { globalConfig, generatedPalettes } = useGlobalConfig();
-  const { toast } = useToast();
-
+  const { sectionThemes, updateSectionTheme } = useSectionTheme();
+  const { globalConfig, palette } = useGlobalConfig();
   const theme = sectionThemes[sectionId] || {};
-  const overrideGlobal = theme.overrideGlobalColors ?? false;
+  const pageMode = globalConfig.brand.mode;
 
-  const handleToggleOverride = (checked: boolean) => {
-    setOverrideGlobalColors(sectionId, checked);
-    toast(checked ? 'Custom colors enabled' : 'Using global colors', 'info');
-  };
+  const primaryColor = palette.primary[500];
+  const accentColor = palette.accent[500];
+  const buttonStyle = theme.buttonStyle ?? 1;
 
-  const handleSelectPalette = (paletteId: string) => {
-    const palette = generatedPalettes.all.find((p: SectionPalette) => p.id === paletteId);
-    if (palette) {
-      setSectionPalette(sectionId, palette);
-      toast(`Applied ${palette.name} palette`, 'success');
-    }
-  };
+  // Button style toggle (shared by fixed and non-fixed sections)
+  const buttonStyleToggle = (
+    <div>
+      <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+        Button Style
+      </Label>
+      <ToggleGroup
+        type="single"
+        value={String(buttonStyle)}
+        onValueChange={(val) => {
+          if (!val) return;
+          updateSectionTheme(sectionId, { buttonStyle: Number(val) as 1 | 2 });
+        }}
+        className="w-full bg-zinc-800 p-1 rounded-lg mt-2"
+      >
+        <ToggleGroupItem value="1" className="flex-1 gap-2 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          <span className="h-3 w-3 rounded-sm shrink-0" style={{ backgroundColor: primaryColor }} />
+          Primary
+        </ToggleGroupItem>
+        <ToggleGroupItem value="2" className="flex-1 gap-2 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          <span className="h-3 w-3 rounded-sm shrink-0" style={{ backgroundColor: accentColor }} />
+          Accent
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </div>
+  );
 
-  return (
-    <div className="space-y-5 text-zinc-200">
-      {/* Override Toggle */}
-      <Card className="bg-zinc-800/50 border-zinc-800">
-        <CardContent className="flex items-center justify-between p-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-800">
-              <Palette className="h-4 w-4 text-zinc-400" />
-            </div>
+  // Fixed sections (header/footer) always follow the page mode
+  if (FIXED_SECTIONS.includes(sectionId)) {
+    return (
+      <div className="space-y-5 text-zinc-200">
+        <div>
+          <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            Section Mode
+          </Label>
+          <div className="mt-3 flex items-start gap-3 p-3 rounded-lg bg-zinc-800/50 border border-zinc-800">
+            <Globe className="h-4 w-4 text-zinc-400 mt-0.5 shrink-0" />
             <div>
-              <Label className="text-xs font-medium text-zinc-200">Custom Colors</Label>
-              <p className="text-[10px] text-zinc-500">
-                {overrideGlobal ? 'Using custom colors' : 'Using global colors'}
+              <p className="text-xs font-medium text-zinc-300">Follows page theme mode</p>
+              <p className="text-[11px] text-zinc-500 mt-0.5">
+                Currently: {pageMode === 'dark' ? 'Dark' : 'Light'}
               </p>
             </div>
           </div>
-          <Switch checked={overrideGlobal} onCheckedChange={handleToggleOverride} />
-        </CardContent>
-      </Card>
+        </div>
+        <Separator className="bg-zinc-800/60" />
+        {buttonStyleToggle}
+      </div>
+    );
+  }
 
-      {overrideGlobal && (
-        <>
-          <Separator className="bg-zinc-800/60" />
+  const paletteMode = theme.paletteMode;
+  const toggleValue = paletteMode ?? 'default';
 
-          {/* Dark Palettes */}
-          <div>
-            <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              Dark Palettes
-            </Label>
-            <p className="text-xs mb-3 text-zinc-400">Pre-designed dark color schemes</p>
-            <div className="grid grid-cols-3 gap-2">
-              {generatedPalettes.dark.map((palette: SectionPalette) => {
-                const isSelected = theme.paletteId === palette.id;
-                return (
-                  <button
-                    key={palette.id}
-                    onClick={() => handleSelectPalette(palette.id)}
-                    className={`relative rounded-lg overflow-hidden h-12 transition-all duration-150 hover:scale-105 border ${
-                      isSelected ? 'border-2 border-emerald-500 ring-2 ring-emerald-500/20' : 'border-zinc-800'
-                    }`}
-                    title={palette.name}
-                  >
-                    <div className="flex h-full">
-                      <div className="flex-1" style={{ backgroundColor: palette.colors.bgPrimary }} />
-                      <div className="flex-1" style={{ backgroundColor: palette.colors.bgSecondary }} />
-                      <div className="w-2" style={{ backgroundColor: palette.colors.accent }} />
-                    </div>
-                    {isSelected && (
-                      <div className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full flex items-center justify-center bg-emerald-600">
-                        <Check className="h-2.5 w-2.5 text-white" />
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+  return (
+    <div className="space-y-5 text-zinc-200">
+      <div>
+        <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+          Section Mode
+        </Label>
+        <ToggleGroup
+          type="single"
+          value={toggleValue}
+          onValueChange={(val) => {
+            if (!val) return;
+            if (val === 'default') {
+              updateSectionTheme(sectionId, { paletteMode: undefined });
+            } else {
+              updateSectionTheme(sectionId, { paletteMode: val as 'dark' | 'light' });
+            }
+          }}
+          className="w-full bg-zinc-800 p-1 rounded-lg mt-2"
+        >
+          <ToggleGroupItem value="default" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+            <Monitor className="h-3.5 w-3.5" />
+            Default
+          </ToggleGroupItem>
+          <ToggleGroupItem value="dark" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+            <Moon className="h-3.5 w-3.5" />
+            Dark
+          </ToggleGroupItem>
+          <ToggleGroupItem value="light" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+            <Sun className="h-3.5 w-3.5" />
+            Light
+          </ToggleGroupItem>
+        </ToggleGroup>
+        <p className="text-[10px] mt-1.5 text-zinc-500">
+          {paletteMode
+            ? `Overriding: ${paletteMode === 'dark' ? 'Dark' : 'Light'}`
+            : `Using page default (${pageMode === 'dark' ? 'Dark' : 'Light'})`}
+        </p>
+      </div>
 
-          {/* Light Palettes */}
-          <div>
-            <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              Light Palettes
-            </Label>
-            <p className="text-xs mb-3 text-zinc-400">Pre-designed light color schemes</p>
-            <div className="grid grid-cols-3 gap-2">
-              {generatedPalettes.light.map((palette: SectionPalette) => {
-                const isSelected = theme.paletteId === palette.id;
-                return (
-                  <button
-                    key={palette.id}
-                    onClick={() => handleSelectPalette(palette.id)}
-                    className={`relative rounded-lg overflow-hidden h-12 transition-all duration-150 hover:scale-105 border ${
-                      isSelected ? 'border-2 border-emerald-500 ring-2 ring-emerald-500/20' : 'border-zinc-800'
-                    }`}
-                    title={palette.name}
-                  >
-                    <div className="flex h-full">
-                      <div className="flex-1" style={{ backgroundColor: palette.colors.bgPrimary }} />
-                      <div className="flex-1" style={{ backgroundColor: palette.colors.bgSecondary }} />
-                      <div className="w-2" style={{ backgroundColor: palette.colors.accent }} />
-                    </div>
-                    {isSelected && (
-                      <div className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full flex items-center justify-center bg-emerald-600">
-                        <Check className="h-2.5 w-2.5 text-white" />
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <Separator className="bg-zinc-800/60" />
-
-          {/* Custom Colors */}
-          <div>
-            <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              Custom Colors
-            </Label>
-            <p className="text-xs mb-3 text-zinc-400">Fine-tune individual colors</p>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-zinc-400">Background Primary</Label>
-                  <ColorPicker
-                    value={theme.bgPrimary || globalConfig.brand.primary}
-                    onChange={(val) => updateSectionTheme(sectionId, { bgPrimary: val })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-zinc-400">Background Secondary</Label>
-                  <ColorPicker
-                    value={theme.bgSecondary || '#1a1a1a'}
-                    onChange={(val) => updateSectionTheme(sectionId, { bgSecondary: val })}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-zinc-400">Text Primary</Label>
-                  <ColorPicker
-                    value={theme.textPrimary || '#ffffff'}
-                    onChange={(val) => updateSectionTheme(sectionId, { textPrimary: val })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-zinc-400">Text Secondary</Label>
-                  <ColorPicker
-                    value={theme.textSecondary || '#a3a3a3'}
-                    onChange={(val) => updateSectionTheme(sectionId, { textSecondary: val })}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-zinc-400">Accent Color</Label>
-                <ColorPicker
-                  value={theme.accent || globalConfig.brand.accent}
-                  onChange={(val) => updateSectionTheme(sectionId, { accent: val })}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Preview */}
-          <div>
-            <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              Preview
-            </Label>
-            <Card className="mt-3 overflow-hidden border-zinc-800">
-              <div
-                className="p-4"
-                style={{ backgroundColor: theme.bgPrimary || globalConfig.brand.primary }}
-              >
-                <div
-                  className="p-3 rounded-lg"
-                  style={{ backgroundColor: theme.bgSecondary || '#1a1a1a' }}
-                >
-                  <p
-                    className="text-sm font-semibold"
-                    style={{ color: theme.textPrimary || '#ffffff' }}
-                  >
-                    Primary Text
-                  </p>
-                  <p
-                    className="text-xs mt-1"
-                    style={{ color: theme.textSecondary || '#a3a3a3' }}
-                  >
-                    Secondary text example
-                  </p>
-                  <div
-                    className="mt-2 px-3 py-1 rounded text-xs font-medium inline-block"
-                    style={{
-                      backgroundColor: theme.accent || globalConfig.brand.accent,
-                      color: '#ffffff',
-                    }}
-                  >
-                    Accent Button
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </>
-      )}
-
+      <Separator className="bg-zinc-800/60" />
+      {buttonStyleToggle}
     </div>
   );
 }

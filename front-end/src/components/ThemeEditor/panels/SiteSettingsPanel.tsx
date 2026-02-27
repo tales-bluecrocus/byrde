@@ -12,6 +12,7 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { useSettingsContext } from '../../../context/SettingsContext';
 import { useGlobalConfig } from '../../../context/GlobalConfigContext';
 import { useToast } from '../../Toast';
+import { getContrastRatio, meetsWCAG, formatContrastRatio } from '../../../utils/colorUtils';
 import {
   ChevronDown,
   Building,
@@ -25,6 +26,9 @@ import {
   Square,
   Circle,
   RectangleHorizontal,
+  Palette,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import type { ThemeSettings } from '../../../hooks/useSettings';
 
@@ -66,6 +70,26 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="space-y-1.5">
       <Label className="text-[11px] font-medium text-zinc-400">{label}</Label>
       {children}
+    </div>
+  );
+}
+
+// Contrast badge: shows WCAG ratio + pass/fail
+function ContrastBadge({ bg, text }: { bg: string; text: string }) {
+  const ratio = getContrastRatio(bg, text);
+  const passes = meetsWCAG(ratio);
+  return (
+    <div className="flex items-center gap-1.5 mt-1.5">
+      <span
+        className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold"
+        style={{
+          backgroundColor: passes ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
+          color: passes ? '#22c55e' : '#ef4444',
+        }}
+      >
+        {passes ? 'AA' : 'Fail'}
+      </span>
+      <span className="text-[10px] text-zinc-500">{formatContrastRatio(ratio)}</span>
     </div>
   );
 }
@@ -183,6 +207,87 @@ export function SiteSettingsPanel() {
             className={inputCls}
           />
         </Field>
+      </Section>
+
+      {/* Brand Colors */}
+      <Section icon={Palette} title="Brand Colors">
+        {/* Default Mode toggle */}
+        <div className="mb-3">
+          <Label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+            Default Mode
+          </Label>
+          <ToggleGroup
+            type="single"
+            value={settings.brand_mode || 'dark'}
+            onValueChange={(val) => {
+              if (val) update('brand_mode', val);
+            }}
+            className="w-full bg-zinc-800 p-1 rounded-lg mt-1.5"
+          >
+            <ToggleGroupItem value="dark" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+              <Moon className="h-3 w-3" />
+              Dark
+            </ToggleGroupItem>
+            <ToggleGroupItem value="light" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+              <Sun className="h-3 w-3" />
+              Light
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+
+        {/* Dark Mode */}
+        <div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <Moon className="h-3 w-3 text-zinc-500" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Dark Mode</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Background">
+              <ColorPicker value={settings.brand_dark_bg} onChange={(val) => update('brand_dark_bg', val)} />
+            </Field>
+            <Field label="Text">
+              <ColorPicker value={settings.brand_dark_text} onChange={(val) => update('brand_dark_text', val)} />
+            </Field>
+          </div>
+          <ContrastBadge bg={settings.brand_dark_bg} text={settings.brand_dark_text} />
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <Field label="Primary">
+              <ColorPicker value={settings.brand_dark_primary} onChange={(val) => update('brand_dark_primary', val)} />
+              <ContrastBadge bg={settings.brand_dark_bg} text={settings.brand_dark_primary} />
+            </Field>
+            <Field label="Accent">
+              <ColorPicker value={settings.brand_dark_accent} onChange={(val) => update('brand_dark_accent', val)} />
+              <ContrastBadge bg={settings.brand_dark_bg} text={settings.brand_dark_accent} />
+            </Field>
+          </div>
+        </div>
+
+        {/* Light Mode */}
+        <div className="pt-2">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Sun className="h-3 w-3 text-zinc-500" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Light Mode</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Background">
+              <ColorPicker value={settings.brand_light_bg} onChange={(val) => update('brand_light_bg', val)} />
+            </Field>
+            <Field label="Text">
+              <ColorPicker value={settings.brand_light_text} onChange={(val) => update('brand_light_text', val)} />
+            </Field>
+          </div>
+          <ContrastBadge bg={settings.brand_light_bg} text={settings.brand_light_text} />
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <Field label="Primary">
+              <ColorPicker value={settings.brand_light_primary} onChange={(val) => update('brand_light_primary', val)} />
+              <ContrastBadge bg={settings.brand_light_bg} text={settings.brand_light_primary} />
+            </Field>
+            <Field label="Accent">
+              <ColorPicker value={settings.brand_light_accent} onChange={(val) => update('brand_light_accent', val)} />
+              <ContrastBadge bg={settings.brand_light_bg} text={settings.brand_light_accent} />
+            </Field>
+          </div>
+        </div>
       </Section>
 
       {/* Google Reviews */}
