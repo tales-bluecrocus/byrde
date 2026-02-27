@@ -58,6 +58,7 @@ declare global {
     GA_MEASUREMENT_ID?: string;
     fbq?: (command: FbqCommand, eventName: string, params?: Record<string, unknown>) => void;
     _fbq?: unknown;
+    byrdeAdsConsentRevoked?: boolean;
   }
 }
 
@@ -226,6 +227,7 @@ export function trackFacebookEvent(
   params?: Record<string, unknown>
 ): void {
   if (!isFacebookPixelAvailable()) return;
+  if (window.byrdeAdsConsentRevoked) return;
 
   window.fbq!('track', eventName, params);
 
@@ -242,6 +244,7 @@ export function trackFacebookCustomEvent(
   params?: Record<string, unknown>
 ): void {
   if (!isFacebookPixelAvailable()) return;
+  if (window.byrdeAdsConsentRevoked) return;
 
   window.fbq!('trackCustom', eventName, params);
 
@@ -255,33 +258,62 @@ export function trackFacebookCustomEvent(
 // ============================================
 
 /**
- * Get the Google Ads conversion label from WordPress settings
+ * Get Google Ads conversion labels from WordPress settings
  */
-function getGoogleAdsConversionLabel(): string {
+function getGoogleAdsConversionLabels(): { form: string; phone: string } {
   // Injected via wp_localize_script as byrdeAnalytics
   const analytics = (window as unknown as Record<string, unknown>).byrdeAnalytics as Record<string, string> | undefined;
-  return analytics?.gads_conversion_label || '';
+  return {
+    form: analytics?.gads_conversion_label || '',
+    phone: analytics?.gads_phone_conversion_label || '',
+  };
 }
 
 /**
- * Fire Google Ads conversion event
+ * Fire Google Ads conversion event for form submissions
  * Requires gads_conversion_label set in Theme Settings > Analytics
  */
 export function trackGoogleAdsConversion(serviceType?: string): void {
   if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
+  if (window.byrdeAdsConsentRevoked) return;
 
-  const conversionLabel = getGoogleAdsConversionLabel();
-  if (!conversionLabel) return;
+  const labels = getGoogleAdsConversionLabels();
+  if (!labels.form) return;
 
   window.gtag('event', 'conversion', {
-    send_to: conversionLabel,
+    send_to: labels.form,
     value: 1.0,
     currency: 'USD',
     ...(serviceType ? { event_label: serviceType } : {}),
   } as Record<string, unknown>);
 
   if (import.meta.env.DEV) {
-    console.log('[Google Ads] Conversion', conversionLabel, serviceType);
+    console.log('[Google Ads] Form Conversion', labels.form, serviceType);
+  }
+}
+
+/**
+ * Fire Google Ads conversion event for phone clicks
+ * Requires gads_phone_conversion_label set in Theme Settings > Analytics
+ * Falls back to gads_conversion_label if phone label is not set
+ */
+export function trackGoogleAdsPhoneConversion(location?: string): void {
+  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
+  if (window.byrdeAdsConsentRevoked) return;
+
+  const labels = getGoogleAdsConversionLabels();
+  const label = labels.phone || labels.form;
+  if (!label) return;
+
+  window.gtag('event', 'conversion', {
+    send_to: label,
+    value: 1.0,
+    currency: 'USD',
+    ...(location ? { event_label: `phone_call_${location}` } : {}),
+  } as Record<string, unknown>);
+
+  if (import.meta.env.DEV) {
+    console.log('[Google Ads] Phone Conversion', label, location);
   }
 }
 
@@ -415,8 +447,8 @@ export function trackPhoneClick(location: string): void {
     gclid: attribution.gclid,
   });
 
-  // Google Ads conversion for phone calls
-  trackGoogleAdsConversion('phone_call');
+  // Google Ads conversion for phone calls (uses phone-specific label)
+  trackGoogleAdsPhoneConversion(location);
 
   // Facebook Pixel - Contact event for phone calls
   trackFacebookEvent('Contact', {

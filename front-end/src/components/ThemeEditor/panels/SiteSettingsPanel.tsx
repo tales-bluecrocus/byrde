@@ -407,29 +407,21 @@ export function SiteSettingsPanel() {
         </Field>
       </Section>
 
-      {/* Analytics */}
+      {/* Analytics — GA4 managed by Site Kit plugin */}
       <Section icon={BarChart3} title="Analytics" open={openSection === 'analytics'} onToggle={() => toggle('analytics')}>
-        <Field label="GA4 Measurement ID">
-          <Input
-            value={settings.ga_measurement_id}
-            onChange={(e) => update('ga_measurement_id', e.target.value)}
-            placeholder="G-XXXXXXXXXX"
-            className={inputCls}
-          />
-        </Field>
-        <Field label="Facebook Pixel ID">
-          <Input
-            value={settings.fb_pixel_id}
-            onChange={(e) => update('fb_pixel_id', e.target.value)}
-            placeholder="123456789"
-            className={inputCls}
-          />
-        </Field>
-        <Field label="Google Ads Conversion Label">
+        <Field label="Google Ads Conversion Label (Form)">
           <Input
             value={settings.gads_conversion_label}
             onChange={(e) => update('gads_conversion_label', e.target.value)}
             placeholder="AW-XXXXXXXXX/YYYYYYY"
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Google Ads Conversion Label (Phone)">
+          <Input
+            value={settings.gads_phone_conversion_label}
+            onChange={(e) => update('gads_phone_conversion_label', e.target.value)}
+            placeholder="AW-XXXXXXXXX/ZZZZZZZ"
             className={inputCls}
           />
         </Field>

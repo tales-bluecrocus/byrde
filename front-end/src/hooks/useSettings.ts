@@ -55,6 +55,7 @@ export interface ThemeSettings {
   ga_measurement_id: string;
   fb_pixel_id: string;
   gads_conversion_label: string;
+  gads_phone_conversion_label: string;
 
   // Legal pages
   privacy_policy_url: string;
@@ -126,6 +127,7 @@ export const DEFAULT_SETTINGS: ThemeSettings = {
   ga_measurement_id: '',
   fb_pixel_id: '',
   gads_conversion_label: '',
+  gads_phone_conversion_label: '',
 
   // Legal pages
   privacy_policy_url: '/privacy-policy',

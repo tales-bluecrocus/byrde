@@ -201,6 +201,7 @@ function flatToNestedSettings(flat: ThemeSettings) {
       ga_measurement_id: flat.ga_measurement_id,
       fb_pixel_id: flat.fb_pixel_id,
       gads_conversion_label: flat.gads_conversion_label,
+      gads_phone_conversion_label: flat.gads_phone_conversion_label,
     },
     legal: {
       privacy_policy_url: flat.privacy_policy_url,
