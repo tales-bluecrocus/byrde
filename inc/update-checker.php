@@ -5,6 +5,9 @@
  * Uses the Plugin Update Checker library to let WordPress detect
  * new releases from the GitHub repository and offer one-click updates.
  *
+ * Uses dirname(__DIR__) instead of get_template_directory() so the paths
+ * resolve correctly in Multisite regardless of active theme context.
+ *
  * @package Byrde
  */
 
@@ -12,8 +15,11 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// Theme root = parent of /inc/ where this file lives
+$byrde_dir = dirname( __DIR__ );
+
 // Composer autoload (installed by release workflow)
-$autoload = get_template_directory() . '/vendor/autoload.php';
+$autoload = $byrde_dir . '/vendor/autoload.php';
 if ( ! file_exists( $autoload ) ) {
     return;
 }
@@ -23,7 +29,7 @@ use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $myUpdateChecker = PucFactory::buildUpdateChecker(
     'https://github.com/tales-bluecrocus/byrde/',
-    get_template_directory() . '/style.css',
+    $byrde_dir . '/style.css',
     'byrde'
 );
 
