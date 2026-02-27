@@ -3,7 +3,7 @@
  * SEO & Structured Data
  *
  * Server-side rendering of meta tags and JSON-LD schemas.
- * All data comes from ACF Theme Settings.
+ * SEO data is per-page, stored in _byrde_theme_config post meta.
  *
  * @package Byrde
  */
@@ -13,40 +13,70 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Get page-level SEO config from theme config post meta.
+ * Returns array with keys: siteName, tagline, description, ogImage.
+ */
+function byrde_get_page_seo( ?int $page_id = null ): array {
+    $defaults = array(
+        'siteName'    => '',
+        'tagline'     => '',
+        'description' => '',
+        'ogImage'     => '',
+    );
+
+    if ( ! $page_id ) {
+        $page_id = get_the_ID();
+    }
+
+    if ( ! $page_id ) {
+        return $defaults;
+    }
+
+    $config = get_post_meta( $page_id, '_byrde_theme_config', true );
+
+    if ( is_string( $config ) && ! empty( $config ) ) {
+        $config = json_decode( $config, true );
+    }
+
+    if ( ! is_array( $config ) || empty( $config['globalConfig']['seo'] ) ) {
+        return $defaults;
+    }
+
+    return wp_parse_args( $config['globalConfig']['seo'], $defaults );
+}
+
+/**
  * Output SEO meta tags in wp_head
  */
 function byrde_output_seo_meta(): void {
-    // Skip in admin or preview mode
+    // Skip in admin
     if ( is_admin() ) {
         return;
     }
 
-    $settings = byrde_get_all_settings();
+    $seo = byrde_get_page_seo();
 
     // Skip if no site name configured
-    if ( empty( $settings['site_name'] ) ) {
+    if ( empty( $seo['siteName'] ) ) {
         return;
     }
 
-    $site_name    = esc_attr( $settings['site_name'] );
-    $site_tagline = esc_attr( $settings['site_tagline'] ?? '' );
-    $site_url     = esc_url( $settings['site_url'] ?? home_url() );
+    $site_name = esc_attr( $seo['siteName'] );
+    $tagline   = esc_attr( $seo['tagline'] );
+    $site_url  = esc_url( home_url() );
 
     // Build page title
-    $page_title = $site_tagline
-        ? "{$site_name} - {$site_tagline}"
+    $page_title = $tagline
+        ? "{$site_name} - {$tagline}"
         : $site_name;
 
     // Meta description
-    $description = esc_attr( $settings['site_description'] ?? '' );
+    $description = esc_attr( $seo['description'] );
 
     // OG Image
-    $og_image = esc_url( $settings['og_image'] ?? '' );
+    $og_image = esc_url( $seo['ogImage'] );
 
-    // Keywords
-    $keywords = esc_attr( $settings['site_keywords'] ?? '' );
-
-    // Canonical URL (get_permalink can return false)
+    // Canonical URL
     $canonical = is_front_page() ? $site_url : ( get_permalink() ?: $site_url );
     ?>
 
@@ -55,11 +85,8 @@ function byrde_output_seo_meta(): void {
     <?php if ( $description ) : ?>
     <meta name="description" content="<?php echo $description; ?>">
     <?php endif; ?>
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="author" content="<?php echo $site_name; ?>">
-    <?php if ( $keywords ) : ?>
-    <meta name="keywords" content="<?php echo $keywords; ?>">
-    <?php endif; ?>
 
     <!-- Canonical -->
     <link rel="canonical" href="<?php echo esc_url( $canonical ); ?>">
@@ -101,10 +128,10 @@ function byrde_output_structured_data(): void {
         return;
     }
 
-    $settings = byrde_get_all_settings();
+    $seo = byrde_get_page_seo();
 
     // Skip if no site name configured
-    if ( empty( $settings['site_name'] ) ) {
+    if ( empty( $seo['siteName'] ) ) {
         return;
     }
 
@@ -153,7 +180,7 @@ function byrde_output_structured_data(): void {
                 '@type'    => 'ListItem',
                 'position' => 1,
                 'name'     => 'Home',
-                'item'     => $settings['site_url'],
+                'item'     => home_url(),
             ),
         ),
     );
@@ -168,17 +195,16 @@ function byrde_output_structured_data(): void {
 add_action( 'wp_head', 'byrde_output_structured_data', 2 );
 
 /**
- * Override WordPress title
+ * Override WordPress title with page-level SEO
  */
 function byrde_custom_title( array $title ): array {
-    $site_name = get_bloginfo( 'name' );
+    $seo = byrde_get_page_seo();
 
-    if ( ! empty( $site_name ) ) {
-        $title['title'] = $site_name;
+    if ( ! empty( $seo['siteName'] ) ) {
+        $title['title'] = $seo['siteName'];
 
-        $tagline = get_bloginfo( 'description' );
-        if ( ! empty( $tagline ) ) {
-            $title['tagline'] = $tagline;
+        if ( ! empty( $seo['tagline'] ) ) {
+            $title['tagline'] = $seo['tagline'];
         }
     }
 

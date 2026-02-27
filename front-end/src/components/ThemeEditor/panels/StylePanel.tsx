@@ -8,6 +8,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Moon, Sun, Monitor, Globe } from 'lucide-react';
 import { useSectionTheme } from '../../../context/SectionThemeContext';
 import { useGlobalConfig } from '../../../context/GlobalConfigContext';
+import { useSettingsContext } from '../../../context/SettingsContext';
 import type { SectionId } from '../../../context/SectionThemeContext';
 
 interface StylePanelProps {
@@ -18,38 +19,47 @@ const FIXED_SECTIONS: SectionId[] = ['topheader', 'header', 'footer'];
 
 export function StylePanel({ sectionId }: StylePanelProps) {
   const { sectionThemes, updateSectionTheme } = useSectionTheme();
-  const { globalConfig, palette } = useGlobalConfig();
+  const { globalConfig } = useGlobalConfig();
+  const { settings } = useSettingsContext();
   const theme = sectionThemes[sectionId] || {};
   const pageMode = globalConfig.brand.mode;
 
-  const primaryColor = palette.primary[500];
-  const accentColor = palette.accent[500];
+  // 4 brand button colors: primary, accent, dark bg, dark text
+  const darkPrimary = settings.brand_dark_primary || '#3ab342';
+  const darkAccent = settings.brand_dark_accent || '#f97316';
+  const darkBg = settings.brand_dark_bg || '#171717';
+  const darkText = settings.brand_dark_text || '#efefef';
+
   const buttonStyle = theme.buttonStyle ?? 1;
 
   // Button style toggle (shared by fixed and non-fixed sections)
   const buttonStyleToggle = (
     <div>
       <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-        Button Style
+        Button Color
       </Label>
-      <ToggleGroup
-        type="single"
-        value={String(buttonStyle)}
-        onValueChange={(val) => {
-          if (!val) return;
-          updateSectionTheme(sectionId, { buttonStyle: Number(val) as 1 | 2 });
-        }}
-        className="w-full bg-zinc-800 p-1 rounded-lg mt-2"
-      >
-        <ToggleGroupItem value="1" className="flex-1 gap-2 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
-          <span className="h-3 w-3 rounded-sm shrink-0" style={{ backgroundColor: primaryColor }} />
-          Primary
-        </ToggleGroupItem>
-        <ToggleGroupItem value="2" className="flex-1 gap-2 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
-          <span className="h-3 w-3 rounded-sm shrink-0" style={{ backgroundColor: accentColor }} />
-          Accent
-        </ToggleGroupItem>
-      </ToggleGroup>
+      <div className="grid grid-cols-2 gap-1.5 mt-2">
+        {([
+          { value: 1, color: darkPrimary, label: 'Primary' },
+          { value: 2, color: darkAccent, label: 'Accent' },
+          { value: 3, color: darkBg, label: 'Background' },
+          { value: 4, color: darkText, label: 'Text' },
+        ] as const).map(({ value, color, label }) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => updateSectionTheme(sectionId, { buttonStyle: value })}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-colors ${
+              buttonStyle === value
+                ? 'bg-zinc-700 text-zinc-100 ring-1 ring-zinc-500'
+                : 'bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800'
+            }`}
+          >
+            <span className="h-4 w-4 rounded shrink-0 border border-white/10" style={{ backgroundColor: color }} />
+            {label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 

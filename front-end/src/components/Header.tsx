@@ -6,6 +6,7 @@ import { useSectionTheme } from "../context/SectionThemeContext";
 import { useSettings } from "../hooks/useSettings";
 import GoogleReviewBadge from "./GoogleReviewBadge";
 import { getContrastColor, withAlpha } from "../utils/colorUtils";
+import { resolveButtonColor } from "../hooks/useSectionPalette";
 import { trackPhoneClick, trackEmailClick } from "../lib/analytics";
 
 const PhoneIcon = () => (
@@ -217,8 +218,8 @@ export default function Header() {
 	// Use header palette colors if overriding, otherwise fall back to global
 	const isOverriding = headerTheme.overrideGlobalColors ?? false;
 	const bgColor = isOverriding ? (headerTheme.bgPrimary || palette.background.primary) : palette.background.primary;
-	const accentColor = isOverriding ? (headerTheme.accent || palette.accent[500]) : palette.accent[500];
 	const textPrimary = isOverriding ? (headerTheme.textPrimary || palette.text.primary) : palette.text.primary;
+	const buttonBg = resolveButtonColor(headerTheme.buttonStyle, globalConfig.brand, palette.primary[500]);
 
 	// Measure header height via ResizeObserver (avoids forced reflow from offsetHeight)
 	useEffect(() => {
@@ -337,8 +338,8 @@ export default function Header() {
 										href={`tel:${settings.phone_raw}`}
 										className="hidden sm:inline-flex btn-themed group relative items-center gap-2 px-6 py-3 rounded-full font-semibold text-base shadow-lg shadow-black/25"
 										style={{
-											backgroundColor: accentColor,
-											color: getContrastColor(accentColor),
+											backgroundColor: buttonBg,
+											color: getContrastColor(buttonBg),
 										}}
 										onClick={() => trackPhoneClick('header_cta')}
 									>

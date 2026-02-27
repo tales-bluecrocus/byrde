@@ -36,7 +36,7 @@ import {
   type FooterContent,
 } from '../../../context/ContentContext';
 import { useHeaderConfig, type TopbarIcon, type TextAlign, type IconPosition } from '../../../context/HeaderConfigContext';
-import type { SectionId } from '../../../context/SectionThemeContext';
+import { useSectionTheme, type SectionId } from '../../../context/SectionThemeContext';
 import { Plus, Trash2, FileText, Star, Phone, Mail, MapPin, Ban, Shield, Clock, CheckCircle, Truck, Image as ImageIcon } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -487,6 +487,11 @@ function FeaturedTestimonialEditor({ content, onChange }: { content: FeaturedTes
 
 // Services Editor
 function ServicesContentEditor({ content, onChange }: { content: ServicesContent; onChange: (updates: Partial<ServicesContent>) => void }) {
+  const { sectionThemes, updateSectionTheme } = useSectionTheme();
+  const servicesTheme = sectionThemes['services'] || {};
+  const iconBgEnabled = servicesTheme.iconBgEnabled !== false;
+  const iconBgColor = servicesTheme.iconBgColor || '';
+
   const handleServiceChange = (index: number, updates: Partial<ServiceItem>) => {
     const newServices = [...content.services];
     newServices[index] = { ...newServices[index], ...updates };
@@ -503,6 +508,50 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
 
   return (
     <div className="space-y-6">
+      {/* Icon Background Control */}
+      <div>
+        <SectionTitle>Icon Style</SectionTitle>
+        <div className="space-y-3 mt-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-medium text-muted-foreground">Icon Background</Label>
+            <Switch
+              checked={iconBgEnabled}
+              onCheckedChange={(checked) => updateSectionTheme('services', { iconBgEnabled: checked })}
+            />
+          </div>
+          {iconBgEnabled && (
+            <div className="flex items-center gap-2">
+              <Label className="text-xs font-medium text-muted-foreground shrink-0">Color</Label>
+              <div className="flex items-center gap-2 flex-1">
+                <input
+                  type="color"
+                  value={iconBgColor || '#3ab342'}
+                  onChange={(e) => updateSectionTheme('services', { iconBgColor: e.target.value })}
+                  className="w-8 h-8 rounded cursor-pointer border border-border bg-transparent p-0.5"
+                />
+                <Input
+                  value={iconBgColor}
+                  onChange={(e) => updateSectionTheme('services', { iconBgColor: e.target.value })}
+                  placeholder="Default (primary)"
+                  className="flex-1 h-8 text-xs"
+                />
+                {iconBgColor && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => updateSectionTheme('services', { iconBgColor: undefined })}
+                    className="h-8 w-8 shrink-0 text-muted-foreground"
+                    title="Reset to default"
+                  >
+                    <LucideIcons.RotateCcw className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      <Separator />
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">

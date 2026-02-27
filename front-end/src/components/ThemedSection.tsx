@@ -112,14 +112,21 @@ export default function ThemedSection({
       } as CSSProperties
     : {};
 
-  // Button style override: 1 = primary, 2 = accent
-  const effectivePaletteForBtn = sectionModePalette || palette;
-  const buttonStyleOverride: CSSProperties = theme.buttonStyle === 2
+  // Button style override: 1=primary, 2=accent, 3=dark background, 4=dark text
+  const b = globalConfig.brand;
+  const btnColorMap: Record<number, string> = {
+    1: b.darkPrimary,
+    2: b.darkAccent,
+    3: b.darkBg,
+    4: b.darkText,
+  };
+  const btnColor = theme.buttonStyle ? btnColorMap[theme.buttonStyle] : undefined;
+  const buttonStyleOverride: CSSProperties = btnColor
     ? {
-        '--color-button-bg': effectivePaletteForBtn.accent[500],
-        '--color-button-hover': effectivePaletteForBtn.accent[400],
-        '--color-button-active': effectivePaletteForBtn.accent[600],
-        '--section-button-bg': effectivePaletteForBtn.accent[500],
+        '--color-button-bg': btnColor,
+        '--color-button-hover': btnColor,
+        '--color-button-active': btnColor,
+        '--section-button-bg': btnColor,
       } as CSSProperties
     : {};
 

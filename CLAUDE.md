@@ -10,7 +10,7 @@ Headless WordPress theme: PHP backend (data + REST API) with React frontend rend
 - **Frontend**: React 18 + TypeScript + Vite
 - **Styling**: Tailwind CSS + shadcn/ui (Radix primitives)
 - **State**: React Context API
-- **Settings**: ACF Pro (Advanced Custom Fields)
+- **Settings**: Native WordPress options (`byrde_theme_settings` in `wp_options`)
 - **Auto-updates**: Plugin Update Checker (Composer) via GitHub Releases
 
 ## Key Directories
@@ -26,7 +26,7 @@ Headless WordPress theme: PHP backend (data + REST API) with React frontend rend
 
 Three data sources injected into React via `window.*`:
 
-1. **`window.byrdeSettings`** — ACF options (logo, phone, social URLs). Stored in `wp_options`.
+1. **`window.byrdeSettings`** — Theme settings (logo, phone, social URLs). Stored in `wp_options` as `byrde_theme_settings`.
 2. **`window.byrdeConfig`** — Theme config (colors, palettes, visibility). Stored in `wp_postmeta` as `_byrde_theme_config`.
 3. **`window.byrdeContent`** — Section content (headlines, text). Stored in `wp_postmeta` as `_byrde_content`.
 
@@ -43,7 +43,8 @@ Base: `/wp-json/byrde/v1`
 | GET | `/pages/{id}/content` | Get section content | `edit_post` |
 | PUT | `/pages/{id}/content` | Save section content | `edit_post` |
 | PUT | `/pages/{id}/save-all` | Atomic save (theme + content) | `edit_post` |
-| GET | `/settings` | Get ACF settings | Public |
+| GET | `/settings` | Get theme settings | Public |
+| PUT | `/settings` | Update theme settings | `manage_options` |
 | POST | `/upload-image` | Upload image | `upload_files` |
 
 ## Build Commands

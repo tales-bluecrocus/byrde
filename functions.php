@@ -17,14 +17,15 @@ require_once get_template_directory() . '/inc/required-plugins.php'; // Required
 require_once get_template_directory() . '/inc/cleanup.php';
 require_once get_template_directory() . '/inc/validators.php'; // Input validation & sanitization
 require_once get_template_directory() . '/inc/rate-limiter.php'; // Rate limiting
-// require_once get_template_directory() . '/inc/theme-settings-manager.php'; // Disabled: using ACF instead
-// require_once get_template_directory() . '/inc/admin-settings-page.php'; // Disabled: using ACF options page
-require_once get_template_directory() . '/inc/acf-theme-settings.php';
+require_once get_template_directory() . '/inc/theme-settings-manager.php';
 require_once get_template_directory() . '/inc/page-theme-editor.php';
 require_once get_template_directory() . '/inc/rest-content-api.php';
 require_once get_template_directory() . '/inc/contact-form-handler.php';
 require_once get_template_directory() . '/inc/analytics.php';
 require_once get_template_directory() . '/inc/seo.php';
+require_once get_template_directory() . '/inc/shortcodes.php';
+require_once get_template_directory() . '/inc/legal-pages.php';
+require_once get_template_directory() . '/inc/cookie-consent.php';
 require_once get_template_directory() . '/inc/update-checker.php';
 
 /**
@@ -43,24 +44,22 @@ function byrde_theme_uri(): string {
 }
 
 /**
- * Get the logo URL and alt text (ACF or bundled fallback).
+ * Get the logo URL and alt text.
  * Shared between preload, shell render, and wp_localize_script.
  *
  * @return array{url: string, alt: string}
  */
 function byrde_get_logo_data(): array {
     $site_name = get_bloginfo( 'name' );
-    $logo      = byrde_get_setting( 'logo' );
+    $settings  = byrde_get_all_settings();
+    $logo_url  = $settings['logo'] ?? '';
+    $logo_alt  = $settings['logo_alt'] ?? '';
 
-    if ( $logo && is_array( $logo ) ) {
-        $url = $logo['sizes']['logo'] ?? $logo['sizes']['thumbnail'] ?? $logo['url'] ?? '';
-        $alt = $logo['alt'] ?? $site_name;
-        if ( ! empty( $url ) ) {
-            return array(
-                'url' => $url,
-                'alt' => $alt ?: $site_name,
-            );
-        }
+    if ( ! empty( $logo_url ) ) {
+        return array(
+            'url' => $logo_url,
+            'alt' => $logo_alt ?: $site_name,
+        );
     }
 
     // Fallback to bundled logo
@@ -87,10 +86,10 @@ function byrde_render_shell(): void {
         return;
     }
 
-    $logo = byrde_get_logo_data();
-    $phone = (string) byrde_get_setting( 'phone' );
+    $logo  = byrde_get_logo_data();
+    $phone = byrde_get_setting( 'phone' );
     ?>
-    <div style="min-height:100vh;background:#0a0a0a">
+    <div style="min-height:100vh;background:#171717">
         <header style="padding:1rem 1.5rem">
             <div style="max-width:80rem;margin:0 auto;display:flex;align-items:center;justify-content:space-between">
                 <?php if ( ! empty( $logo['url'] ) ) : ?>
@@ -141,6 +140,15 @@ function byrde_enqueue_assets(): void {
         // Pass theme settings + API URL to React
         $settings            = byrde_get_all_settings();
         $settings['apiUrl']  = rest_url( 'byrde/v1' );
+
+        // Include contact form settings for admins (not exposed publicly)
+        if ( current_user_can( 'manage_options' ) ) {
+            $settings['postmark_api_token']      = byrde_get_setting( 'postmark_api_token' );
+            $settings['contact_form_to_email']   = byrde_get_setting( 'contact_form_to_email' );
+            $settings['contact_form_from_email'] = byrde_get_setting( 'contact_form_from_email' );
+            $settings['contact_form_subject']    = byrde_get_setting( 'contact_form_subject' );
+        }
+
         wp_localize_script( 'byrde-main', 'byrdeSettings', $settings );
     }
 }
@@ -171,7 +179,7 @@ function byrde_preload_resources(): void {
     echo '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Outfit:wght@100..900&amp;display=swap" media="print" onload="this.media=\'all\'">' . "\n";
     echo '<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Outfit:wght@100..900&amp;display=swap"></noscript>' . "\n";
 
-    // Preload LCP logo image (ACF or bundled fallback)
+    // Preload LCP logo image
     $logo = byrde_get_logo_data();
     if ( ! empty( $logo['url'] ) ) {
         printf(
@@ -180,7 +188,7 @@ function byrde_preload_resources(): void {
         );
     }
 
-    // Favicon — use ACF logo (or fallback). Skipped when WP has a site icon set.
+    // Favicon — use logo (or fallback). Skipped when WP has a site icon set.
     if ( ! has_site_icon() && ! empty( $logo['url'] ) ) {
         printf(
             '<link rel="icon" href="%s" type="%s">' . "\n",
@@ -241,30 +249,40 @@ add_action( 'after_setup_theme', 'byrde_setup' );
 function byrde_activate(): void {
     $pages = array(
         array(
-            'title' => 'Home',
-            'slug'  => 'home',
+            'title'     => 'Home',
+            'slug'      => 'home',
             'set_front' => true,
         ),
         array(
-            'title' => 'Privacy Policy',
-            'slug'  => 'privacy-policy',
+            'title'    => 'Privacy Policy',
+            'slug'     => 'privacy-policy',
+            'template' => 'page-legal.php',
         ),
         array(
-            'title' => 'Terms & Conditions',
-            'slug'  => 'terms-and-conditions',
+            'title'    => 'Terms & Conditions',
+            'slug'     => 'terms-and-conditions',
+            'template' => 'page-legal.php',
         ),
         array(
-            'title' => 'Cookie Settings',
-            'slug'  => 'cookie-settings',
+            'title'    => 'Cookie Settings',
+            'slug'     => 'cookie-settings',
+            'template' => 'page-legal.php',
         ),
     );
 
     $front_page_id = 0;
 
     foreach ( $pages as $page ) {
-        // Skip if a page with this slug already exists
         $existing = get_page_by_path( $page['slug'] );
+
         if ( $existing ) {
+            // Ensure legal page template is set on existing pages
+            if ( ! empty( $page['template'] ) ) {
+                $current_template = get_post_meta( $existing->ID, '_wp_page_template', true );
+                if ( empty( $current_template ) || 'default' === $current_template ) {
+                    update_post_meta( $existing->ID, '_wp_page_template', $page['template'] );
+                }
+            }
             if ( ! empty( $page['set_front'] ) ) {
                 $front_page_id = $existing->ID;
             }
@@ -279,8 +297,14 @@ function byrde_activate(): void {
             'post_content' => '',
         ) );
 
-        if ( ! empty( $page['set_front'] ) && $page_id && ! is_wp_error( $page_id ) ) {
-            $front_page_id = $page_id;
+        if ( $page_id && ! is_wp_error( $page_id ) ) {
+            // Set page template
+            if ( ! empty( $page['template'] ) ) {
+                update_post_meta( $page_id, '_wp_page_template', $page['template'] );
+            }
+            if ( ! empty( $page['set_front'] ) ) {
+                $front_page_id = $page_id;
+            }
         }
     }
 

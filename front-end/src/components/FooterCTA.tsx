@@ -1,6 +1,6 @@
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
-import { useSectionPalette } from '../hooks/useSectionPalette';
+import { useSectionPalette, resolveButtonColor } from '../hooks/useSectionPalette';
 import { useContent } from '../context/ContentContext';
 import { renderHeadlineStyled } from '../utils/renderHeadline';
 import { getContrastColor, withAlpha } from '../utils/colorUtils';
@@ -40,7 +40,7 @@ export default function FooterCTA() {
   const effectiveMode = ctaTheme.paletteMode || globalConfig.brand.mode;
   const isLightMode = effectiveMode === 'light';
 
-  const buttonBg = ctaTheme.buttonStyle === 2 ? accentColor : palette.primary[500];
+  const buttonBg = resolveButtonColor(ctaTheme.buttonStyle, globalConfig.brand, palette.primary[500]);
   const buttonText = getContrastColor(buttonBg);
 
   const dividerColor = isLightMode ? withAlpha('#000000', 0.1) : withAlpha('#ffffff', 0.1);

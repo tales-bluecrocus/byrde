@@ -22,17 +22,6 @@ function byrde_register_required_plugins(): void {
 
 	$plugins = array(
 		array(
-			'name'     => 'Advanced Custom Fields PRO',
-			'slug'     => 'advanced-custom-fields-pro',
-			'source'   => get_template_directory() . '/plugins/advanced-custom-fields-pro.zip',
-			'required' => true,
-		),
-		array(
-			'name'     => 'Advanced Custom Fields: Extended',
-			'slug'     => 'acf-extended',
-			'required' => true,
-		),
-		array(
 			'name'     => 'Classic Editor',
 			'slug'     => 'classic-editor',
 			'required' => true,

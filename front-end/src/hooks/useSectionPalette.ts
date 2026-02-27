@@ -13,6 +13,7 @@ import { useSectionTheme } from '../context/SectionThemeContext';
 import { generateBrandPalette } from '../utils/colorUtils';
 import type { BrandPalette } from '../utils/colorUtils';
 import type { SectionId } from '../context/SectionThemeContext';
+import type { BrandColors } from '../context/GlobalConfigContext';
 
 export function useSectionPalette(sectionId: SectionId): BrandPalette {
   const { palette, globalConfig } = useGlobalConfig();
@@ -33,4 +34,22 @@ export function useSectionPalette(sectionId: SectionId): BrandPalette {
       isDark ? b.darkText : b.lightText,
     );
   }, [theme.paletteMode, globalConfig.brand, palette]);
+}
+
+/**
+ * Resolve buttonStyle (1-4) to a hex color from brand colors.
+ * 1 = primary, 2 = accent, 3 = dark background, 4 = dark text.
+ * Default (undefined/1) returns palette.primary[500] (current mode primary).
+ */
+export function resolveButtonColor(
+  style: number | undefined,
+  brand: BrandColors,
+  fallback: string,
+): string {
+  switch (style) {
+    case 2: return brand.darkAccent;
+    case 3: return brand.darkBg;
+    case 4: return brand.darkText;
+    default: return fallback; // style 1 or undefined: use section palette primary
+  }
 }

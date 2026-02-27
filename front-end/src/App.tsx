@@ -74,7 +74,7 @@ function ScrollToTopButton() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 flex items-center justify-center w-11 h-11 rounded-full bg-zinc-800 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 hover:text-white hover:border-zinc-500 transition-all duration-300 active:scale-90 shadow-xl shadow-black/40"
+      className="fixed bottom-6 left-6 sm:left-auto sm:bottom-8 sm:right-8 z-50 flex items-center justify-center w-11 h-11 rounded-full bg-zinc-800 border border-zinc-600 text-zinc-300 hover:bg-zinc-700 hover:text-white hover:border-zinc-500 transition-all duration-300 active:scale-90 shadow-xl shadow-black/40"
       aria-label="Scroll to top"
     >
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
@@ -96,7 +96,7 @@ function FloatingPhoneButton() {
     <a
       href={`tel:${settings.phone_raw}`}
       onClick={handleClick}
-      className="sm:hidden fixed bottom-20 right-6 z-60 flex items-center justify-center w-14 h-14 btn-themed rounded-full shadow-xl shadow-black/30 transition-all duration-300 active:scale-95"
+      className="sm:hidden fixed bottom-6 right-6 z-60 flex items-center justify-center w-14 h-14 btn-themed rounded-full shadow-xl shadow-black/30 transition-all duration-300 active:scale-95"
       aria-label={`Call ${settings.phone}`}
     >
       <PhoneIcon />

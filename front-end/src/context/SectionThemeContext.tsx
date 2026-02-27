@@ -7,7 +7,9 @@ export interface SectionTheme {
   overrideGlobalColors?: boolean; // If true, use palette colors instead of global
   paletteId?: string;             // ID of the selected palette (only used when override is true)
   paletteMode?: 'dark' | 'light'; // Individual dark/light mode for this section
-  buttonStyle?: 1 | 2;            // 1 = primary color, 2 = accent color
+  buttonStyle?: 1 | 2 | 3 | 4;    // 1 = primary, 2 = accent, 3 = dark background, 4 = dark text
+  iconBgEnabled?: boolean;   // Show icon box background (default true)
+  iconBgColor?: string;      // Custom icon box background color (default: section primary)
 
   // Palette colors (applied when overrideGlobalColors is true)
   bgPrimary?: string;

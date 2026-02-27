@@ -42,7 +42,7 @@ const ServiceIcon = memo(({ service }: { service: ServiceItem }) => {
 });
 ServiceIcon.displayName = 'ServiceIcon';
 
-function ServiceCard({ service, className = '' }: { service: ServiceItem; className?: string }) {
+function ServiceCard({ service, iconBgEnabled = true, iconBgColor, className = '' }: { service: ServiceItem; iconBgEnabled?: boolean; iconBgColor?: string; className?: string }) {
   return (
     <article
       className={`group relative section-bg-secondary rounded-2xl p-8 section-border border hover:border-opacity-70 shadow-sm hover:shadow-xl hover:shadow-black/20 transition-all duration-500 hover:-translate-y-1 ${className}`}
@@ -52,7 +52,14 @@ function ServiceCard({ service, className = '' }: { service: ServiceItem; classN
 
       <div className="relative">
         {/* Icon */}
-        <div className="w-14 h-14 bg-primary-500 rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-primary-500/20">
+        <div
+          className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ${
+            iconBgEnabled
+              ? `${iconBgColor ? '' : 'bg-primary-500 shadow-lg shadow-primary-500/20'} text-white`
+              : 'section-text-accent'
+          }`}
+          style={iconBgEnabled && iconBgColor ? { backgroundColor: iconBgColor } : undefined}
+        >
           <ServiceIcon service={service} />
         </div>
 
@@ -75,7 +82,7 @@ function ServiceCard({ service, className = '' }: { service: ServiceItem; classN
   );
 }
 
-function ServicesSlider({ services }: { services: ServiceItem[] }) {
+function ServicesSlider({ services, iconBgEnabled, iconBgColor }: { services: ServiceItem[]; iconBgEnabled?: boolean; iconBgColor?: string }) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: 'start', slidesToScroll: 1 },
     [Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })]
@@ -103,7 +110,7 @@ function ServicesSlider({ services }: { services: ServiceItem[] }) {
         <div className="flex -ml-6">
           {services.map((service) => (
             <div key={service.id} className="flex-[0_0_100%] min-w-0 pl-6 md:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
-              <ServiceCard service={service} className="h-full" />
+              <ServiceCard service={service} iconBgEnabled={iconBgEnabled} iconBgColor={iconBgColor} className="h-full" />
             </div>
           ))}
         </div>
@@ -152,6 +159,8 @@ export default function ServicesGrid() {
   const content = getContent('services');
   const theme = sectionThemes['services'] || {};
   const hasBgImage = !!theme.bgImage;
+  const iconBgEnabled = theme.iconBgEnabled !== false; // default true
+  const iconBgColor = theme.iconBgColor;
 
   const count = content.services.length;
   const useSlider = count > 6;
@@ -197,13 +206,15 @@ export default function ServicesGrid() {
 
         {/* Services: Grid or Slider */}
         {useSlider ? (
-          <ServicesSlider services={content.services} />
+          <ServicesSlider services={content.services} iconBgEnabled={iconBgEnabled} iconBgColor={iconBgColor} />
         ) : (
           <div className={getGridClass()}>
             {content.services.map((service, index) => (
               <ServiceCard
                 key={service.id}
                 service={service}
+                iconBgEnabled={iconBgEnabled}
+                iconBgColor={iconBgColor}
                 className={getCardClass(index)}
               />
             ))}

@@ -91,13 +91,12 @@ export default function ServiceAreas() {
             </h3>
             <div className="flex flex-wrap gap-3">
               {content.areas.map((area) => (
-                <a
+                <span
                   key={area.id}
-                  href="#contato"
-                  className={`group inline-flex items-center gap-2 px-4 py-2.5 rounded-full font-medium transition-all duration-300 ${
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full font-medium ${
                     area.highlighted
-                      ? 'bg-gradient-to-r from-primary-500 to-primary-400 text-white shadow-lg shadow-primary-500/20 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-0.5'
-                      : 'section-bg-secondary section-text-secondary section-border border hover:border-primary-500/50 hover:text-primary-400 shadow-sm hover:shadow-md'
+                      ? 'bg-gradient-to-r from-primary-500 to-primary-400 text-white shadow-lg shadow-primary-500/20'
+                      : 'section-bg-secondary section-text-secondary section-border border shadow-sm'
                   }`}
                 >
                   <MapPinIcon />
@@ -105,7 +104,7 @@ export default function ServiceAreas() {
                   <span className={`text-xs ${area.highlighted ? 'text-white/80' : 'section-text-secondary opacity-70'}`}>
                     {area.state}
                   </span>
-                </a>
+                </span>
               ))}
             </div>
 

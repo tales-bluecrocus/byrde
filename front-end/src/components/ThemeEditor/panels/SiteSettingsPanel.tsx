@@ -32,22 +32,22 @@ import {
 } from 'lucide-react';
 import type { ThemeSettings } from '../../../hooks/useSettings';
 
-// Collapsible section wrapper
+// Collapsible section wrapper (accordion: only one open at a time)
 function Section({
   icon: Icon,
   title,
-  defaultOpen = false,
+  open,
+  onToggle,
   children,
 }: {
   icon: React.ElementType;
   title: string;
-  defaultOpen?: boolean;
+  open: boolean;
+  onToggle: () => void;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
-
   return (
-    <Collapsible open={open} onOpenChange={setOpen}>
+    <Collapsible open={open} onOpenChange={onToggle}>
       <CollapsibleTrigger className="flex items-center gap-2 w-full py-2 px-3 rounded-lg hover:bg-zinc-800/50 transition-colors group">
         <div className="flex h-6 w-6 items-center justify-center rounded-md bg-zinc-800">
           <Icon className="h-3.5 w-3.5 text-zinc-400" />
@@ -98,10 +98,17 @@ function ContrastBadge({ bg, text }: { bg: string; text: string }) {
 const inputCls = "bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 text-xs h-8";
 const textareaCls = "w-full rounded-md bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder:text-zinc-600 text-xs p-2 resize-y min-h-[60px] focus:outline-none focus:border-zinc-600";
 
+type SectionKey = 'brand' | 'colors' | 'reviews' | 'footer' | 'social' | 'analytics' | 'legal' | 'form';
+
 export function SiteSettingsPanel() {
   const { settings, updateSettings } = useSettingsContext();
   const { globalConfig, updateLogo } = useGlobalConfig();
   const { toast } = useToast();
+  const [openSection, setOpenSection] = useState<SectionKey | null>('brand');
+
+  const toggle = useCallback((key: SectionKey) => {
+    setOpenSection(prev => prev === key ? null : key);
+  }, []);
 
   const update = useCallback((key: keyof ThemeSettings, value: string) => {
     updateSettings({ [key]: value });
@@ -132,7 +139,7 @@ export function SiteSettingsPanel() {
   return (
     <div className="space-y-1 text-zinc-200">
       {/* Brand */}
-      <Section icon={Building} title="Brand" defaultOpen>
+      <Section icon={Building} title="Brand" open={openSection === 'brand'} onToggle={() => toggle('brand')}>
         <Field label="Company Name">
           <Input
             value={settings.site_name}
@@ -210,7 +217,7 @@ export function SiteSettingsPanel() {
       </Section>
 
       {/* Brand Colors */}
-      <Section icon={Palette} title="Brand Colors">
+      <Section icon={Palette} title="Brand Colors" open={openSection === 'colors'} onToggle={() => toggle('colors')}>
         {/* Default Mode toggle */}
         <div className="mb-3">
           <Label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
@@ -291,7 +298,7 @@ export function SiteSettingsPanel() {
       </Section>
 
       {/* Google Reviews */}
-      <Section icon={Star} title="Google Reviews">
+      <Section icon={Star} title="Google Reviews" open={openSection === 'reviews'} onToggle={() => toggle('reviews')}>
         <Field label="Rating">
           <Input
             value={settings.google_rating}
@@ -319,7 +326,7 @@ export function SiteSettingsPanel() {
       </Section>
 
       {/* Footer */}
-      <Section icon={FileText} title="Footer">
+      <Section icon={FileText} title="Footer" open={openSection === 'footer'} onToggle={() => toggle('footer')}>
         <Field label="Tagline">
           <Input
             value={settings.footer_tagline}
@@ -365,7 +372,7 @@ export function SiteSettingsPanel() {
       </Section>
 
       {/* Social */}
-      <Section icon={Share2} title="Social Media">
+      <Section icon={Share2} title="Social Media" open={openSection === 'social'} onToggle={() => toggle('social')}>
         <Field label="Facebook URL">
           <Input
             value={settings.facebook_url}
@@ -401,7 +408,7 @@ export function SiteSettingsPanel() {
       </Section>
 
       {/* Analytics */}
-      <Section icon={BarChart3} title="Analytics">
+      <Section icon={BarChart3} title="Analytics" open={openSection === 'analytics'} onToggle={() => toggle('analytics')}>
         <Field label="GA4 Measurement ID">
           <Input
             value={settings.ga_measurement_id}
@@ -429,7 +436,7 @@ export function SiteSettingsPanel() {
       </Section>
 
       {/* Legal Pages */}
-      <Section icon={Scale} title="Legal Pages">
+      <Section icon={Scale} title="Legal Pages" open={openSection === 'legal'} onToggle={() => toggle('legal')}>
         <Field label="Privacy Policy URL">
           <Input
             value={settings.privacy_policy_url}
@@ -457,7 +464,7 @@ export function SiteSettingsPanel() {
       </Section>
 
       {/* Contact Form */}
-      <Section icon={Mail} title="Contact Form">
+      <Section icon={Mail} title="Contact Form" open={openSection === 'form'} onToggle={() => toggle('form')}>
         <Field label="Postmark API Token">
           <Input
             value={settings.postmark_api_token}

@@ -81,9 +81,10 @@ function byrde_get_default_settings(): array {
 
 		// Analytics
 		'analytics'      => array(
-			'ga_measurement_id' => '',
-			'gtm_container_id'  => '',
-			'fb_pixel_id'       => '',
+			'ga_measurement_id'     => '',
+			'gtm_container_id'      => '',
+			'fb_pixel_id'           => '',
+			'gads_conversion_label' => '',
 		),
 
 		// Legal Pages
@@ -91,6 +92,14 @@ function byrde_get_default_settings(): array {
 			'privacy_policy_url' => '/privacy-policy',
 			'terms_url'          => '/terms-and-conditions',
 			'cookie_settings_url' => '/cookie-settings',
+		),
+
+		// Contact Form (server-only, not exposed to frontend)
+		'contact_form'   => array(
+			'postmark_api_token' => '',
+			'to_email'           => '',
+			'from_email'         => '',
+			'subject'            => 'New Lead from Website',
 		),
 	);
 }
@@ -205,9 +214,10 @@ function byrde_sanitize_theme_settings( array $settings ): array {
 	// Analytics
 	if ( isset( $settings['analytics'] ) ) {
 		$sanitized['analytics'] = array(
-			'ga_measurement_id' => sanitize_text_field( $settings['analytics']['ga_measurement_id'] ?? '' ),
-			'gtm_container_id'  => sanitize_text_field( $settings['analytics']['gtm_container_id'] ?? '' ),
-			'fb_pixel_id'       => sanitize_text_field( $settings['analytics']['fb_pixel_id'] ?? '' ),
+			'ga_measurement_id'     => sanitize_text_field( $settings['analytics']['ga_measurement_id'] ?? '' ),
+			'gtm_container_id'      => sanitize_text_field( $settings['analytics']['gtm_container_id'] ?? '' ),
+			'fb_pixel_id'           => sanitize_text_field( $settings['analytics']['fb_pixel_id'] ?? '' ),
+			'gads_conversion_label' => sanitize_text_field( $settings['analytics']['gads_conversion_label'] ?? '' ),
 		);
 	}
 
@@ -220,7 +230,47 @@ function byrde_sanitize_theme_settings( array $settings ): array {
 		);
 	}
 
+	// Contact Form
+	if ( isset( $settings['contact_form'] ) ) {
+		$sanitized['contact_form'] = array(
+			'postmark_api_token' => sanitize_text_field( $settings['contact_form']['postmark_api_token'] ?? '' ),
+			'to_email'           => sanitize_email( $settings['contact_form']['to_email'] ?? '' ),
+			'from_email'         => sanitize_email( $settings['contact_form']['from_email'] ?? '' ),
+			'subject'            => sanitize_text_field( $settings['contact_form']['subject'] ?? 'New Lead from Website' ),
+		);
+	}
+
+	// Brand Colors (per-mode)
+	if ( isset( $settings['brand_colors'] ) ) {
+		$sanitized['brand_colors'] = array(
+			'dark_primary'  => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['dark_primary'] ?? '#3ab342' ) ?: '#3ab342',
+			'dark_accent'   => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['dark_accent'] ?? '#f97316' ) ?: '#f97316',
+			'dark_bg'       => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['dark_bg'] ?? '#171717' ) ?: '#171717',
+			'dark_text'     => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['dark_text'] ?? '#efefef' ) ?: '#efefef',
+			'light_primary' => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['light_primary'] ?? '#3ab342' ) ?: '#3ab342',
+			'light_accent'  => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['light_accent'] ?? '#f97316' ) ?: '#f97316',
+			'light_bg'      => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['light_bg'] ?? '#ffffff' ) ?: '#ffffff',
+			'light_text'    => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['light_text'] ?? '#2a2a2a' ) ?: '#2a2a2a',
+			'mode'          => in_array( $settings['brand_colors']['mode'] ?? 'dark', array( 'light', 'dark' ), true )
+				? $settings['brand_colors']['mode']
+				: 'dark',
+		);
+	}
+
 	return $sanitized;
+}
+
+/**
+ * Sanitize hex color with optional alpha (supports #RGB, #RGBA, #RRGGBB, #RRGGBBAA)
+ *
+ * @param string $color Hex color string.
+ * @return string|false Sanitized hex or false if invalid.
+ */
+function byrde_sanitize_hex_color_alpha( string $color ) {
+	if ( preg_match( '/^#([a-fA-F0-9]{3,4}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/', $color ) ) {
+		return $color;
+	}
+	return false;
 }
 
 /**
@@ -302,16 +352,65 @@ function byrde_get_all_settings(): array {
 	$flattened['schema_opening_hours']  = $settings['schema']['opening_hours'] ?? '';
 
 	// Analytics
-	$flattened['ga_measurement_id'] = $settings['analytics']['ga_measurement_id'] ?? '';
-	$flattened['gtm_container_id']  = $settings['analytics']['gtm_container_id'] ?? '';
-	$flattened['fb_pixel_id']       = $settings['analytics']['fb_pixel_id'] ?? '';
+	$flattened['ga_measurement_id']     = $settings['analytics']['ga_measurement_id'] ?? '';
+	$flattened['gtm_container_id']      = $settings['analytics']['gtm_container_id'] ?? '';
+	$flattened['fb_pixel_id']           = $settings['analytics']['fb_pixel_id'] ?? '';
+	$flattened['gads_conversion_label'] = $settings['analytics']['gads_conversion_label'] ?? '';
 
-	// Legal
-	$flattened['privacy_policy_url']  = $settings['legal']['privacy_policy_url'] ?? '/privacy-policy';
-	$flattened['terms_url']           = $settings['legal']['terms_url'] ?? '/terms-and-conditions';
-	$flattened['cookie_settings_url'] = $settings['legal']['cookie_settings_url'] ?? '/cookie-settings';
+	// Legal — use home_url() so multisite subdirectory prefix is included
+	$privacy = $settings['legal']['privacy_policy_url'] ?? '';
+	$terms   = $settings['legal']['terms_url'] ?? '';
+	$cookie  = $settings['legal']['cookie_settings_url'] ?? '';
+	$flattened['privacy_policy_url']  = $privacy ?: home_url( '/privacy-policy' );
+	$flattened['terms_url']           = $terms ?: home_url( '/terms-and-conditions' );
+	$flattened['cookie_settings_url'] = $cookie ?: home_url( '/cookie-settings' );
 
-	return $flattened;
+	// Brand Colors (per-mode)
+	$flattened['brand_dark_primary']  = $settings['brand_colors']['dark_primary'] ?? '#3ab342';
+	$flattened['brand_dark_accent']   = $settings['brand_colors']['dark_accent'] ?? '#f97316';
+	$flattened['brand_dark_bg']       = $settings['brand_colors']['dark_bg'] ?? '#171717';
+	$flattened['brand_dark_text']     = $settings['brand_colors']['dark_text'] ?? '#efefef';
+	$flattened['brand_light_primary'] = $settings['brand_colors']['light_primary'] ?? '#3ab342';
+	$flattened['brand_light_accent']  = $settings['brand_colors']['light_accent'] ?? '#f97316';
+	$flattened['brand_light_bg']      = $settings['brand_colors']['light_bg'] ?? '#ffffff';
+	$flattened['brand_light_text']    = $settings['brand_colors']['light_text'] ?? '#2a2a2a';
+	$flattened['brand_mode']          = $settings['brand_colors']['mode'] ?? 'dark';
+
+	// Ensure all values are strings (PHP 8.1+ wp_localize_script compat)
+	return array_map( 'strval', $flattened );
+}
+
+/**
+ * Get a single theme setting by flat key
+ *
+ * Reads from the nested settings structure using a key map.
+ * Used by contact-form-handler.php and functions.php.
+ *
+ * @param string $key     Setting key (flat format).
+ * @param mixed  $default Default value if not found.
+ * @return mixed Setting value.
+ */
+function byrde_get_setting( string $key, $default = '' ) {
+	static $cache = null;
+
+	if ( null === $cache ) {
+		$cache = byrde_get_all_settings();
+
+		// Add contact form settings (server-only, not in frontend)
+		$settings = byrde_get_theme_settings();
+		$cache['postmark_api_token']      = $settings['contact_form']['postmark_api_token'] ?? '';
+		$cache['contact_form_to_email']   = $settings['contact_form']['to_email'] ?? '';
+		$cache['contact_form_from_email'] = $settings['contact_form']['from_email'] ?? '';
+		$cache['contact_form_subject']    = $settings['contact_form']['subject'] ?? 'New Lead from Website';
+	}
+
+	$value = $cache[ $key ] ?? null;
+
+	if ( null === $value || false === $value ) {
+		return $default;
+	}
+
+	return $value ?: $default;
 }
 
 /**
@@ -386,18 +485,5 @@ function byrde_register_settings_api(): void {
 }
 add_action( 'rest_api_init', 'byrde_register_settings_api' );
 
-/**
- * Inject settings into frontend (for React)
- */
-function byrde_enqueue_settings_script(): void {
-	if ( is_admin() ) {
-		return;
-	}
-
-	wp_localize_script(
-		'byrde-main',
-		'byrdeSettings',
-		byrde_get_all_settings()
-	);
-}
-add_action( 'wp_enqueue_scripts', 'byrde_enqueue_settings_script', 20 );
+// Note: byrde_enqueue_assets() in functions.php handles wp_localize_script
+// for byrdeSettings, including the apiUrl and admin-only contact form fields.

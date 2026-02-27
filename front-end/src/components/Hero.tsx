@@ -8,7 +8,7 @@
 import { useState, useMemo, useCallback, memo } from 'react';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
-import { useSectionPalette } from '../hooks/useSectionPalette';
+import { useSectionPalette, resolveButtonColor } from '../hooks/useSectionPalette';
 import { useContent, type BadgeIconType } from '../context/ContentContext';
 import { renderHeadlineStyled } from '../utils/renderHeadline';
 import { useSettings } from '../hooks/useSettings';
@@ -328,7 +328,7 @@ export default function Hero() {
     const labelColor = isOverriding
       ? textSecondary
       : (formConfig.labelColor || palette.text.secondary);
-    const defaultButtonColor = heroTheme.buttonStyle === 2 ? palette.accent[500] : palette.primary[500];
+    const defaultButtonColor = resolveButtonColor(heroTheme.buttonStyle, globalConfig.brand, palette.primary[500]);
     const buttonBg = formConfig.buttonBg || defaultButtonColor;
     const buttonHoverBg = lighten(buttonBg, 15);
 
