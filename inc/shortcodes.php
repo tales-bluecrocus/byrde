@@ -83,10 +83,17 @@ function byrde_shortcode_address(): string {
 add_shortcode( 'byrde_address', 'byrde_shortcode_address' );
 
 /**
- * [byrde_site_url] — Site home URL
+ * [byrde_site_url] — Root site URL (scheme + host only)
+ *
+ * In multisite with path-based installs (e.g. example.com/lp/),
+ * this returns just the root domain (example.com), not the subsite path.
  */
 function byrde_shortcode_site_url(): string {
-    return esc_url( home_url() );
+    $url    = home_url();
+    $parsed = wp_parse_url( $url );
+    $root   = ( $parsed['scheme'] ?? 'https' ) . '://' . ( $parsed['host'] ?? '' );
+
+    return esc_url( $root );
 }
 add_shortcode( 'byrde_site_url', 'byrde_shortcode_site_url' );
 

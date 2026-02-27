@@ -284,16 +284,8 @@ function byrde_inject_admin_context(): void {
         }
     }
 
-    $theme_config = $byrde_page_id ? get_post_meta( $byrde_page_id, '_byrde_theme_config', true ) : '';
-
-    // Debug: Log what we're injecting
-    error_log( '[Byrde Inject] Page ID: ' . $byrde_page_id );
-    error_log( '[Byrde Inject] Raw theme_config: ' . substr( $theme_config, 0, 200 ) );
-
+    $theme_config   = $byrde_page_id ? get_post_meta( $byrde_page_id, '_byrde_theme_config', true ) : '';
     $decoded_config = $theme_config ? json_decode( $theme_config, true ) : null;
-    if ( $decoded_config && isset( $decoded_config['sectionThemes']['hero'] ) ) {
-        error_log( '[Byrde Inject] Hero config: ' . print_r( $decoded_config['sectionThemes']['hero'], true ) );
-    }
 
     // Always inject for preview mode (but mark if user can save)
     $admin_data = array(
@@ -492,10 +484,6 @@ function byrde_rest_save_page_theme( WP_REST_Request $request ) {
     $byrde_page_id = $request->get_param( 'id' );
     $config  = $request->get_json_params();
 
-    // Debug logging
-    error_log( '[Byrde Theme Save] Page ID: ' . $byrde_page_id );
-    error_log( '[Byrde Theme Save] Config received: ' . print_r( $config, true ) );
-
     if ( empty( $config ) ) {
         return new WP_Error( 'empty_config', 'No config data provided', array( 'status' => 400 ) );
     }
@@ -503,7 +491,6 @@ function byrde_rest_save_page_theme( WP_REST_Request $request ) {
     // Validate config structure
     $errors = byrde_validate_theme_config( $config );
     if ( ! empty( $errors ) ) {
-        error_log( '[Byrde Theme Save] Validation errors: ' . print_r( $errors, true ) );
         return new WP_Error(
             'validation_failed',
             implode( ', ', $errors ),
@@ -513,22 +500,14 @@ function byrde_rest_save_page_theme( WP_REST_Request $request ) {
 
     // Sanitize config
     $sanitized = byrde_sanitize_theme_config( $config );
-    error_log( '[Byrde Theme Save] Sanitized: ' . print_r( $sanitized, true ) );
 
-    // Save as JSON
+    // Save as JSON (update_post_meta returns false if value unchanged, which is OK)
+    // Cache purge is handled automatically by byrde_purge_on_meta_save() in cache.php
     $json_config = wp_json_encode( $sanitized );
-    // Note: update_post_meta returns false if value unchanged, which is OK
-    $result = update_post_meta( $byrde_page_id, '_byrde_theme_config', $json_config );
-    error_log( '[Byrde Theme Save] update_post_meta result: ' . var_export( $result, true ) );
+    update_post_meta( $byrde_page_id, '_byrde_theme_config', $json_config );
 
-    // CRITICAL: Clear post meta cache to ensure fresh data on next load
-    wp_cache_delete( $byrde_page_id, 'post_meta' );
-    clean_post_cache( $byrde_page_id );
-
-    // Verify save by reading back (bypassing cache)
+    // Verify save
     $saved_config = get_post_meta( $byrde_page_id, '_byrde_theme_config', true );
-    error_log( '[Byrde Theme Save] Saved config: ' . $saved_config );
-
     if ( empty( $saved_config ) && ! empty( $json_config ) ) {
         return new WP_Error( 'save_failed', 'Failed to save theme config', array( 'status' => 500 ) );
     }
@@ -587,15 +566,11 @@ function byrde_rest_save_all( WP_REST_Request $request ) {
     $sanitized_theme   = byrde_sanitize_theme_config( $theme_config );
     $sanitized_content = byrde_sanitize_content( $content );
 
-    // Save both atomically (WordPress doesn't have transactions, but we check both saves)
+    // Save both (cache purge handled by byrde_purge_on_meta_save() in cache.php)
     update_post_meta( $byrde_page_id, '_byrde_theme_config', wp_json_encode( $sanitized_theme ) );
     update_post_meta( $byrde_page_id, '_byrde_content', $sanitized_content );
 
-    // CRITICAL: Clear post meta cache to ensure fresh data on next load
-    wp_cache_delete( $byrde_page_id, 'post_meta' );
-    clean_post_cache( $byrde_page_id );
-
-    // Verify both saves by reading back (bypassing cache)
+    // Verify both saves
     $saved_theme   = get_post_meta( $byrde_page_id, '_byrde_theme_config', true );
     $saved_content = get_post_meta( $byrde_page_id, '_byrde_content', true );
 

@@ -253,8 +253,8 @@ function byrde_handle_contact_form( WP_REST_Request $request ): WP_REST_Response
         $errors['phone'] = 'A valid phone number is required.';
     }
 
-    if ( empty( $service ) || ! in_array( $service, BYRDE_ALLOWED_SERVICES, true ) ) {
-        $errors['service'] = 'Please select a valid service.';
+    if ( empty( $service ) ) {
+        $errors['service'] = 'Service is required.';
     }
 
     if ( ! empty( $errors ) ) {

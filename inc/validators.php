@@ -122,30 +122,14 @@ function byrde_validate_theme_config( array $config ): array {
  * @return mixed Sanitized data.
  */
 function byrde_sanitize_theme_config( $data, $depth = 0 ) {
-	// Add logging at root level
-	if ( $depth === 0 ) {
-		error_log( '[Sanitize START] Input type: ' . gettype( $data ) . ' - keys: ' . ( is_array( $data ) ? implode( ', ', array_keys( $data ) ) : 'N/A' ) );
-	}
-
 	if ( is_array( $data ) ) {
 		$result = array();
 		foreach ( $data as $key => $value ) {
 			$sanitized = byrde_sanitize_theme_config( $value, $depth + 1 );
 			if ( $sanitized !== null ) {
 				$result[ $key ] = $sanitized;
-			} else {
-				error_log( "[Sanitize] Removed null value at key: $key (depth: $depth)" );
 			}
 		}
-
-		// Log at root level
-		if ( $depth === 0 ) {
-			error_log( '[Sanitize END] Output keys: ' . implode( ', ', array_keys( $result ) ) );
-			if ( isset( $result['sectionThemes'] ) ) {
-				error_log( '[Sanitize END] sectionThemes keys: ' . ( is_array( $result['sectionThemes'] ) ? implode( ', ', array_keys( $result['sectionThemes'] ) ) : 'NOT ARRAY' ) );
-			}
-		}
-
 		return $result;
 	}
 

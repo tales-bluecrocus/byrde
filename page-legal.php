@@ -28,6 +28,15 @@ $site_name = $settings['site_name'] ?? get_bloginfo( 'name' );
 $copyright = $settings['copyright'] ?? '';
 $brand_primary = $settings['brand_primary'] ?? '#10b981';
 
+// Meta descriptions for legal pages
+$slug = get_post_field( 'post_name', get_the_ID() );
+$meta_descriptions = array(
+    'privacy-policy'       => 'Learn how ' . $site_name . ' collects, uses, and protects your personal information. Read our full privacy policy.',
+    'terms-and-conditions' => 'Review the terms and conditions for using the ' . $site_name . ' website and services.',
+    'cookie-settings'      => 'Manage your cookie preferences and learn about the cookies used by ' . $site_name . '.',
+);
+$meta_description = $meta_descriptions[ $slug ] ?? 'Legal information for ' . $site_name . '.';
+
 // Get page content — fall back to default if empty
 $post_content = get_the_content();
 if ( ! empty( trim( wp_strip_all_tags( $post_content ) ) ) ) {
@@ -43,6 +52,7 @@ if ( ! empty( trim( wp_strip_all_tags( $post_content ) ) ) ) {
 <head>
     <meta charset="<?php bloginfo( 'charset' ); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="<?php echo esc_attr( $meta_description ); ?>">
     <?php wp_head(); ?>
     <style>
         /* ===== Legal Page Base ===== */

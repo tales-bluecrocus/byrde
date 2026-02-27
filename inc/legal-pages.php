@@ -75,7 +75,7 @@ function byrde_privacy_policy_content(): string {
 </ul>
 
 <h2>Cookies and Tracking Technologies</h2>
-<p>We use cookies and similar technologies to enhance your experience. For detailed information about the cookies we use and how to manage them, please visit our <a href="/cookie-settings">Cookie Settings</a> page.</p>
+<p>We use cookies and similar technologies to enhance your experience. For detailed information about the cookies we use and how to manage your preferences, please visit our <a href="/cookie-settings">Cookie Settings and Preferences</a> page.</p>
 
 <h3>Third-Party Analytics and Advertising</h3>
 <p>We use the following third-party services that may collect data through cookies:</p>
@@ -187,7 +187,7 @@ function byrde_terms_conditions_content(): string {
 <p>You agree to indemnify and hold harmless [byrde_company_name], its officers, employees, and agents from any claims, damages, or expenses arising from your use of the website or violation of these Terms.</p>
 
 <h2>11. Privacy</h2>
-<p>Your use of the website is also governed by our <a href="/privacy-policy">Privacy Policy</a>, which explains how we collect, use, and protect your personal information.</p>
+<p>Your use of the website is also governed by our <a href="/privacy-policy">Privacy Policy — how we collect, use, and protect your data</a>.</p>
 
 <h2>12. Governing Law</h2>
 <p>These Terms shall be governed by and construed in accordance with the laws of the state in which [byrde_company_name] is registered, without regard to conflict of law principles.</p>
@@ -229,12 +229,6 @@ function byrde_cookie_settings_content(): string {
 
 <h2>Analytics</h2>
 <p>Used to help us understand how the [byrde_company_name] website is performing, how visitors interact with the site, and where technical issues may occur. This information allows us to improve features and overall reliability.</p>
-<p><a href="#" class="byrde-cc-open-modal">View Cookies</a></p>
-
-<hr>
-
-<h2>Personalization</h2>
-<p>Allow [byrde_company_name] to remember the choices you make, such as your preferred language, region, or saved settings. These cookies make your experience more personal and help tailor the platform to your needs.</p>
 <p><a href="#" class="byrde-cc-open-modal">View Cookies</a></p>
 
 <hr>

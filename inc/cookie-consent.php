@@ -49,7 +49,7 @@ function byrde_cookie_consent_output(): void {
         <!-- View 1: Intro -->
         <div id="byrde-cc-intro" class="byrde-cc-view">
             <h2 class="byrde-cc-title">Cookies Settings</h2>
-            <p class="byrde-cc-desc">We use cookies to deliver and improve our services, analyze site usage, and if you agree, to customize or personalize your experience and market our services to you. You can read our Cookie Policy <a href="<?php echo $cookie_url; ?>" class="byrde-cc-link byrde-cc-navigate">here</a>.</p>
+            <p class="byrde-cc-desc">We use cookies to deliver and improve our services, analyze site usage, and if you agree, to customize or personalize your experience and market our services to you. You can read our <a href="<?php echo $cookie_url; ?>" class="byrde-cc-link byrde-cc-navigate">Cookie Policy and Preferences</a>.</p>
             <div class="byrde-cc-actions-stack">
                 <button id="byrde-cc-customize-btn" class="byrde-cc-btn byrde-cc-btn-outline" type="button">Customize Cookie Settings</button>
                 <div class="byrde-cc-actions-row">
@@ -293,15 +293,22 @@ function byrde_cookie_consent_output(): void {
     }
 
     function applyConsent(s){
+        // Analytics opt-out: disable GA4
         if (!s.analytics && window.GA_MEASUREMENT_ID) {
             window['ga-disable-' + window.GA_MEASUREMENT_ID] = true;
         }
-        if (!s.marketing && typeof window.fbq === 'function') {
-            window.fbq('consent', 'revoke');
+        // Marketing opt-out: disable FB Pixel + flag Google Ads conversions
+        if (!s.marketing) {
+            if (typeof window.fbq === 'function') window.fbq('consent', 'revoke');
+            window.byrdeAdsConsentRevoked = true;
+        } else {
+            window.byrdeAdsConsentRevoked = false;
         }
+        // Do Not Sell: disable everything
         if (s.doNotSell) {
             if (window.GA_MEASUREMENT_ID) window['ga-disable-' + window.GA_MEASUREMENT_ID] = true;
             if (typeof window.fbq === 'function') window.fbq('consent', 'revoke');
+            window.byrdeAdsConsentRevoked = true;
         }
     }
 

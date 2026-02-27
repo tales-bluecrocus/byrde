@@ -81,10 +81,11 @@ function byrde_get_default_settings(): array {
 
 		// Analytics
 		'analytics'      => array(
-			'ga_measurement_id'     => '',
-			'gtm_container_id'      => '',
-			'fb_pixel_id'           => '',
-			'gads_conversion_label' => '',
+			'ga_measurement_id'           => '',
+			'gtm_container_id'            => '',
+			'fb_pixel_id'                 => '',
+			'gads_conversion_label'       => '',
+			'gads_phone_conversion_label' => '',
 		),
 
 		// Legal Pages
@@ -214,10 +215,11 @@ function byrde_sanitize_theme_settings( array $settings ): array {
 	// Analytics
 	if ( isset( $settings['analytics'] ) ) {
 		$sanitized['analytics'] = array(
-			'ga_measurement_id'     => sanitize_text_field( $settings['analytics']['ga_measurement_id'] ?? '' ),
-			'gtm_container_id'      => sanitize_text_field( $settings['analytics']['gtm_container_id'] ?? '' ),
-			'fb_pixel_id'           => sanitize_text_field( $settings['analytics']['fb_pixel_id'] ?? '' ),
-			'gads_conversion_label' => sanitize_text_field( $settings['analytics']['gads_conversion_label'] ?? '' ),
+			'ga_measurement_id'           => sanitize_text_field( $settings['analytics']['ga_measurement_id'] ?? '' ),
+			'gtm_container_id'            => sanitize_text_field( $settings['analytics']['gtm_container_id'] ?? '' ),
+			'fb_pixel_id'                 => sanitize_text_field( $settings['analytics']['fb_pixel_id'] ?? '' ),
+			'gads_conversion_label'       => sanitize_text_field( $settings['analytics']['gads_conversion_label'] ?? '' ),
+			'gads_phone_conversion_label' => sanitize_text_field( $settings['analytics']['gads_phone_conversion_label'] ?? '' ),
 		);
 	}
 
@@ -355,7 +357,8 @@ function byrde_get_all_settings(): array {
 	$flattened['ga_measurement_id']     = $settings['analytics']['ga_measurement_id'] ?? '';
 	$flattened['gtm_container_id']      = $settings['analytics']['gtm_container_id'] ?? '';
 	$flattened['fb_pixel_id']           = $settings['analytics']['fb_pixel_id'] ?? '';
-	$flattened['gads_conversion_label'] = $settings['analytics']['gads_conversion_label'] ?? '';
+	$flattened['gads_conversion_label']       = $settings['analytics']['gads_conversion_label'] ?? '';
+	$flattened['gads_phone_conversion_label'] = $settings['analytics']['gads_phone_conversion_label'] ?? '';
 
 	// Legal — use home_url() so multisite subdirectory prefix is included
 	$privacy = $settings['legal']['privacy_policy_url'] ?? '';

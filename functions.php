@@ -21,11 +21,11 @@ require_once get_template_directory() . '/inc/theme-settings-manager.php';
 require_once get_template_directory() . '/inc/page-theme-editor.php';
 require_once get_template_directory() . '/inc/rest-content-api.php';
 require_once get_template_directory() . '/inc/contact-form-handler.php';
-require_once get_template_directory() . '/inc/analytics.php';
 require_once get_template_directory() . '/inc/seo.php';
 require_once get_template_directory() . '/inc/shortcodes.php';
 require_once get_template_directory() . '/inc/legal-pages.php';
 require_once get_template_directory() . '/inc/cookie-consent.php';
+require_once get_template_directory() . '/inc/cache.php';
 require_once get_template_directory() . '/inc/update-checker.php';
 
 /**
@@ -117,7 +117,7 @@ function byrde_render_shell(): void {
 function byrde_enqueue_assets(): void {
     $dist_dir = get_template_directory() . '/front-end/dist';
     $dist_uri = byrde_theme_uri() . '/front-end/dist';
-    $version  = wp_get_theme()->get( 'Version' );
+    $version  = byrde_get_cache_version();
 
     if ( file_exists( $dist_dir . '/assets/style.css' ) ) {
         wp_enqueue_style(
@@ -161,7 +161,7 @@ add_action( 'wp_enqueue_scripts', 'byrde_enqueue_assets' );
 function byrde_preload_resources(): void {
     $dist_dir = get_template_directory() . '/front-end/dist';
     $dist_uri = byrde_theme_uri() . '/front-end/dist';
-    $version  = wp_get_theme()->get( 'Version' );
+    $version  = byrde_get_cache_version();
 
     // Modulepreload JS bundle — browser downloads in parallel with CSS (breaks sequential chain)
     if ( file_exists( $dist_dir . '/assets/main.js' ) ) {
