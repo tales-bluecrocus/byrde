@@ -11,6 +11,7 @@ import { useGlobalConfig } from '../../../context/GlobalConfigContext';
 import { useSectionTheme } from '../../../context/SectionThemeContext';
 import { useHeaderConfig } from '../../../context/HeaderConfigContext';
 import { useContent } from '../../../context/ContentContext';
+import { useSettingsContext } from '../../../context/SettingsContext';
 import { useToast } from '../../Toast';
 import { Copy, Download, Upload, Check, AlertTriangle } from 'lucide-react';
 import type { GlobalConfig } from '../../../context/GlobalConfigContext';
@@ -37,6 +38,7 @@ export function PageAdvancedPanel() {
   const { sectionThemes, sectionOrder, sectionVisibility, importSectionData } = useSectionTheme();
   const { headerConfig, topbarConfig, replaceHeaderConfig, replaceTopbarConfig } = useHeaderConfig();
   const { sectionContent, replaceAllContent } = useContent();
+  const { updateSettings } = useSettingsContext();
   const { toast } = useToast();
 
   const [importText, setImportText] = useState('');
@@ -95,7 +97,25 @@ export function PageAdvancedPanel() {
       }
 
       if (data.config) {
-        if (data.config.globalConfig) replaceGlobalConfig(data.config.globalConfig);
+        if (data.config.globalConfig) {
+          replaceGlobalConfig(data.config.globalConfig);
+
+          // Sync brand colors to Settings so they persist to wp_options on save
+          const b = data.config.globalConfig.brand;
+          if (b) {
+            updateSettings({
+              brand_dark_primary: b.darkPrimary,
+              brand_dark_accent: b.darkAccent,
+              brand_dark_bg: b.darkBg,
+              brand_dark_text: b.darkText,
+              brand_light_primary: b.lightPrimary,
+              brand_light_accent: b.lightAccent,
+              brand_light_bg: b.lightBg,
+              brand_light_text: b.lightText,
+              brand_mode: b.mode,
+            });
+          }
+        }
         if (data.config.header) replaceHeaderConfig(data.config.header);
         if (data.config.topbar) replaceTopbarConfig(data.config.topbar);
         if (data.config.sectionThemes || data.config.sectionOrder) {

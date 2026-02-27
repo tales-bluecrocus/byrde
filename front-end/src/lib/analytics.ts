@@ -1,15 +1,13 @@
 /**
- * Analytics Tracking System
+ * Analytics — DataLayer Events & Ad Attribution
  *
- * Centralized analytics implementation for GA4, Facebook Pixel, and dataLayer events.
- * Supports scroll tracking, form interactions, CTA clicks, UTM capture, and ad attribution.
+ * All platform-specific tags (GA4, Google Ads conversions, Facebook Pixel)
+ * are managed by the ads team via Google Tag Manager.
  *
- * PAID ADS FEATURES:
- * - UTM parameter capture and storage
- * - Google Ads GCLID capture for offline conversions
- * - Facebook/Meta FBCLID capture
- * - Facebook Pixel event tracking
- * - Enhanced conversion data support
+ * This module:
+ *  - Pushes rich, structured events to `window.dataLayer` for GTM to consume
+ *  - Captures UTM parameters and click IDs (GCLID/FBCLID) for form attribution
+ *  - Provides React-friendly helpers for common tracking scenarios
  */
 
 // ============================================
@@ -45,20 +43,9 @@ export interface FormTrackingConfig {
   formLocation: string;
 }
 
-// GA4 gtag type
-type GtagCommand = 'config' | 'event' | 'set' | 'consent';
-
-// Facebook Pixel type
-type FbqCommand = 'init' | 'track' | 'trackCustom' | 'trackSingle' | 'trackSingleCustom';
-
 declare global {
   interface Window {
-    gtag?: (command: GtagCommand, targetId: string, config?: Record<string, unknown>) => void;
     dataLayer?: Record<string, unknown>[];
-    GA_MEASUREMENT_ID?: string;
-    fbq?: (command: FbqCommand, eventName: string, params?: Record<string, unknown>) => void;
-    _fbq?: unknown;
-    byrdeAdsConsentRevoked?: boolean;
   }
 }
 
@@ -209,115 +196,6 @@ export function getAttributionForSubmission(): Record<string, string> {
 }
 
 // ============================================
-// FACEBOOK PIXEL TRACKING
-// ============================================
-
-/**
- * Check if Facebook Pixel is available
- */
-export function isFacebookPixelAvailable(): boolean {
-  return typeof window !== 'undefined' && typeof window.fbq === 'function';
-}
-
-/**
- * Track Facebook Pixel event
- */
-export function trackFacebookEvent(
-  eventName: string,
-  params?: Record<string, unknown>
-): void {
-  if (!isFacebookPixelAvailable()) return;
-  if (window.byrdeAdsConsentRevoked) return;
-
-  window.fbq!('track', eventName, params);
-
-  if (import.meta.env.DEV) {
-    console.log('[FB Pixel]', eventName, params);
-  }
-}
-
-/**
- * Track Facebook custom event
- */
-export function trackFacebookCustomEvent(
-  eventName: string,
-  params?: Record<string, unknown>
-): void {
-  if (!isFacebookPixelAvailable()) return;
-  if (window.byrdeAdsConsentRevoked) return;
-
-  window.fbq!('trackCustom', eventName, params);
-
-  if (import.meta.env.DEV) {
-    console.log('[FB Pixel Custom]', eventName, params);
-  }
-}
-
-// ============================================
-// GOOGLE ADS CONVERSION TRACKING
-// ============================================
-
-/**
- * Get Google Ads conversion labels from WordPress settings
- */
-function getGoogleAdsConversionLabels(): { form: string; phone: string } {
-  // Injected via wp_localize_script as byrdeAnalytics
-  const analytics = (window as unknown as Record<string, unknown>).byrdeAnalytics as Record<string, string> | undefined;
-  return {
-    form: analytics?.gads_conversion_label || '',
-    phone: analytics?.gads_phone_conversion_label || '',
-  };
-}
-
-/**
- * Fire Google Ads conversion event for form submissions
- * Requires gads_conversion_label set in Theme Settings > Analytics
- */
-export function trackGoogleAdsConversion(serviceType?: string): void {
-  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
-  if (window.byrdeAdsConsentRevoked) return;
-
-  const labels = getGoogleAdsConversionLabels();
-  if (!labels.form) return;
-
-  window.gtag('event', 'conversion', {
-    send_to: labels.form,
-    value: 1.0,
-    currency: 'USD',
-    ...(serviceType ? { event_label: serviceType } : {}),
-  } as Record<string, unknown>);
-
-  if (import.meta.env.DEV) {
-    console.log('[Google Ads] Form Conversion', labels.form, serviceType);
-  }
-}
-
-/**
- * Fire Google Ads conversion event for phone clicks
- * Requires gads_phone_conversion_label set in Theme Settings > Analytics
- * Falls back to gads_conversion_label if phone label is not set
- */
-export function trackGoogleAdsPhoneConversion(location?: string): void {
-  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
-  if (window.byrdeAdsConsentRevoked) return;
-
-  const labels = getGoogleAdsConversionLabels();
-  const label = labels.phone || labels.form;
-  if (!label) return;
-
-  window.gtag('event', 'conversion', {
-    send_to: label,
-    value: 1.0,
-    currency: 'USD',
-    ...(location ? { event_label: `phone_call_${location}` } : {}),
-  } as Record<string, unknown>);
-
-  if (import.meta.env.DEV) {
-    console.log('[Google Ads] Phone Conversion', label, location);
-  }
-}
-
-// ============================================
 // EVENT NAMES (Object-Action naming convention)
 // ============================================
 
@@ -355,21 +233,12 @@ export const AnalyticsEvents = {
 export type AnalyticsEventName = typeof AnalyticsEvents[keyof typeof AnalyticsEvents];
 
 // ============================================
-// CORE TRACKING FUNCTIONS
+// CORE TRACKING — DataLayer Only
 // ============================================
 
 /**
- * Check if analytics is available
- */
-export function isAnalyticsAvailable(): boolean {
-  return typeof window !== 'undefined' && (
-    typeof window.gtag === 'function' ||
-    Array.isArray(window.dataLayer)
-  );
-}
-
-/**
- * Push event to dataLayer (GA4 / Site Kit compatible)
+ * Push event to dataLayer for GTM to consume.
+ * GTM triggers fire tags (GA4, Google Ads, FB Pixel, etc.) based on these events.
  */
 export function pushToDataLayer(event: TrackingEvent): void {
   if (typeof window === 'undefined') return;
@@ -382,7 +251,8 @@ export function pushToDataLayer(event: TrackingEvent): void {
 }
 
 /**
- * Track event with GA4 gtag
+ * Track event — pushes structured data to dataLayer.
+ * GTM handles routing to GA4, Google Ads, FB Pixel, etc.
  */
 export function trackEvent(
   eventName: string,
@@ -397,15 +267,8 @@ export function trackEvent(
       )
     : undefined;
 
-  // Push to dataLayer
   pushToDataLayer({ name: eventName, properties: cleanProps });
 
-  // Also send to gtag if available
-  if (typeof window.gtag === 'function') {
-    window.gtag('event', eventName, cleanProps);
-  }
-
-  // Debug logging in development
   if (import.meta.env.DEV) {
     console.log('[Analytics]', eventName, cleanProps);
   }
@@ -432,8 +295,8 @@ export function trackCTAClick(
 }
 
 /**
- * Track phone click (high-value conversion for local services)
- * Fires: GA4 phone_clicked, Google Ads conversion, FB Pixel Contact
+ * Track phone click (high-value conversion for local services).
+ * Pushes phone_clicked to dataLayer — GTM fires Google Ads + FB Pixel tags.
  */
 export function trackPhoneClick(location: string): void {
   const attribution = getAdAttribution();
@@ -445,15 +308,6 @@ export function trackPhoneClick(location: string): void {
     utm_medium: attribution.utm_medium,
     utm_campaign: attribution.utm_campaign,
     gclid: attribution.gclid,
-  });
-
-  // Google Ads conversion for phone calls (uses phone-specific label)
-  trackGoogleAdsPhoneConversion(location);
-
-  // Facebook Pixel - Contact event for phone calls
-  trackFacebookEvent('Contact', {
-    content_name: 'phone_call',
-    content_category: location,
   });
 }
 
@@ -502,7 +356,7 @@ export function trackScrollDepth(depth: number): void {
  */
 export function trackFAQExpanded(question: string, index: number): void {
   trackEvent(AnalyticsEvents.FAQ_EXPANDED, {
-    question_text: question.substring(0, 100), // Limit length
+    question_text: question.substring(0, 100),
     question_index: index,
   });
 }
@@ -547,48 +401,33 @@ export function trackFormFieldCompleted(
 }
 
 /**
- * Track form submission with full attribution
- * Fires: GA4 form_submitted, GA4 lead_generated, Google Ads conversion, FB Pixel Lead
+ * Track form submission with full attribution.
+ * Pushes form_submitted + lead_generated to dataLayer.
+ * GTM fires conversion tags (Google Ads, FB Pixel) based on these events.
  */
 export function trackFormSubmitted(
   formName: string,
   formLocation: string,
   formData?: Record<string, string>
 ): void {
-  // Get attribution data for this conversion
   const attribution = getAdAttribution();
 
   trackEvent(AnalyticsEvents.FORM_SUBMITTED, {
     form_name: formName,
     form_location: formLocation,
-    // Only include non-PII fields
     service_type: formData?.service,
-    // Include attribution
     utm_source: attribution.utm_source,
     utm_medium: attribution.utm_medium,
     utm_campaign: attribution.utm_campaign,
   });
 
-  // Also track as conversion
   trackEvent(AnalyticsEvents.LEAD_GENERATED, {
     lead_source: formLocation,
     service_requested: formData?.service,
-    // Attribution for conversion
     utm_source: attribution.utm_source,
     utm_medium: attribution.utm_medium,
     utm_campaign: attribution.utm_campaign,
     gclid: attribution.gclid,
-  });
-
-  // Google Ads conversion event (requires gads_conversion_label in settings)
-  trackGoogleAdsConversion(formData?.service);
-
-  // Facebook Pixel Lead event
-  trackFacebookEvent('Lead', {
-    content_name: formName,
-    content_category: formData?.service,
-    value: 1,
-    currency: 'USD',
   });
 }
 
@@ -636,7 +475,7 @@ export function trackQuoteRequested(
   trackEvent(AnalyticsEvents.QUOTE_REQUESTED, {
     service_type: serviceType,
     conversion_source: source,
-    value: 1, // For conversion counting
+    value: 1,
   });
 }
 
@@ -775,7 +614,7 @@ export class SectionVisibilityTracker {
             }
           });
         },
-        { threshold: 0.5 } // 50% visibility
+        { threshold: 0.5 }
       );
     }
 

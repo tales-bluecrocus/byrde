@@ -419,6 +419,9 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
           <FormField label="Submit Button Text">
             <Input value={content.formSubmitText} onChange={(e) => onChange({ formSubmitText: e.target.value })} placeholder="Get My Free Quote" />
           </FormField>
+          <FormField label="Default Service (hidden field)">
+            <Input value={content.formDefaultService} onChange={(e) => onChange({ formDefaultService: e.target.value })} placeholder="junk-removal" />
+          </FormField>
         </div>
       </div>
       <Separator />

@@ -2,7 +2,7 @@
  * React Hooks for Analytics Tracking
  *
  * Custom hooks for integrating analytics into React components.
- * Includes paid ads attribution capture for Google Ads, Meta Ads, etc.
+ * Captures UTM/click ID attribution and pushes events to dataLayer for GTM.
  */
 
 import { useEffect, useRef, useCallback, useMemo } from 'react';

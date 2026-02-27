@@ -19,7 +19,6 @@ import {
   Star,
   FileText,
   Share2,
-  BarChart3,
   Scale,
   Upload,
   Mail,
@@ -402,26 +401,6 @@ export function SiteSettingsPanel() {
             value={settings.yelp_url}
             onChange={(e) => update('yelp_url', e.target.value)}
             placeholder="https://yelp.com/biz/..."
-            className={inputCls}
-          />
-        </Field>
-      </Section>
-
-      {/* Analytics — GA4 managed by Site Kit plugin */}
-      <Section icon={BarChart3} title="Analytics" open={openSection === 'analytics'} onToggle={() => toggle('analytics')}>
-        <Field label="Google Ads Conversion Label (Form)">
-          <Input
-            value={settings.gads_conversion_label}
-            onChange={(e) => update('gads_conversion_label', e.target.value)}
-            placeholder="AW-XXXXXXXXX/YYYYYYY"
-            className={inputCls}
-          />
-        </Field>
-        <Field label="Google Ads Conversion Label (Phone)">
-          <Input
-            value={settings.gads_phone_conversion_label}
-            onChange={(e) => update('gads_phone_conversion_label', e.target.value)}
-            placeholder="AW-XXXXXXXXX/ZZZZZZZ"
             className={inputCls}
           />
         </Field>

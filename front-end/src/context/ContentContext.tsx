@@ -43,6 +43,7 @@ export interface HeroContent {
   formTitle: string;
   formSubtitle: string;
   formSubmitText: string;
+  formDefaultService: string;
   // Hero badge (above headline)
   heroBadgeText: string;
   showHeroBadge: boolean;
@@ -219,6 +220,7 @@ const DEFAULT_HERO_CONTENT: HeroContent = {
   formTitle: 'Fill Out This Form for Your Free Estimate',
   formSubtitle: "We'll get back to you within 30 minutes",
   formSubmitText: 'Get My Free Quote',
+  formDefaultService: 'junk-removal',
   // Hero badge
   heroBadgeText: 'Fully Insured. Peace of Mind.',
   showHeroBadge: true,

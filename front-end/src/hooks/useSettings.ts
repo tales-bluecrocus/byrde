@@ -51,12 +51,6 @@ export interface ThemeSettings {
   site_url: string;
   og_image: string;
 
-  // Analytics
-  ga_measurement_id: string;
-  fb_pixel_id: string;
-  gads_conversion_label: string;
-  gads_phone_conversion_label: string;
-
   // Legal pages
   privacy_policy_url: string;
   terms_url: string;
@@ -122,12 +116,6 @@ export const DEFAULT_SETTINGS: ThemeSettings = {
   site_keywords: '',
   site_url: '',
   og_image: '',
-
-  // Analytics - NO defaults
-  ga_measurement_id: '',
-  fb_pixel_id: '',
-  gads_conversion_label: '',
-  gads_phone_conversion_label: '',
 
   // Legal pages
   privacy_policy_url: '/privacy-policy',

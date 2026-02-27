@@ -50,17 +50,6 @@ const FALLBACK_BENEFITS = [
   'Honest & Upfront Pricing',
 ] as const;
 
-// Service options for dropdown
-const SERVICE_OPTIONS = [
-  { value: '', label: 'Select a service' },
-  { value: 'junk-removal', label: 'Junk Removal' },
-  { value: 'demolition', label: 'Demolition Services' },
-  { value: 'estate-cleanout', label: 'Estate & Hoarder Cleanouts' },
-  { value: 'move-out', label: 'Apartment & Move-Out Cleanouts' },
-  { value: 'bobcat', label: 'Bobcat & Excavation Work' },
-  { value: 'dumpster', label: 'Dumpster Rentals' },
-] as const;
-
 // ============================================
 // MEMOIZED ICON COMPONENTS
 // ============================================
@@ -172,7 +161,6 @@ interface FormData {
   name: string;
   phone: string;
   email: string;
-  service: string;
   message: string;
 }
 
@@ -180,14 +168,12 @@ interface FormErrors {
   name?: string;
   phone?: string;
   email?: string;
-  service?: string;
 }
 
 const INITIAL_FORM_DATA: FormData = {
   name: '',
   phone: '',
   email: '',
-  service: '',
   message: '',
 };
 
@@ -221,10 +207,6 @@ function validateForm(formData: FormData): FormErrors {
     errors.email = 'Email is required';
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
     errors.email = 'Invalid email';
-  }
-
-  if (!formData.service) {
-    errors.service = 'Please select a service';
   }
 
   return errors;
@@ -411,6 +393,7 @@ export default function Hero() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...formData,
+            service: content.formDefaultService || 'junk-removal',
             _honeypot: (document.getElementById('byrde_hp') as HTMLInputElement)?.value || '',
             attribution: getAttributionForSubmission(),
           }),
@@ -426,7 +409,7 @@ export default function Hero() {
 
       // Track successful submission
       trackFormSubmitted('hero_contact_form', 'hero', {
-        service: formData.service,
+        service: content.formDefaultService || 'junk-removal',
       });
 
       setIsSuccess(true);
@@ -732,34 +715,6 @@ export default function Hero() {
                         />
                         {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
                       </div>
-                    </div>
-
-                    {/* Service */}
-                    <div>
-                      <label htmlFor="service" className="block text-sm font-medium mb-1.5" style={{ color: themeStyles.labelColor }}>
-                        Service Needed
-                      </label>
-                      <select
-                        id="service"
-                        name="service"
-                        value={formData.service}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full px-4 py-3 rounded-xl border transition-all duration-300 outline-none appearance-none cursor-pointer focus:ring-2"
-                        style={{
-                          backgroundColor: errors.service ? 'rgba(239, 68, 68, 0.1)' : themeStyles.inputBg,
-                          borderColor: errors.service ? '#ef4444' : themeStyles.inputBorder,
-                          color: themeStyles.inputText,
-                          '--tw-ring-color': `${themeStyles.inputFocusBorder}33`,
-                        } as React.CSSProperties}
-                      >
-                        {SERVICE_OPTIONS.map(option => (
-                          <option key={option.value} value={option.value} style={{ backgroundColor: themeStyles.inputBg }}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.service && <p className="text-red-400 text-xs mt-1">{errors.service}</p>}
                     </div>
 
                     {/* Message */}
