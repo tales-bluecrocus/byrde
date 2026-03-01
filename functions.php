@@ -1,6 +1,6 @@
 <?php
 /**
- * Byrde Theme Functions
+ * Byrde Plugin Functions
  *
  * @package Byrde
  */
@@ -10,37 +10,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Include theme modules
+ * Include plugin modules
  */
-require_once get_template_directory() . '/inc/constants.php'; // Theme constants
-require_once get_template_directory() . '/inc/required-plugins.php'; // Required plugin checks
-require_once get_template_directory() . '/inc/cleanup.php';
-require_once get_template_directory() . '/inc/validators.php'; // Input validation & sanitization
-require_once get_template_directory() . '/inc/rate-limiter.php'; // Rate limiting
-require_once get_template_directory() . '/inc/theme-settings-manager.php';
-require_once get_template_directory() . '/inc/page-theme-editor.php';
-require_once get_template_directory() . '/inc/rest-content-api.php';
-require_once get_template_directory() . '/inc/contact-form-handler.php';
-require_once get_template_directory() . '/inc/seo.php';
-require_once get_template_directory() . '/inc/shortcodes.php';
-require_once get_template_directory() . '/inc/legal-pages.php';
-require_once get_template_directory() . '/inc/cookie-consent.php';
-require_once get_template_directory() . '/inc/cache.php';
-require_once get_template_directory() . '/inc/update-checker.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/constants.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/required-plugins.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/cleanup.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/validators.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/rate-limiter.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/theme-settings-manager.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/cpt-landing.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/template-loader.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/page-theme-editor.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/rest-content-api.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/contact-form-handler.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/seo.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/shortcodes.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/legal-pages.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/cookie-consent.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/cache.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/update-checker.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/migration.php';
 
 /**
- * Get the theme directory URI relative to the network root.
+ * Get the plugin directory URI, multisite-aware.
  *
- * In multisite subdirectory installs, get_template_directory_uri() includes
- * the subsite prefix (e.g. /lp/wp-content/...) which causes 404s since
- * wp-content lives at the root. This helper uses network_site_url() to
- * generate the correct path from the installation root.
+ * In multisite subdirectory installs, plugins_url() may include
+ * the subsite prefix which causes 404s since wp-content lives
+ * at the root. This helper uses network_site_url() to generate
+ * the correct path from the installation root.
  */
-function byrde_theme_uri(): string {
+function byrde_plugin_uri(): string {
     if ( is_multisite() ) {
-        return network_site_url( 'wp-content/themes/' . get_template() );
+        return network_site_url( 'wp-content/plugins/byrde' );
     }
-    return get_template_directory_uri();
+    return untrailingslashit( BYRDE_PLUGIN_URL );
 }
 
 /**
@@ -63,10 +66,10 @@ function byrde_get_logo_data(): array {
     }
 
     // Fallback to bundled logo
-    $dist_dir = get_template_directory() . '/front-end/dist';
+    $dist_dir = BYRDE_PLUGIN_DIR . 'front-end/dist';
     if ( file_exists( $dist_dir . '/assets/byrde-logo.webp' ) ) {
         return array(
-            'url' => byrde_theme_uri() . '/front-end/dist/assets/byrde-logo.webp',
+            'url' => byrde_plugin_uri() . '/front-end/dist/assets/byrde-logo.webp',
             'alt' => $site_name,
         );
     }
@@ -115,8 +118,13 @@ function byrde_render_shell(): void {
  * Enqueue front-end assets (fixed filenames, version-based cache busting)
  */
 function byrde_enqueue_assets(): void {
-    $dist_dir = get_template_directory() . '/front-end/dist';
-    $dist_uri = byrde_theme_uri() . '/front-end/dist';
+    // Only enqueue on byrde_landing pages
+    if ( ! is_singular( BYRDE_CPT_LANDING ) ) {
+        return;
+    }
+
+    $dist_dir = BYRDE_PLUGIN_DIR . 'front-end/dist';
+    $dist_uri = byrde_plugin_uri() . '/front-end/dist';
     $version  = byrde_get_cache_version();
 
     if ( file_exists( $dist_dir . '/assets/style.css' ) ) {
@@ -159,8 +167,13 @@ add_action( 'wp_enqueue_scripts', 'byrde_enqueue_assets' );
  * Outputs early in <head> so browser discovers resources ASAP.
  */
 function byrde_preload_resources(): void {
-    $dist_dir = get_template_directory() . '/front-end/dist';
-    $dist_uri = byrde_theme_uri() . '/front-end/dist';
+    // Only on byrde_landing pages
+    if ( ! is_singular( BYRDE_CPT_LANDING ) ) {
+        return;
+    }
+
+    $dist_dir = BYRDE_PLUGIN_DIR . 'front-end/dist';
+    $dist_uri = byrde_plugin_uri() . '/front-end/dist';
     $version  = byrde_get_cache_version();
 
     // Modulepreload JS bundle — browser downloads in parallel with CSS (breaks sequential chain)
@@ -232,7 +245,7 @@ function byrde_script_type( string $tag, string $handle ): string {
 add_filter( 'script_loader_tag', 'byrde_script_type', 10, 2 );
 
 /**
- * Theme setup
+ * Plugin setup (runs on after_setup_theme so theme support is registered)
  */
 function byrde_setup(): void {
     add_theme_support( 'title-tag' );
@@ -244,47 +257,47 @@ function byrde_setup(): void {
 add_action( 'after_setup_theme', 'byrde_setup' );
 
 /**
- * Create default pages on theme activation
+ * Create default landing pages on plugin activation
  */
 function byrde_activate(): void {
     $pages = array(
         array(
-            'title'     => 'Home',
-            'slug'      => 'home',
-            'set_front' => true,
+            'title' => 'First PPC',
+            'slug'  => 'first-ppc',
         ),
         array(
-            'title'    => 'Privacy Policy',
-            'slug'     => 'privacy-policy',
-            'template' => 'page-legal.php',
+            'title'     => 'Privacy Policy',
+            'slug'      => 'privacy-policy',
+            'page_type' => 'legal',
         ),
         array(
-            'title'    => 'Terms & Conditions',
-            'slug'     => 'terms-and-conditions',
-            'template' => 'page-legal.php',
+            'title'     => 'Terms & Conditions',
+            'slug'      => 'terms-and-conditions',
+            'page_type' => 'legal',
         ),
         array(
-            'title'    => 'Cookie Settings',
-            'slug'     => 'cookie-settings',
-            'template' => 'page-legal.php',
+            'title'     => 'Cookie Settings',
+            'slug'      => 'cookie-settings',
+            'page_type' => 'legal',
         ),
     );
 
-    $front_page_id = 0;
-
     foreach ( $pages as $page ) {
-        $existing = get_page_by_path( $page['slug'] );
+        // Check if a landing page with this slug already exists
+        $existing = get_posts( array(
+            'post_type'      => BYRDE_CPT_LANDING,
+            'name'           => $page['slug'],
+            'posts_per_page' => 1,
+            'post_status'    => 'any',
+        ) );
 
-        if ( $existing ) {
-            // Ensure legal page template is set on existing pages
-            if ( ! empty( $page['template'] ) ) {
-                $current_template = get_post_meta( $existing->ID, '_wp_page_template', true );
-                if ( empty( $current_template ) || 'default' === $current_template ) {
-                    update_post_meta( $existing->ID, '_wp_page_template', $page['template'] );
+        if ( ! empty( $existing ) ) {
+            // Ensure page type meta is set on existing pages
+            if ( ! empty( $page['page_type'] ) ) {
+                $current_type = get_post_meta( $existing[0]->ID, '_byrde_page_type', true );
+                if ( empty( $current_type ) ) {
+                    update_post_meta( $existing[0]->ID, '_byrde_page_type', $page['page_type'] );
                 }
-            }
-            if ( ! empty( $page['set_front'] ) ) {
-                $front_page_id = $existing->ID;
             }
             continue;
         }
@@ -293,25 +306,14 @@ function byrde_activate(): void {
             'post_title'   => $page['title'],
             'post_name'    => $page['slug'],
             'post_status'  => 'publish',
-            'post_type'    => 'page',
+            'post_type'    => BYRDE_CPT_LANDING,
             'post_content' => '',
         ) );
 
         if ( $page_id && ! is_wp_error( $page_id ) ) {
-            // Set page template
-            if ( ! empty( $page['template'] ) ) {
-                update_post_meta( $page_id, '_wp_page_template', $page['template'] );
-            }
-            if ( ! empty( $page['set_front'] ) ) {
-                $front_page_id = $page_id;
+            if ( ! empty( $page['page_type'] ) ) {
+                update_post_meta( $page_id, '_byrde_page_type', $page['page_type'] );
             }
         }
     }
-
-    // Set static front page
-    if ( $front_page_id ) {
-        update_option( 'show_on_front', 'page' );
-        update_option( 'page_on_front', $front_page_id );
-    }
 }
-add_action( 'after_switch_theme', 'byrde_activate' );

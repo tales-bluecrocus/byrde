@@ -19,8 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Output cookie consent modal HTML + CSS + JS
  */
 function byrde_cookie_consent_output(): void {
-    // Skip in admin or preview mode
+    // Skip in admin, preview mode, or non-Byrde pages
     if ( is_admin() ) {
+        return;
+    }
+    if ( ! is_singular( BYRDE_CPT_LANDING ) ) {
         return;
     }
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended

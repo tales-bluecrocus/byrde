@@ -39,7 +39,7 @@ function byrde_maybe_render_editor(): void {
     }
 
     $page = get_post( $byrde_page_id );
-    if ( ! $page || $page->post_type !== 'page' ) {
+    if ( ! $page || $page->post_type !== BYRDE_CPT_LANDING ) {
         wp_die( __( 'Page not found.', 'byrde' ) );
     }
 
@@ -72,10 +72,10 @@ add_action( 'admin_menu', 'byrde_register_editor_page' );
 function byrde_render_editor_page( int $byrde_page_id, WP_Post $page ): void {
     $preview_url = add_query_arg( array(
         'byrde_preview' => '1',
-        'byrde_page_id'          => $byrde_page_id,
-    ), home_url( '/' ) );
+        'byrde_page_id' => $byrde_page_id,
+    ), get_permalink( $byrde_page_id ) );
 
-    $back_url = admin_url( 'edit.php?post_type=page' );
+    $back_url = admin_url( 'edit.php?post_type=' . BYRDE_CPT_LANDING );
     $view_url = get_permalink( $byrde_page_id );
 
     // Output full-screen editor
@@ -235,7 +235,7 @@ function byrde_render_editor_page( int $byrde_page_id, WP_Post $page ): void {
  * Add "Edit Theme" link to page row actions
  */
 function byrde_add_editor_link( array $actions, WP_Post $post ): array {
-    if ( $post->post_type !== 'page' || ! current_user_can( 'edit_post', $post->ID ) ) {
+    if ( $post->post_type !== BYRDE_CPT_LANDING || ! current_user_can( 'edit_post', $post->ID ) ) {
         return $actions;
     }
 
@@ -249,7 +249,7 @@ function byrde_add_editor_link( array $actions, WP_Post $post ): array {
 
     return $actions;
 }
-add_filter( 'page_row_actions', 'byrde_add_editor_link', 10, 2 );
+add_filter( 'post_row_actions', 'byrde_add_editor_link', 10, 2 );
 
 /**
  * Inject admin context into preview iframe
@@ -593,7 +593,7 @@ function byrde_load_page_theme_config(): void {
         return;
     }
 
-    if ( ! is_singular( 'page' ) ) {
+    if ( ! is_singular( BYRDE_CPT_LANDING ) ) {
         return;
     }
 
@@ -620,7 +620,7 @@ add_action( 'wp_head', 'byrde_load_page_theme_config', 1 );
  * Register meta key
  */
 function byrde_register_theme_meta(): void {
-    register_post_meta( 'page', '_byrde_theme_config', array(
+    register_post_meta( BYRDE_CPT_LANDING, '_byrde_theme_config', array(
         'type'         => 'string',
         'single'       => true,
         'show_in_rest' => false,
@@ -635,7 +635,7 @@ add_action( 'init', 'byrde_register_theme_meta' );
  */
 function byrde_customize_admin_bar( WP_Admin_Bar $wp_admin_bar ): void {
     // Only on frontend pages
-    if ( is_admin() || ! is_singular( 'page' ) ) {
+    if ( is_admin() || ! is_singular( BYRDE_CPT_LANDING ) ) {
         return;
     }
 

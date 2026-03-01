@@ -158,5 +158,9 @@ function byrde_get_cache_version(): string {
 	if ( $cache_ver ) {
 		return $cache_ver;
 	}
-	return wp_get_theme()->get( 'Version' );
+	if ( ! function_exists( 'get_plugin_data' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	$plugin_data = get_plugin_data( BYRDE_PLUGIN_FILE );
+	return $plugin_data['Version'] ?? '1.0.0';
 }

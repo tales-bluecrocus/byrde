@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once get_template_directory() . '/inc/class-tgm-plugin-activation.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/class-tgm-plugin-activation.php';
 
 /**
  * Register required and recommended plugins via TGMPA.

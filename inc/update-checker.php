@@ -1,12 +1,9 @@
 <?php
 /**
- * GitHub-based theme auto-updater.
+ * GitHub-based plugin auto-updater.
  *
  * Uses the Plugin Update Checker library to let WordPress detect
  * new releases from the GitHub repository and offer one-click updates.
- *
- * Uses dirname(__DIR__) instead of get_template_directory() so the paths
- * resolve correctly in Multisite regardless of active theme context.
  *
  * @package Byrde
  */
@@ -15,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// Theme root = parent of /inc/ where this file lives
+// Plugin root directory
 $byrde_dir = dirname( __DIR__ );
 
 // Composer autoload (installed by release workflow)
@@ -29,7 +26,7 @@ use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $myUpdateChecker = PucFactory::buildUpdateChecker(
     'https://github.com/tales-bluecrocus/byrde/',
-    $byrde_dir . '/style.css',
+    BYRDE_PLUGIN_FILE,
     'byrde'
 );
 
@@ -43,10 +40,10 @@ $myUpdateChecker->getVcsApi()->enableReleaseAssets();
  * Fix folder name during update installation.
  *
  * GitHub release ZIPs sometimes extract into a folder with a hash suffix.
- * This ensures the theme lands in wp-content/themes/byrde/.
+ * This ensures the plugin lands in wp-content/plugins/byrde/.
  */
 add_filter( 'upgrader_source_selection', function ( $source, $remote_source, $upgrader, $hook_extra ) {
-    if ( ! isset( $hook_extra['theme'] ) || 'byrde' !== $hook_extra['theme'] ) {
+    if ( ! isset( $hook_extra['plugin'] ) || plugin_basename( BYRDE_PLUGIN_FILE ) !== $hook_extra['plugin'] ) {
         return $source;
     }
 
@@ -62,5 +59,5 @@ add_filter( 'upgrader_source_selection', function ( $source, $remote_source, $up
         return $corrected_source;
     }
 
-    return new WP_Error( 'rename_failed', 'Could not rename the theme folder during update.' );
+    return new WP_Error( 'rename_failed', 'Could not rename the plugin folder during update.' );
 }, 10, 4 );

@@ -12,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // =======================
+// CUSTOM POST TYPE
+// =======================
+define( 'BYRDE_CPT_LANDING', 'byrde_landing' );
+
+// =======================
 // POST META KEYS
 // =======================
 

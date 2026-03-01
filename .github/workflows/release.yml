@@ -43,7 +43,7 @@ jobs:
             - name: Create distribution directory
               run: mkdir -p dist-release
 
-            - name: Copy theme files to distribution
+            - name: Copy plugin files to distribution
               run: |
                   rsync -av --progress . dist-release/byrde \
                     --exclude='.git/' \
@@ -68,10 +68,13 @@ jobs:
                     --exclude='front-end/package.json' \
                     --exclude='front-end/package-lock.json' \
                     --exclude='front-end/eslint.config.js' \
+                    --exclude='front-end/jest.config.ts' \
                     --exclude='front-end/README.md' \
                     --exclude='front-end/claude.md' \
                     --exclude='front-end/content.md' \
                     --exclude='front-end/reference.md' \
+                    --exclude='style.css' \
+                    --exclude='page-legal.php' \
                     --exclude='.gitignore' \
                     --exclude='.gitattributes' \
                     --exclude='composer.json' \

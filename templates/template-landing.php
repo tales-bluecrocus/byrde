@@ -1,6 +1,9 @@
 <?php
 /**
- * Main Template
+ * Template: Landing Page
+ *
+ * Standalone HTML document for byrde_landing posts.
+ * Renders the React app mount point, bypassing the active theme.
  *
  * @package Byrde
  */
@@ -18,9 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
-
     <div id="root"><?php byrde_render_shell(); ?></div>
-
 <?php wp_footer(); ?>
 </body>
 </html>

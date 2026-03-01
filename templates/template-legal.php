@@ -1,7 +1,6 @@
 <?php
 /**
- * Template Name: Legal Page
- * Template Post Type: page
+ * Template: Legal Page
  *
  * Server-rendered template for legal pages (Privacy Policy, Terms, Cookies).
  * Uses matching dark header/footer with a light, readable content area.
@@ -151,9 +150,9 @@ if ( ! empty( trim( wp_strip_all_tags( $post_content ) ) ) ) {
             </p>
             <nav class="byrde-lp-footer-links">
                 <a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
-                <a href="<?php echo esc_url( $settings['privacy_policy_url'] ?? home_url( '/privacy-policy' ) ); ?>">Privacy Policy</a>
-                <a href="<?php echo esc_url( $settings['terms_url'] ?? home_url( '/terms-and-conditions' ) ); ?>">Terms &amp; Conditions</a>
-                <a href="<?php echo esc_url( $settings['cookie_settings_url'] ?? home_url( '/cookie-settings' ) ); ?>">Cookie Settings</a>
+                <a href="<?php echo esc_url( $settings['privacy_policy_url'] ?? home_url( '/lp/privacy-policy' ) ); ?>">Privacy Policy</a>
+                <a href="<?php echo esc_url( $settings['terms_url'] ?? home_url( '/lp/terms-and-conditions' ) ); ?>">Terms &amp; Conditions</a>
+                <a href="<?php echo esc_url( $settings['cookie_settings_url'] ?? home_url( '/lp/cookie-settings' ) ); ?>">Cookie Settings</a>
             </nav>
         </div>
     </footer>

@@ -1,22 +1,22 @@
 #!/bin/bash
 
-# Build local do tema para upload manual no WordPress do cliente
+# Build local do plugin para upload manual no WordPress do cliente
 # Uso: ./.config/build-zip.sh
 
 set -e
 
-# Get theme root directory (parent of .config)
-THEME_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-FRONTEND_DIR="$THEME_DIR/front-end"
-BUILD_DIR="$THEME_DIR/dist-release"
-OUTPUT="$THEME_DIR/../byrde.zip"
+# Get plugin root directory (parent of .config)
+PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FRONTEND_DIR="$PLUGIN_DIR/front-end"
+BUILD_DIR="$PLUGIN_DIR/dist-release"
+OUTPUT="$PLUGIN_DIR/../byrde.zip"
 
 # Colors
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${BLUE}Building Byrde theme...${NC}\n"
+echo -e "${BLUE}Building Byrde plugin...${NC}\n"
 
 # Clean old artifacts
 echo -e "${GREEN}Cleaning old build...${NC}"
@@ -32,14 +32,14 @@ npm run build
 
 # Install composer production deps
 echo -e "${GREEN}Installing composer dependencies...${NC}"
-cd "$THEME_DIR"
+cd "$PLUGIN_DIR"
 composer install --no-dev --optimize-autoloader --quiet
 
 # Assemble distribution
-echo -e "${GREEN}Packaging theme...${NC}"
+echo -e "${GREEN}Packaging plugin...${NC}"
 mkdir -p "$BUILD_DIR"
 
-rsync -a "$THEME_DIR/" "$BUILD_DIR/byrde/" \
+rsync -a "$PLUGIN_DIR/" "$BUILD_DIR/byrde/" \
   --exclude='.git/' \
   --exclude='.github/' \
   --exclude='.vscode/' \
@@ -63,10 +63,13 @@ rsync -a "$THEME_DIR/" "$BUILD_DIR/byrde/" \
   --exclude='front-end/package.json' \
   --exclude='front-end/package-lock.json' \
   --exclude='front-end/eslint.config.js' \
+  --exclude='front-end/jest.config.ts' \
   --exclude='front-end/README.md' \
   --exclude='front-end/claude.md' \
   --exclude='front-end/content.md' \
   --exclude='front-end/reference.md' \
+  --exclude='style.css' \
+  --exclude='page-legal.php' \
   --exclude='.gitignore' \
   --exclude='.gitattributes' \
   --exclude='composer.json' \

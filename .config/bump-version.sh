@@ -8,9 +8,9 @@
 
 set -e
 
-# Get theme root directory (parent of .config)
-THEME_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$THEME_DIR"
+# Get plugin root directory (parent of .config)
+PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PLUGIN_DIR"
 
 # Colors
 RED='\033[0;31m'
@@ -31,8 +31,8 @@ if [[ ! "$BUMP_TYPE" =~ ^(major|minor|patch)$ ]]; then
     exit 1
 fi
 
-# Get current version from style.css
-CURRENT_VERSION=$(grep -m 1 "Version:" style.css | sed 's/.*Version: *//' | tr -d '\r')
+# Get current version from byrde.php
+CURRENT_VERSION=$(grep -m 1 "Version:" byrde.php | sed 's/.*Version: *//' | tr -d '\r')
 
 # Parse current version
 IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"

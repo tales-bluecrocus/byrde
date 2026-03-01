@@ -1,7 +1,7 @@
 {
     "name": "byrde/byrde",
-    "description": "WordPress theme Byrde",
-    "type": "wordpress-theme",
+    "description": "WordPress plugin Byrde Landing Pages",
+    "type": "wordpress-plugin",
     "require": {
         "php": ">=8.0",
         "yahnis-elsts/plugin-update-checker": "^5.6"

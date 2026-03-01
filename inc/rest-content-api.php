@@ -42,8 +42,8 @@ add_action( 'wp_head', function() {
         return;
     }
 
-    // Only on singular pages
-    if ( ! is_singular( 'page' ) ) {
+    // Only on byrde_landing pages
+    if ( ! is_singular( BYRDE_CPT_LANDING ) ) {
         return;
     }
 

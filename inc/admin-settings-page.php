@@ -97,17 +97,28 @@ function byrde_render_settings_page(): void {
 
 				<div style="text-align: center; margin: 30px 0;">
 					<?php
-					// Get a page to edit (preferably homepage)
-					$homepage = get_option( 'page_on_front' );
-					if ( ! $homepage ) {
-						// Get any published page
-						$pages = get_posts( array(
-							'post_type'      => 'page',
+					// Get a landing page to edit
+					$landing_pages = get_posts( array(
+						'post_type'      => BYRDE_CPT_LANDING,
+						'posts_per_page' => 1,
+						'post_status'    => 'publish',
+						'meta_query'     => array(
+							array(
+								'key'     => '_byrde_page_type',
+								'value'   => 'legal',
+								'compare' => '!=',
+							),
+						),
+					) );
+					if ( empty( $landing_pages ) ) {
+						// Fallback: any landing page
+						$landing_pages = get_posts( array(
+							'post_type'      => BYRDE_CPT_LANDING,
 							'posts_per_page' => 1,
 							'post_status'    => 'publish',
 						) );
-						$homepage = ! empty( $pages ) ? $pages[0]->ID : 0;
 					}
+					$homepage = ! empty( $landing_pages ) ? $landing_pages[0]->ID : 0;
 
 					$editor_url = $homepage
 						? admin_url( 'admin.php?page=byrde-editor&byrde_page_id=' . $homepage )

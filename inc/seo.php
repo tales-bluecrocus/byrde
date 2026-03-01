@@ -49,8 +49,8 @@ function byrde_get_page_seo( ?int $page_id = null ): array {
  * Output SEO meta tags in wp_head
  */
 function byrde_output_seo_meta(): void {
-    // Skip in admin
-    if ( is_admin() ) {
+    // Skip in admin or non-Byrde pages
+    if ( is_admin() || ! is_singular( BYRDE_CPT_LANDING ) ) {
         return;
     }
 
@@ -123,8 +123,8 @@ add_action( 'wp_head', 'byrde_output_seo_meta', 1 );
  * Output JSON-LD Structured Data
  */
 function byrde_output_structured_data(): void {
-    // Skip in admin
-    if ( is_admin() ) {
+    // Skip in admin or non-Byrde pages
+    if ( is_admin() || ! is_singular( BYRDE_CPT_LANDING ) ) {
         return;
     }
 
@@ -140,7 +140,7 @@ function byrde_output_structured_data(): void {
     // ========================================
     // FAQ Schema (from page content)
     // ========================================
-    if ( is_singular( 'page' ) ) {
+    if ( is_singular( BYRDE_CPT_LANDING ) ) {
         $page_id = get_the_ID();
         if ( $page_id ) {
             $content = get_post_meta( $page_id, '_byrde_content', true );
@@ -198,6 +198,10 @@ add_action( 'wp_head', 'byrde_output_structured_data', 2 );
  * Override WordPress title with page-level SEO
  */
 function byrde_custom_title( array $title ): array {
+    if ( ! is_singular( BYRDE_CPT_LANDING ) ) {
+        return $title;
+    }
+
     $seo = byrde_get_page_seo();
 
     if ( ! empty( $seo['siteName'] ) ) {
@@ -216,6 +220,9 @@ add_filter( 'document_title_parts', 'byrde_custom_title' );
  * Custom title separator
  */
 function byrde_title_separator( string $sep ): string {
+    if ( ! is_singular( BYRDE_CPT_LANDING ) ) {
+        return $sep;
+    }
     return '-';
 }
 add_filter( 'document_title_separator', 'byrde_title_separator' );

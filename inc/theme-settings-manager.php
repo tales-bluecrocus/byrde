@@ -90,9 +90,9 @@ function byrde_get_default_settings(): array {
 
 		// Legal Pages
 		'legal'          => array(
-			'privacy_policy_url' => '/privacy-policy',
-			'terms_url'          => '/terms-and-conditions',
-			'cookie_settings_url' => '/cookie-settings',
+			'privacy_policy_url' => '/lp/privacy-policy',
+			'terms_url'          => '/lp/terms-and-conditions',
+			'cookie_settings_url' => '/lp/cookie-settings',
 		),
 
 		// Contact Form (server-only, not exposed to frontend)
@@ -364,9 +364,9 @@ function byrde_get_all_settings(): array {
 	$privacy = $settings['legal']['privacy_policy_url'] ?? '';
 	$terms   = $settings['legal']['terms_url'] ?? '';
 	$cookie  = $settings['legal']['cookie_settings_url'] ?? '';
-	$flattened['privacy_policy_url']  = $privacy ?: home_url( '/privacy-policy' );
-	$flattened['terms_url']           = $terms ?: home_url( '/terms-and-conditions' );
-	$flattened['cookie_settings_url'] = $cookie ?: home_url( '/cookie-settings' );
+	$flattened['privacy_policy_url']  = $privacy ?: home_url( '/lp/privacy-policy' );
+	$flattened['terms_url']           = $terms ?: home_url( '/lp/terms-and-conditions' );
+	$flattened['cookie_settings_url'] = $cookie ?: home_url( '/lp/cookie-settings' );
 
 	// Brand Colors (per-mode)
 	$flattened['brand_dark_primary']  = $settings['brand_colors']['dark_primary'] ?? '#3ab342';

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Script para criar uma nova versão/release do tema
+# Script para criar uma nova versão/release do plugin
 # Uso: ./.config/create-release.sh 1.0.1
 
 set -e
 
-# Get theme root directory (parent of .config)
-THEME_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$THEME_DIR"
+# Get plugin root directory (parent of .config)
+PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PLUGIN_DIR"
 
 # Colors for output
 RED='\033[0;31m'
@@ -60,8 +60,8 @@ if git rev-parse "$TAG" >/dev/null 2>&1; then
     exit 1
 fi
 
-# Get current version from style.css
-CURRENT_VERSION=$(grep -m 1 "Version:" style.css | sed 's/.*Version: *//' | tr -d '\r')
+# Get current version from byrde.php
+CURRENT_VERSION=$(grep -m 1 "Version:" byrde.php | sed 's/.*Version: *//' | tr -d '\r')
 echo -e "${BLUE}Versão atual: $CURRENT_VERSION${NC}"
 echo -e "${BLUE}Nova versão: $VERSION${NC}\n"
 
@@ -73,18 +73,18 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-# Update version in style.css
-echo -e "${GREEN}Atualizando versão no style.css...${NC}"
+# Update version in byrde.php
+echo -e "${GREEN}Atualizando versão no byrde.php...${NC}"
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    sed -i '' "s/Version: .*/Version: $VERSION/" style.css
+    sed -i '' "s/Version: .*/Version: $VERSION/" byrde.php
 else
-    sed -i "s/Version: .*/Version: $VERSION/" style.css
+    sed -i "s/Version: .*/Version: $VERSION/" byrde.php
 fi
 
 # Verify the change
-NEW_VERSION=$(grep -m 1 "Version:" style.css | sed 's/.*Version: *//' | tr -d '\r')
+NEW_VERSION=$(grep -m 1 "Version:" byrde.php | sed 's/.*Version: *//' | tr -d '\r')
 if [ "$NEW_VERSION" != "$VERSION" ]; then
-    echo -e "${RED}Erro: Falha ao atualizar versão no style.css${NC}"
+    echo -e "${RED}Erro: Falha ao atualizar versão no byrde.php${NC}"
     exit 1
 fi
 
@@ -92,7 +92,7 @@ echo -e "${GREEN}Versão atualizada: $CURRENT_VERSION -> $VERSION${NC}\n"
 
 # Commit version bump
 echo -e "${GREEN}Commitando mudança de versão...${NC}"
-git add style.css
+git add byrde.php
 if git diff --staged --quiet; then
     echo -e "${YELLOW}Sem mudanças na versão (já está em $VERSION)${NC}\n"
 else
@@ -118,5 +118,5 @@ echo -e "${BLUE}Após o build completar (~2-3 min), a release estará disponíve
 echo -e "   https://github.com/tales-bluecrocus/byrde/releases/tag/$TAG"
 echo ""
 echo -e "${YELLOW}O WordPress detectará a atualização automaticamente em até 12 horas.${NC}"
-echo -e "${YELLOW}Ou force a verificação em: Aparência > Temas${NC}"
+echo -e "${YELLOW}Ou force a verificação em: Plugins > Instalados${NC}"
 echo ""
