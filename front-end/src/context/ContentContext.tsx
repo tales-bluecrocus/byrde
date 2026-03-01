@@ -455,9 +455,12 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
         const data = await response.json();
 
-        if (data.success && data.content) {
-          const migrated = migrateContent(data.content as Record<string, unknown>);
-          setSectionContent(prev => ({ ...prev, ...migrated } as Record<ContentSectionId, SectionContent>));
+        if (data.success) {
+          if (data.content) {
+            const migrated = migrateContent(data.content as Record<string, unknown>);
+            setSectionContent(prev => ({ ...prev, ...migrated } as Record<ContentSectionId, SectionContent>));
+          }
+          // content: null means new page with no saved content — keep defaults
         } else {
           throw new Error('Invalid response format from server');
         }
