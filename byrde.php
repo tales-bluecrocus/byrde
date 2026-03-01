@@ -3,7 +3,7 @@
  * Plugin Name: Byrde Landing Pages
  * Plugin URI: https://bluecrocus.ca
  * Description: Headless landing page builder with visual editor for PPC campaigns.
- * Version: 2.0.0
+ * Version: 2.0.1
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 8.0
