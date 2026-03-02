@@ -234,10 +234,32 @@ body {
   color: var(--color-text-secondary);
 }
 
+/* Section padding — controlled by ThemedSection via --section-py */
+.section-padding {
+  padding-top: var(--section-py, 3rem);
+  padding-bottom: var(--section-py, 3rem);
+}
+
 /* Themed Button */
 .btn-themed {
   background-color: var(--color-button-bg);
   color: var(--color-button-text);
+  border: var(--color-button-border-width, 0) solid var(--color-button-border, transparent);
+  border-radius: var(--color-button-radius, 12px);
+}
+
+/* Floating phone button pulse */
+.phone-pulse {
+  animation: phone-border-pulse 2s ease-in-out infinite;
+}
+
+@keyframes phone-border-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--color-button-bg, #3ab342);
+  }
+  50% {
+    box-shadow: 0 0 0 10px transparent;
+  }
 }
 
 /* Custom Scrollbar */
@@ -359,6 +381,8 @@ body {
 .themed-section .btn-section {
   background-color: var(--section-button-bg, var(--color-button-bg));
   color: var(--section-button-text, var(--color-button-text));
+  border: var(--color-button-border-width, 0) solid var(--color-button-border, transparent);
+  border-radius: var(--color-button-radius, 12px);
 }
 
 /* Standardized CTA button interaction states */

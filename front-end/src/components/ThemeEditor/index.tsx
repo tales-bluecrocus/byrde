@@ -219,6 +219,16 @@ function flatToNestedSettings(flat: ThemeSettings) {
       light_text: flat.brand_light_text,
       mode: flat.brand_mode,
     },
+    button_style: {
+      dark_bg: flat.button_dark_bg,
+      dark_text: flat.button_dark_text,
+      dark_border_color: flat.button_dark_border_color,
+      light_bg: flat.button_light_bg,
+      light_text: flat.button_light_text,
+      light_border_color: flat.button_light_border_color,
+      border_width: flat.button_border_width,
+      border_radius: flat.button_border_radius,
+    },
   };
 }
 
@@ -276,7 +286,7 @@ export function ThemeEditor() {
   const { settings, updateSettings } = useSettingsContext();
   const { toast } = useToast();
 
-  // Brand color defaults for resetting SettingsContext
+  // Brand color + button style defaults for resetting SettingsContext
   const resetBrandColors = useCallback(() => {
     updateSettings({
       brand_dark_primary: DEFAULT_SETTINGS.brand_dark_primary,
@@ -288,6 +298,15 @@ export function ThemeEditor() {
       brand_light_bg: DEFAULT_SETTINGS.brand_light_bg,
       brand_light_text: DEFAULT_SETTINGS.brand_light_text,
       brand_mode: DEFAULT_SETTINGS.brand_mode,
+      // Button style
+      button_dark_bg: DEFAULT_SETTINGS.button_dark_bg,
+      button_dark_text: DEFAULT_SETTINGS.button_dark_text,
+      button_dark_border_color: DEFAULT_SETTINGS.button_dark_border_color,
+      button_light_bg: DEFAULT_SETTINGS.button_light_bg,
+      button_light_text: DEFAULT_SETTINGS.button_light_text,
+      button_light_border_color: DEFAULT_SETTINGS.button_light_border_color,
+      button_border_width: DEFAULT_SETTINGS.button_border_width,
+      button_border_radius: DEFAULT_SETTINGS.button_border_radius,
     });
   }, [updateSettings]);
 
@@ -330,13 +349,16 @@ export function ThemeEditor() {
     setIsSaving(true);
 
     try {
-      // Re-inject visibility into each section theme before saving
-      const sectionThemesWithVisibility = Object.fromEntries(
-        Object.entries(sectionThemes).map(([id, theme]) => [
-          id,
-          { ...theme, visible: isSectionVisible(id as SectionId) },
-        ])
-      );
+      // Re-inject visibility into each section theme before saving.
+      // Use sectionOrder (all sections) as source — sectionThemes may not
+      // contain entries for sections that were never style-customized.
+      const sectionThemesWithVisibility: Record<string, unknown> = {};
+      for (const id of sectionOrder) {
+        sectionThemesWithVisibility[id] = {
+          ...(sectionThemes[id] || {}),
+          visible: isSectionVisible(id),
+        };
+      }
 
       const configPayload = {
         globalConfig,
@@ -387,7 +409,7 @@ export function ThemeEditor() {
     } finally {
       setIsSaving(false);
     }
-  }, [wpAdmin, globalConfig, sectionThemes, sectionOrder, headerConfig, topbarConfig, sectionContent, settings, toast]);
+  }, [wpAdmin, globalConfig, sectionThemes, sectionOrder, isSectionVisible, headerConfig, topbarConfig, sectionContent, settings, toast]);
 
   const handleResetAll = useCallback(() => {
     resetGlobalConfig();

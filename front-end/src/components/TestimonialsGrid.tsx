@@ -151,7 +151,7 @@ export default function TestimonialsGrid() {
   const useSlider = content.testimonials.length > 3;
 
   return (
-    <div id="reviews" className={`py-24 relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
+    <div id="reviews" className={`section-padding relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-primary-500/5 to-transparent opacity-50" />

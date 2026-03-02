@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
+import { useSettingsContext } from '../context/SettingsContext';
 import { withAlpha } from '../utils/colorUtils';
 
 /**
@@ -9,6 +10,7 @@ import { withAlpha } from '../utils/colorUtils';
  */
 export default function PaletteInjector() {
   const { palette, globalConfig } = useGlobalConfig();
+  const { settings } = useSettingsContext();
 
   useEffect(() => {
     const isEditorMode = Boolean(window.byrdeAdmin);
@@ -31,11 +33,24 @@ export default function PaletteInjector() {
       root.style.setProperty(`--color-accent-${shade}`, palette.accent[shade]);
     }
 
-    // Button colors (derived from primary)
-    root.style.setProperty('--color-button-bg', palette.primary[500]);
-    root.style.setProperty('--color-button-hover', palette.primary[400]);
-    root.style.setProperty('--color-button-active', palette.primary[600]);
-    root.style.setProperty('--color-button-text', '#ffffff');
+    // Button style — mode-aware colors + shared structure
+    const isDark = globalConfig.brand.mode === 'dark';
+    const btnBg = isDark
+      ? (settings.button_dark_bg || palette.primary[500])
+      : (settings.button_light_bg || palette.primary[500]);
+    const btnText = isDark
+      ? (settings.button_dark_text || '#ffffff')
+      : (settings.button_light_text || '#ffffff');
+    const btnBorder = isDark
+      ? (settings.button_dark_border_color || 'transparent')
+      : (settings.button_light_border_color || 'transparent');
+    root.style.setProperty('--color-button-bg', btnBg);
+    root.style.setProperty('--color-button-hover', btnBg);
+    root.style.setProperty('--color-button-active', btnBg);
+    root.style.setProperty('--color-button-text', btnText);
+    root.style.setProperty('--color-button-border', btnBorder);
+    root.style.setProperty('--color-button-border-width', `${settings.button_border_width || '0'}px`);
+    root.style.setProperty('--color-button-radius', `${settings.button_border_radius || '12'}px`);
 
     // Text colors
     root.style.setProperty('--color-text-primary', palette.text.primary);
@@ -66,7 +81,7 @@ export default function PaletteInjector() {
       }
     }
 
-  }, [palette, globalConfig.brand.mode]);
+  }, [palette, globalConfig.brand.mode, settings.button_dark_bg, settings.button_dark_text, settings.button_dark_border_color, settings.button_light_bg, settings.button_light_text, settings.button_light_border_color, settings.button_border_width, settings.button_border_radius]);
 
   return null;
 }

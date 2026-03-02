@@ -22,7 +22,7 @@ export default function FeaturedTestimonial() {
   const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('');
 
   return (
-    <div className={`py-20 relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
+    <div className={`section-padding relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Background Decorations */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />

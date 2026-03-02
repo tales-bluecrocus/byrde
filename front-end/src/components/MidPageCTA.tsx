@@ -1,10 +1,10 @@
 import { memo } from 'react';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
-import { useSectionPalette, resolveButtonColor } from '../hooks/useSectionPalette';
+import { useSectionPalette } from '../hooks/useSectionPalette';
 import { useContent, type FeatureItem } from '../context/ContentContext';
 import { renderHeadlineStyled } from '../utils/renderHeadline';
-import { getContrastColor, withAlpha } from '../utils/colorUtils';
+import { withAlpha } from '../utils/colorUtils';
 import { trackPhoneClick } from '../lib/analytics';
 import * as LucideIcons from 'lucide-react';
 
@@ -52,10 +52,6 @@ export default function MidPageCTA() {
   const effectiveMode = ctaTheme.paletteMode || globalConfig.brand.mode;
   const isLightMode = effectiveMode === 'light';
 
-  // Button colors with proper contrast
-  const buttonBg = resolveButtonColor(ctaTheme.buttonStyle, globalConfig.brand, palette.primary[500]);
-  const buttonText = getContrastColor(buttonBg);
-
   // Badge colors - inverted for visibility
   const badgeBg = isLightMode ? withAlpha('#000000', 0.08) : withAlpha('#ffffff', 0.1);
   const badgeText = textPrimary;
@@ -71,7 +67,7 @@ export default function MidPageCTA() {
   return (
     <div
       id="mid-cta-section"
-      className="relative py-20 overflow-hidden"
+      className="section-padding relative overflow-hidden"
       style={backgroundStyle}
     >
       {/* Subtle gradient overlay for depth */}
@@ -139,10 +135,6 @@ export default function MidPageCTA() {
           <a
             href={content.ctaLink}
             className="group inline-flex items-center gap-3 btn-section px-8 py-4 rounded-full font-semibold text-lg shadow-2xl"
-            style={{
-              backgroundColor: buttonBg,
-              color: buttonText,
-            }}
             onClick={() => trackPhoneClick('mid_cta')}
           >
             <PhoneIcon />

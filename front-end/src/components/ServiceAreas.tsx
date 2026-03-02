@@ -17,7 +17,7 @@ export default function ServiceAreas() {
   const hasBgImage = !!theme.bgImage;
 
   return (
-    <div id="areas" className={`py-24 relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
+    <div id="areas" className={`section-padding relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Map Background Pattern */}
       <div className="absolute inset-0">
         <div
@@ -108,19 +108,19 @@ export default function ServiceAreas() {
               ))}
             </div>
 
-            {/* Contact Link */}
+            {/* Contact CTA */}
             <div className="mt-8 pt-6 section-border border-t">
               <p className="section-text-secondary mb-4">
                 {content.missingAreaText}
               </p>
               <a
                 href={content.ctaLink}
-                className="inline-flex items-center gap-2 section-text-accent font-semibold hover:opacity-80 transition-colors"
+                className="inline-flex items-center gap-3 btn-section px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-black/25"
               >
-                <span>{content.ctaText}</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
+                {content.ctaText}
               </a>
             </div>
           </div>

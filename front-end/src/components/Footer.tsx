@@ -4,7 +4,6 @@ import { useSectionTheme } from '../context/SectionThemeContext';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle, faFacebookF, faInstagram, faYoutube, faYelp } from '@fortawesome/free-brands-svg-icons';
-import logoFallback from "../assets/images/byrde-logo.webp";
 
 export default function Footer() {
   const settings = useSettings();
@@ -15,8 +14,7 @@ export default function Footer() {
   const theme = sectionThemes['footer'] || {};
   const hasBgImage = !!theme.bgImage;
 
-  // Use WordPress logo if available, otherwise fallback
-  const logo = settings.logo || logoFallback;
+  const logo = settings.logo;
   const logoAlt = settings.logo_alt;
 
   // Get logo shape border radius (same as header)
@@ -39,14 +37,14 @@ export default function Footer() {
   ].filter(link => link.url);
 
   return (
-    <div className={`section-text-primary ${hasBgImage ? '' : 'section-bg-primary'}`}>
+    <div className={`section-padding section-text-primary ${hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-8 lg:gap-12 justify-between">
           {/* Brand Column */}
           <div className="max-w-sm">
             {/* Logo - uses same settings as header */}
-            {footerConfig.showLogo && (
+            {footerConfig.showLogo && logo && (
               <a href="#" className="flex items-center gap-3 mb-6">
                 <div
                   className={`p-2 ${logoConfig.shape === 'circle' ? 'overflow-hidden' : ''}`}

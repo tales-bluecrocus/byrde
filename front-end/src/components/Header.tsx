@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import logoFallback from "../assets/images/byrde-logo.webp";
+
 import { useHeaderConfig } from "../context/HeaderConfigContext";
 import { useGlobalConfig } from "../context/GlobalConfigContext";
 import { useSectionTheme } from "../context/SectionThemeContext";
 import { useSettings } from "../hooks/useSettings";
 import GoogleReviewBadge from "./GoogleReviewBadge";
 import { getContrastColor, withAlpha } from "../utils/colorUtils";
-import { resolveButtonColor } from "../hooks/useSectionPalette";
 import { trackPhoneClick, trackEmailClick } from "../lib/analytics";
 
 const PhoneIcon = () => (
@@ -211,16 +210,13 @@ export default function Header() {
 	const [headerHeight, setHeaderHeight] = useState(0);
 	const headerRef = useRef<HTMLDivElement>(null);
 
-	// Use WordPress logo if available, otherwise fallback
-	const logo = settings.logo || logoFallback;
+	const logo = settings.logo;
 	const logoAlt = settings.logo_alt;
 
 	// Use header palette colors if overriding, otherwise fall back to global
 	const isOverriding = headerTheme.overrideGlobalColors ?? false;
 	const bgColor = isOverriding ? (headerTheme.bgPrimary || palette.background.primary) : palette.background.primary;
 	const textPrimary = isOverriding ? (headerTheme.textPrimary || palette.text.primary) : palette.text.primary;
-	const buttonBg = resolveButtonColor(headerTheme.buttonStyle, globalConfig.brand, palette.primary[500]);
-
 	// Measure header height via ResizeObserver (avoids forced reflow from offsetHeight)
 	useEffect(() => {
 		const el = headerRef.current;
@@ -302,24 +298,26 @@ export default function Header() {
 					<div className="max-w-7xl mx-auto px-6 lg:px-8">
 						<div className="flex items-center justify-between">
 							{/* Logo */}
-							<a href="#" className="flex items-center group">
-								<div
-									className={`p-2 sm:p-3 ${globalConfig.logo.shape === 'circle' ? 'overflow-hidden' : ''}`}
-									style={{
-										backgroundColor: globalConfig.logo.bgColor,
-										borderRadius: getLogoBorderRadius(),
-									}}
-								>
-									<img
-										src={logo}
-										alt={logoAlt}
-										width={64}
-										height={64}
-										fetchPriority="high"
-										className="w-auto h-14 sm:h-16"
-									/>
-								</div>
-							</a>
+							{logo && (
+								<a href="#" className="flex items-center group">
+									<div
+										className={`p-2 sm:p-3 ${globalConfig.logo.shape === 'circle' ? 'overflow-hidden' : ''}`}
+										style={{
+											backgroundColor: globalConfig.logo.bgColor,
+											borderRadius: getLogoBorderRadius(),
+										}}
+									>
+										<img
+											src={logo}
+											alt={logoAlt}
+											width={64}
+											height={64}
+											fetchPriority="high"
+											className="w-auto h-14 sm:h-16"
+										/>
+									</div>
+								</a>
+							)}
 
 							{/* Right Side - Google Reviews Badge + CTA (desktop) */}
 							<div className="flex items-center gap-3 sm:gap-4">
@@ -337,10 +335,6 @@ export default function Header() {
 									<a
 										href={`tel:${settings.phone_raw}`}
 										className="hidden sm:inline-flex btn-themed group relative items-center gap-2 px-6 py-3 rounded-full font-semibold text-base shadow-lg shadow-black/25"
-										style={{
-											backgroundColor: buttonBg,
-											color: getContrastColor(buttonBg),
-										}}
 										onClick={() => trackPhoneClick('header_cta')}
 									>
 										<PhoneIcon />

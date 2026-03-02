@@ -27,7 +27,7 @@ export default function FAQ() {
   };
 
   return (
-    <div id="faq" className={`py-24 relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
+    <div id="faq" className={`section-padding relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Background Decorations */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary-500/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-72 h-72 section-bg-secondary rounded-full blur-3xl opacity-50" />
@@ -81,7 +81,7 @@ export default function FAQ() {
               >
                 <button
                   onClick={() => toggleFAQ(index)}
-                  className="w-full flex items-center justify-between p-6 text-left"
+                  className="w-full flex items-center justify-between p-6 text-left cursor-pointer"
                   aria-expanded={openIndex === index}
                 >
                   <span className="font-semibold section-text-primary pr-4">

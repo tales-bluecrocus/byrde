@@ -443,7 +443,7 @@ export default function Hero() {
   }, [content, settings.google_rating, settings.google_reviews_count, showBadge1, showBadge2]);
 
   return (
-    <div className={`relative lg:min-h-screen pt-8 pb-10 lg:pt-12 lg:pb-20 overflow-hidden ${themeStyles.hasBgImage ? '' : 'section-bg-primary'}`}>
+    <div className={`section-padding relative overflow-hidden ${themeStyles.hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -613,7 +613,7 @@ export default function Hero() {
                       <a
                         href={`tel:${settings.phone_raw}`}
                         onClick={() => trackPhoneClick('hero_form_header')}
-                        className="font-semibold hover:underline transition-colors"
+                        className="text-lg font-semibold hover:underline transition-colors"
                         style={{ color: themeStyles.accentColor }}
                       >
                         {settings.phone}
@@ -664,7 +664,7 @@ export default function Hero() {
                           color: themeStyles.inputText,
                           '--tw-ring-color': `${themeStyles.inputFocusBorder}33`,
                         } as React.CSSProperties}
-                        placeholder="Your name"
+                        placeholder="Full Name"
                       />
                       {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
                     </div>
@@ -689,7 +689,7 @@ export default function Hero() {
                             color: themeStyles.inputText,
                             '--tw-ring-color': `${themeStyles.inputFocusBorder}33`,
                           } as React.CSSProperties}
-                          placeholder="(208) 555-1234"
+                          placeholder="Phone"
                         />
                         {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
                       </div>
@@ -711,7 +711,7 @@ export default function Hero() {
                             color: themeStyles.inputText,
                             '--tw-ring-color': `${themeStyles.inputFocusBorder}33`,
                           } as React.CSSProperties}
-                          placeholder="you@email.com"
+                          placeholder="Email"
                         />
                         {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
                       </div>
@@ -736,7 +736,7 @@ export default function Hero() {
                           color: themeStyles.inputText,
                           '--tw-ring-color': `${themeStyles.inputFocusBorder}33`,
                         } as React.CSSProperties}
-                        placeholder="Tell us about your project..."
+                        placeholder="Message"
                       />
                     </div>
 
@@ -745,10 +745,10 @@ export default function Hero() {
                       type="submit"
                       disabled={isSubmitting}
                       className="btn-themed w-full py-4 rounded-xl font-semibold text-lg shadow-lg shadow-black/25"
-                      style={{
+                      style={globalConfig.form.buttonBg ? {
                         backgroundColor: themeStyles.buttonBg,
                         color: getContrastColor(themeStyles.buttonBg),
-                      }}
+                      } : undefined}
                     >
                       {isSubmitting ? (
                         <span className="flex items-center justify-center gap-2">

@@ -22,6 +22,9 @@ export interface SectionTheme {
   buttonText?: string;
   borderColor?: string;
 
+  // Layout
+  padding?: 'sm' | 'md' | 'lg' | 'xl'; // Section vertical padding (default: md = py-12)
+
   // Background image
   bgImage?: string;          // URL of the background image
   bgImageOpacity?: number;   // Opacity of the background image (0-1)

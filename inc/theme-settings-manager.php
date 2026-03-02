@@ -95,6 +95,18 @@ function byrde_get_default_settings(): array {
 			'cookie_settings_url' => '/lp/cookie-settings',
 		),
 
+		// Button Style (per-mode colors + shared structure)
+		'button_style'   => array(
+			'dark_bg'            => '',
+			'dark_text'          => '#ffffff',
+			'dark_border_color'  => '',
+			'light_bg'           => '',
+			'light_text'         => '#ffffff',
+			'light_border_color' => '',
+			'border_width'       => '0',
+			'border_radius'      => '12',
+		),
+
 		// Contact Form (server-only, not exposed to frontend)
 		'contact_form'   => array(
 			'postmark_api_token' => '',
@@ -259,6 +271,26 @@ function byrde_sanitize_theme_settings( array $settings ): array {
 		);
 	}
 
+	// Button Style (per-mode colors + shared structure)
+	if ( isset( $settings['button_style'] ) ) {
+		$bs = $settings['button_style'];
+		$sanitize_btn_color = function( $val, $default = '' ) {
+			if ( empty( $val ) ) return $default;
+			return byrde_sanitize_hex_color_alpha( $val ) ?: $default;
+		};
+
+		$sanitized['button_style'] = array(
+			'dark_bg'            => $sanitize_btn_color( $bs['dark_bg'] ?? '' ),
+			'dark_text'          => $sanitize_btn_color( $bs['dark_text'] ?? '#ffffff', '#ffffff' ),
+			'dark_border_color'  => $sanitize_btn_color( $bs['dark_border_color'] ?? '' ),
+			'light_bg'           => $sanitize_btn_color( $bs['light_bg'] ?? '' ),
+			'light_text'         => $sanitize_btn_color( $bs['light_text'] ?? '#ffffff', '#ffffff' ),
+			'light_border_color' => $sanitize_btn_color( $bs['light_border_color'] ?? '' ),
+			'border_width'       => max( 0, min( 10, intval( $bs['border_width'] ?? '0' ) ) ) . '',
+			'border_radius'      => max( 0, min( 9999, intval( $bs['border_radius'] ?? '12' ) ) ) . '',
+		);
+	}
+
 	return $sanitized;
 }
 
@@ -378,6 +410,15 @@ function byrde_get_all_settings(): array {
 	$flattened['brand_light_bg']      = $settings['brand_colors']['light_bg'] ?? '#ffffff';
 	$flattened['brand_light_text']    = $settings['brand_colors']['light_text'] ?? '#2a2a2a';
 	$flattened['brand_mode']          = $settings['brand_colors']['mode'] ?? 'dark';
+	// Button style (per-mode + shared)
+	$flattened['button_dark_bg']            = $settings['button_style']['dark_bg'] ?? '';
+	$flattened['button_dark_text']          = $settings['button_style']['dark_text'] ?? '#ffffff';
+	$flattened['button_dark_border_color']  = $settings['button_style']['dark_border_color'] ?? '';
+	$flattened['button_light_bg']           = $settings['button_style']['light_bg'] ?? '';
+	$flattened['button_light_text']         = $settings['button_style']['light_text'] ?? '#ffffff';
+	$flattened['button_light_border_color'] = $settings['button_style']['light_border_color'] ?? '';
+	$flattened['button_border_width']       = $settings['button_style']['border_width'] ?? '0';
+	$flattened['button_border_radius']      = $settings['button_style']['border_radius'] ?? '12';
 
 	// Ensure all values are strings (PHP 8.1+ wp_localize_script compat)
 	return array_map( 'strval', $flattened );

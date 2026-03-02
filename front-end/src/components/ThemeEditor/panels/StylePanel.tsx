@@ -1,15 +1,13 @@
 /**
- * Style Panel - Per-section mode override + button style
+ * Style Panel - Per-section mode override
  */
 
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Moon, Sun, Monitor, Globe } from 'lucide-react';
 import { useSectionTheme } from '../../../context/SectionThemeContext';
 import { useGlobalConfig } from '../../../context/GlobalConfigContext';
-import { useSettingsContext } from '../../../context/SettingsContext';
-import type { SectionId } from '../../../context/SectionThemeContext';
+import type { SectionId, SectionTheme } from '../../../context/SectionThemeContext';
 
 interface StylePanelProps {
   sectionId: SectionId;
@@ -20,46 +18,38 @@ const FIXED_SECTIONS: SectionId[] = ['topheader', 'header', 'footer'];
 export function StylePanel({ sectionId }: StylePanelProps) {
   const { sectionThemes, updateSectionTheme } = useSectionTheme();
   const { globalConfig } = useGlobalConfig();
-  const { settings } = useSettingsContext();
   const theme = sectionThemes[sectionId] || {};
   const pageMode = globalConfig.brand.mode;
 
-  // 4 brand button colors: primary, accent, dark bg, dark text
-  const darkPrimary = settings.brand_dark_primary || '#3ab342';
-  const darkAccent = settings.brand_dark_accent || '#f97316';
-  const darkBg = settings.brand_dark_bg || '#171717';
-  const darkText = settings.brand_dark_text || '#efefef';
+  const paddingValue = theme.padding || 'md';
 
-  const buttonStyle = theme.buttonStyle ?? 1;
-
-  // Button style toggle (shared by fixed and non-fixed sections)
-  const buttonStyleToggle = (
+  const paddingToggle = (
     <div>
       <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-        Button Color
+        Padding
       </Label>
-      <div className="grid grid-cols-2 gap-1.5 mt-2">
-        {([
-          { value: 1, color: darkPrimary, label: 'Primary' },
-          { value: 2, color: darkAccent, label: 'Accent' },
-          { value: 3, color: darkBg, label: 'Background' },
-          { value: 4, color: darkText, label: 'Text' },
-        ] as const).map(({ value, color, label }) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => updateSectionTheme(sectionId, { buttonStyle: value })}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-colors ${
-              buttonStyle === value
-                ? 'bg-zinc-700 text-zinc-100 ring-1 ring-zinc-500'
-                : 'bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800'
-            }`}
-          >
-            <span className="h-4 w-4 rounded shrink-0 border border-white/10" style={{ backgroundColor: color }} />
-            {label}
-          </button>
-        ))}
-      </div>
+      <ToggleGroup
+        type="single"
+        value={paddingValue}
+        onValueChange={(val) => {
+          if (!val) return;
+          updateSectionTheme(sectionId, { padding: val as SectionTheme['padding'] });
+        }}
+        className="w-full bg-zinc-800 p-1 rounded-lg mt-2"
+      >
+        <ToggleGroupItem value="sm" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          Small
+        </ToggleGroupItem>
+        <ToggleGroupItem value="md" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          Medium
+        </ToggleGroupItem>
+        <ToggleGroupItem value="lg" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          Large
+        </ToggleGroupItem>
+        <ToggleGroupItem value="xl" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          XL
+        </ToggleGroupItem>
+      </ToggleGroup>
     </div>
   );
 
@@ -81,8 +71,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
             </div>
           </div>
         </div>
-        <Separator className="bg-zinc-800/60" />
-        {buttonStyleToggle}
+        {paddingToggle}
       </div>
     );
   }
@@ -128,9 +117,7 @@ export function StylePanel({ sectionId }: StylePanelProps) {
             : `Using page default (${pageMode === 'dark' ? 'Dark' : 'Light'})`}
         </p>
       </div>
-
-      <Separator className="bg-zinc-800/60" />
-      {buttonStyleToggle}
+      {paddingToggle}
     </div>
   );
 }

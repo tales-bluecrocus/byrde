@@ -178,7 +178,7 @@ export default function ServicesGrid() {
   };
 
   return (
-    <div id="services" className={`py-24 relative ${hasBgImage ? '' : 'section-bg-primary'}`}>
+    <div id="services" className={`section-padding relative ${hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-[0.02]">
         <div

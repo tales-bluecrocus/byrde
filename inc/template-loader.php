@@ -48,14 +48,14 @@ function byrde_is_core_asset( string $handle, $registry ): bool {
         return false;
     }
 
-    $src = $registry->registered[ $handle ]->src;
-    if ( empty( $src ) ) {
+    $src = $registry->registered[ $handle ]->src ?? '';
+    if ( '' === $src ) {
         // Assets with no src are virtual/alias handles (e.g. jquery) — keep them.
         return true;
     }
 
     // Core assets live under /wp-includes/ or /wp-admin/
-    return (bool) ( strpos( $src, '/wp-includes/' ) !== false || strpos( $src, '/wp-admin/' ) !== false );
+    return str_contains( $src, '/wp-includes/' ) || str_contains( $src, '/wp-admin/' );
 }
 
 /**

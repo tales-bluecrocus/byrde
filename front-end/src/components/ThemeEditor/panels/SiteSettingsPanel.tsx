@@ -28,6 +28,7 @@ import {
   Palette,
   Sun,
   Moon,
+  MousePointerClick,
 } from 'lucide-react';
 import type { ThemeSettings } from '../../../hooks/useSettings';
 
@@ -97,7 +98,7 @@ function ContrastBadge({ bg, text }: { bg: string; text: string }) {
 const inputCls = "bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 text-xs h-8";
 const textareaCls = "w-full rounded-md bg-zinc-800 border border-zinc-700 text-zinc-100 placeholder:text-zinc-600 text-xs p-2 resize-y min-h-[60px] focus:outline-none focus:border-zinc-600";
 
-type SectionKey = 'brand' | 'colors' | 'reviews' | 'footer' | 'social' | 'analytics' | 'legal' | 'form';
+type SectionKey = 'brand' | 'colors' | 'buttons' | 'reviews' | 'footer' | 'social' | 'analytics' | 'legal' | 'form';
 
 export function SiteSettingsPanel() {
   const { settings, updateSettings } = useSettingsContext();
@@ -293,6 +294,158 @@ export function SiteSettingsPanel() {
               <ContrastBadge bg={settings.brand_light_bg} text={settings.brand_light_accent} />
             </Field>
           </div>
+        </div>
+
+      </Section>
+
+      {/* Button Style */}
+      <Section icon={MousePointerClick} title="Button Style" open={openSection === 'buttons'} onToggle={() => toggle('buttons')}>
+        {/* Live Preview — shows current mode button */}
+        {(() => {
+          const isDark = (settings.brand_mode || 'dark') === 'dark';
+          const previewBg = isDark
+            ? (settings.button_dark_bg || settings.brand_dark_primary || '#3ab342')
+            : (settings.button_light_bg || settings.brand_light_primary || '#3ab342');
+          const previewText = isDark
+            ? (settings.button_dark_text || '#ffffff')
+            : (settings.button_light_text || '#ffffff');
+          const previewBorder = isDark ? settings.button_dark_border_color : settings.button_light_border_color;
+          return (
+            <div className="flex justify-center py-3">
+              <div
+                className="px-6 py-3 font-semibold text-sm transition-all"
+                style={{
+                  backgroundColor: previewBg,
+                  color: previewText,
+                  border: previewBorder
+                    ? `${settings.button_border_width || '0'}px solid ${previewBorder}`
+                    : 'none',
+                  borderRadius: `${settings.button_border_radius || '12'}px`,
+                }}
+              >
+                Button Preview
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Dark Mode */}
+        <div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <Moon className="h-3 w-3 text-zinc-500" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Dark Mode</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Background">
+              <ColorPicker
+                value={settings.button_dark_bg || settings.brand_dark_primary || '#3ab342'}
+                onChange={(val) => update('button_dark_bg', val)}
+              />
+            </Field>
+            <Field label="Text">
+              <ColorPicker
+                value={settings.button_dark_text || '#ffffff'}
+                onChange={(val) => update('button_dark_text', val)}
+              />
+            </Field>
+          </div>
+          <ContrastBadge bg={settings.button_dark_bg || settings.brand_dark_primary || '#3ab342'} text={settings.button_dark_text || '#ffffff'} />
+          <div className="mt-3">
+            <Field label="Border Color">
+              <ColorPicker
+                value={settings.button_dark_border_color || ''}
+                onChange={(val) => update('button_dark_border_color', val)}
+              />
+              {settings.button_dark_border_color && (
+                <button
+                  type="button"
+                  onClick={() => update('button_dark_border_color', '')}
+                  className="text-[10px] text-zinc-500 hover:text-zinc-300 underline underline-offset-2 mt-1"
+                >
+                  Remove border
+                </button>
+              )}
+            </Field>
+          </div>
+        </div>
+
+        {/* Light Mode */}
+        <div className="pt-2">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Sun className="h-3 w-3 text-zinc-500" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Light Mode</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Background">
+              <ColorPicker
+                value={settings.button_light_bg || settings.brand_light_primary || '#3ab342'}
+                onChange={(val) => update('button_light_bg', val)}
+              />
+            </Field>
+            <Field label="Text">
+              <ColorPicker
+                value={settings.button_light_text || '#ffffff'}
+                onChange={(val) => update('button_light_text', val)}
+              />
+            </Field>
+          </div>
+          <ContrastBadge bg={settings.button_light_bg || settings.brand_light_primary || '#3ab342'} text={settings.button_light_text || '#ffffff'} />
+          <div className="mt-3">
+            <Field label="Border Color">
+              <ColorPicker
+                value={settings.button_light_border_color || ''}
+                onChange={(val) => update('button_light_border_color', val)}
+              />
+              {settings.button_light_border_color && (
+                <button
+                  type="button"
+                  onClick={() => update('button_light_border_color', '')}
+                  className="text-[10px] text-zinc-500 hover:text-zinc-300 underline underline-offset-2 mt-1"
+                >
+                  Remove border
+                </button>
+              )}
+            </Field>
+          </div>
+        </div>
+
+        {/* Shared: border width + radius */}
+        <div className="pt-2 grid grid-cols-2 gap-3">
+          {(settings.button_dark_border_color || settings.button_light_border_color) && (
+            <Field label="Border Width (px)">
+              <Input
+                type="number"
+                min="0"
+                max="10"
+                value={settings.button_border_width || '0'}
+                onChange={(e) => update('button_border_width', e.target.value)}
+                className={inputCls}
+              />
+            </Field>
+          )}
+        </div>
+
+        <div>
+          <Label className="text-[11px] font-medium text-zinc-400">Border Radius</Label>
+          <ToggleGroup
+            type="single"
+            value={settings.button_border_radius || '12'}
+            onValueChange={(val) => val && update('button_border_radius', val)}
+            className="w-full bg-zinc-800 p-1 rounded-lg mt-1.5"
+          >
+            <ToggleGroupItem value="0" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+              None
+            </ToggleGroupItem>
+            <ToggleGroupItem value="4" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+              Small
+            </ToggleGroupItem>
+            <ToggleGroupItem value="12" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+              Medium
+            </ToggleGroupItem>
+            <ToggleGroupItem value="9999" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+              Full
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
       </Section>
 

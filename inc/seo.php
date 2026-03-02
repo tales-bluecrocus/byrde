@@ -85,7 +85,6 @@ function byrde_output_seo_meta(): void {
     <?php if ( $description ) : ?>
     <meta name="description" content="<?php echo $description; ?>">
     <?php endif; ?>
-    <meta name="robots" content="noindex, nofollow">
     <meta name="author" content="<?php echo $site_name; ?>">
 
     <!-- Canonical -->
@@ -118,6 +117,49 @@ function byrde_output_seo_meta(): void {
     <?php
 }
 add_action( 'wp_head', 'byrde_output_seo_meta', 1 );
+
+/**
+ * Force noindex/nofollow on all byrde_landing pages.
+ *
+ * Runs at priority 0 in wp_head so it always fires — even when
+ * SEO fields haven't been filled in.
+ */
+function byrde_force_noindex(): void {
+    if ( is_admin() || ! is_singular( BYRDE_CPT_LANDING ) ) {
+        return;
+    }
+
+    // Remove WP core robots hooks so ours is the only one
+    remove_filter( 'wp_robots', 'wp_robots_max_image_preview_large' );
+
+    echo '<meta name="robots" content="noindex, nofollow">' . "\n";
+}
+add_action( 'wp_head', 'byrde_force_noindex', 0 );
+
+/**
+ * Override wp_robots filter for landing pages.
+ * This overrides any SEO plugin that respects wp_robots (Yoast, RankMath, etc.).
+ */
+function byrde_wp_robots_noindex( array $robots ): array {
+    if ( is_admin() || ! is_singular( BYRDE_CPT_LANDING ) ) {
+        return $robots;
+    }
+
+    return array(
+        'noindex'  => true,
+        'nofollow' => true,
+    );
+}
+add_filter( 'wp_robots', 'byrde_wp_robots_noindex', 999 );
+
+/**
+ * Exclude byrde_landing from WordPress core sitemap.
+ */
+function byrde_exclude_from_sitemap( array $post_types ): array {
+    unset( $post_types[ BYRDE_CPT_LANDING ] );
+    return $post_types;
+}
+add_filter( 'wp_sitemaps_post_types', 'byrde_exclude_from_sitemap' );
 
 /**
  * Output JSON-LD Structured Data

@@ -96,7 +96,7 @@ function FloatingPhoneButton() {
     <a
       href={`tel:${settings.phone_raw}`}
       onClick={handleClick}
-      className="sm:hidden fixed bottom-6 right-6 z-60 flex items-center justify-center w-14 h-14 btn-themed rounded-full shadow-xl shadow-black/30 transition-all duration-300 active:scale-95"
+      className="sm:hidden fixed bottom-6 right-6 z-60 flex items-center justify-center w-14 h-14 btn-themed rounded-full shadow-xl shadow-black/30 transition-all duration-300 active:scale-95 phone-pulse"
       aria-label={`Call ${settings.phone}`}
     >
       <PhoneIcon />

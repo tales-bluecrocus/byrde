@@ -25,6 +25,16 @@ export interface ThemeSettings {
   brand_light_text: string;
   brand_mode: string;
 
+  // Button Style (per-mode colors + shared structure)
+  button_dark_bg: string;
+  button_dark_text: string;
+  button_dark_border_color: string;
+  button_light_bg: string;
+  button_light_text: string;
+  button_light_border_color: string;
+  button_border_width: string;
+  button_border_radius: string;
+
   // Google Reviews
   google_rating: string;
   google_reviews_count: string;
@@ -90,6 +100,16 @@ export const DEFAULT_SETTINGS: ThemeSettings = {
   brand_light_bg: '#ffffff',
   brand_light_text: '#2a2a2a',
   brand_mode: 'dark',
+
+  // Button Style (per-mode colors + shared structure)
+  button_dark_bg: '',
+  button_dark_text: '#ffffff',
+  button_dark_border_color: '',
+  button_light_bg: '',
+  button_light_text: '#ffffff',
+  button_light_border_color: '',
+  button_border_width: '0',
+  button_border_radius: '12',
 
   // Google Reviews
   google_rating: '5.0',

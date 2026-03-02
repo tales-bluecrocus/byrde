@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { ReactNode, CSSProperties } from 'react';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
+import { useSettingsContext } from '../context/SettingsContext';
 import type { SectionId } from '../context/SectionThemeContext';
 import { generateBrandPalette, withAlpha } from '../utils/colorUtils';
 import type { BrandPalette } from '../utils/colorUtils';
@@ -14,8 +15,15 @@ interface ThemedSectionProps {
   index?: number; // Used for alternating backgrounds (even/odd)
 }
 
-/** Convert a BrandPalette into CSS variable overrides (same vars as PaletteInjector). */
-function paletteToStyles(p: BrandPalette): Record<string, string> {
+/** Convert a BrandPalette into CSS variable overrides (same vars as PaletteInjector).
+ *  When sectionMode is provided, uses the correct button settings for that mode. */
+interface ButtonSettings {
+  bg: string;
+  text: string;
+  borderColor: string;
+}
+
+function paletteToStyles(p: BrandPalette, btnSettings?: ButtonSettings): Record<string, string> {
   const styles: Record<string, string> = {};
 
   // Primary shade scale
@@ -25,11 +33,17 @@ function paletteToStyles(p: BrandPalette): Record<string, string> {
     styles[`--color-accent-${shade}`] = p.accent[shade];
   }
 
-  // Button colors
-  styles['--color-button-bg'] = p.primary[500];
-  styles['--color-button-hover'] = p.primary[400];
-  styles['--color-button-active'] = p.primary[600];
-  styles['--color-button-text'] = '#ffffff';
+  // Button colors — use settings for the target mode, fallback to palette primary
+  const btnBg = btnSettings?.bg || p.primary[500];
+  const btnText = btnSettings?.text || '#ffffff';
+  const btnBorder = btnSettings?.borderColor || 'transparent';
+  styles['--color-button-bg'] = btnBg;
+  styles['--color-button-hover'] = btnBg;
+  styles['--color-button-active'] = btnBg;
+  styles['--color-button-text'] = btnText;
+  styles['--color-button-border'] = btnBorder;
+  styles['--section-button-bg'] = btnBg;
+  styles['--section-button-text'] = btnText;
 
   // Text
   styles['--color-text-primary'] = p.text.primary;
@@ -52,8 +66,6 @@ function paletteToStyles(p: BrandPalette): Record<string, string> {
   styles['--section-text-primary'] = p.text.primary;
   styles['--section-text-secondary'] = p.text.secondary;
   styles['--section-text-accent'] = p.primary[500];
-  styles['--section-button-bg'] = p.primary[500];
-  styles['--section-button-text'] = '#ffffff';
   styles['--section-border'] = p.border;
 
   // Border
@@ -72,6 +84,7 @@ export default function ThemedSection({
 }: ThemedSectionProps) {
   const { getSectionStyles, isSectionVisible, sectionThemes } = useSectionTheme();
   const { palette, globalConfig } = useGlobalConfig();
+  const { settings } = useSettingsContext();
   const sectionStyles = getSectionStyles(id);
   const theme = sectionThemes[id] || {};
 
@@ -103,35 +116,23 @@ export default function ThemedSection({
       : 'section-bg-odd'
     : '';
 
+  // Resolve button settings for this section's effective mode
+  const effectiveMode = theme.paletteMode || globalConfig.brand.mode;
+  const sectionBtnSettings: ButtonSettings = effectiveMode === 'dark'
+    ? { bg: settings.button_dark_bg, text: settings.button_dark_text, borderColor: settings.button_dark_border_color }
+    : { bg: settings.button_light_bg, text: settings.button_light_text, borderColor: settings.button_light_border_color };
+
   // Build mode-override styles (if section has different mode than page)
   const modeStyles: CSSProperties = sectionModePalette
     ? {
-        ...paletteToStyles(sectionModePalette),
+        ...paletteToStyles(sectionModePalette, sectionBtnSettings),
         backgroundColor: sectionModePalette.background.primary,
         color: sectionModePalette.text.primary,
       } as CSSProperties
     : {};
 
-  // Button style override: 1=primary, 2=accent, 3=dark background, 4=dark text
-  const b = globalConfig.brand;
-  const btnColorMap: Record<number, string> = {
-    1: b.darkPrimary,
-    2: b.darkAccent,
-    3: b.darkBg,
-    4: b.darkText,
-  };
-  const btnColor = theme.buttonStyle ? btnColorMap[theme.buttonStyle] : undefined;
-  const buttonStyleOverride: CSSProperties = btnColor
-    ? {
-        '--color-button-bg': btnColor,
-        '--color-button-hover': btnColor,
-        '--color-button-active': btnColor,
-        '--section-button-bg': btnColor,
-      } as CSSProperties
-    : {};
-
-  // Merge: buttonStyle > sectionStyles (custom overrides) > modeStyles (mode palette) > global
-  const mergedStyles: CSSProperties = { ...modeStyles, ...buttonStyleOverride, ...sectionStyles };
+  // Merge: sectionStyles (custom overrides) > modeStyles (mode palette) > global
+  const mergedStyles: CSSProperties = { ...modeStyles, ...sectionStyles };
 
   // Background image settings
   const hasBgImage = !!theme.bgImage;
@@ -143,10 +144,20 @@ export default function ThemedSection({
   const effectivePalette = sectionModePalette || palette;
   const overlayColor = theme.bgImageOverlayColor || theme.bgPrimary || effectivePalette.background.primary;
 
+  // Per-section padding — exposed as CSS variable for child components
+  const PADDING_VALUES: Record<string, string> = {
+    sm: '1.5rem',
+    md: '3rem',
+    lg: '4rem',
+    xl: '5rem',
+  };
+  const sectionPadding = PADDING_VALUES[theme.padding || 'md'] || '3rem';
+
   // When we have a background image, make section bg transparent
+  const paddingVar = { '--section-py': sectionPadding } as CSSProperties;
   const combinedStyles: CSSProperties = hasBgImage
-    ? { ...mergedStyles, backgroundColor: 'transparent' }
-    : mergedStyles;
+    ? { ...mergedStyles, ...paddingVar, backgroundColor: 'transparent' }
+    : { ...mergedStyles, ...paddingVar };
 
   // Background image layer - full opacity, behind everything
   const bgImageLayerStyle: CSSProperties = hasBgImage ? {

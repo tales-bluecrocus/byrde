@@ -1,9 +1,9 @@
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
-import { useSectionPalette, resolveButtonColor } from '../hooks/useSectionPalette';
+import { useSectionPalette } from '../hooks/useSectionPalette';
 import { useContent } from '../context/ContentContext';
 import { renderHeadlineStyled } from '../utils/renderHeadline';
-import { getContrastColor, withAlpha } from '../utils/colorUtils';
+import { withAlpha } from '../utils/colorUtils';
 import { trackPhoneClick } from '../lib/analytics';
 
 const PhoneIcon = () => (
@@ -40,9 +40,6 @@ export default function FooterCTA() {
   const effectiveMode = ctaTheme.paletteMode || globalConfig.brand.mode;
   const isLightMode = effectiveMode === 'light';
 
-  const buttonBg = resolveButtonColor(ctaTheme.buttonStyle, globalConfig.brand, palette.primary[500]);
-  const buttonText = getContrastColor(buttonBg);
-
   const dividerColor = isLightMode ? withAlpha('#000000', 0.1) : withAlpha('#ffffff', 0.1);
 
   const backgroundStyle = hasBgImage
@@ -51,7 +48,7 @@ export default function FooterCTA() {
 
   return (
     <div
-      className="relative py-24 sm:py-28 overflow-hidden"
+      className="section-padding relative overflow-hidden"
       style={backgroundStyle}
     >
       {/* Subtle radial accent glow */}
@@ -99,10 +96,6 @@ export default function FooterCTA() {
         <a
           href={content.ctaLink}
           className="inline-flex items-center gap-3 btn-section px-8 py-4 rounded-full font-semibold text-lg shadow-2xl shadow-black/25"
-          style={{
-            backgroundColor: buttonBg,
-            color: buttonText,
-          }}
           onClick={() => trackPhoneClick('footer_cta')}
         >
           <PhoneIcon />
