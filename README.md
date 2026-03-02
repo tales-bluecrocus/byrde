@@ -1,10 +1,11 @@
 # Byrde
 
-A headless WordPress theme with a React frontend. WordPress handles the backend (data storage and REST API), while React renders the entire UI.
+A WordPress plugin for building headless PPC landing pages. WordPress handles the backend (data storage, REST API, CPT), while React renders the entire frontend UI. Runs alongside any active theme without conflicts.
 
 ## Features
 
-- **Visual Editor** — Drag-and-drop style editor with live preview, color palettes, section visibility, and content editing
+- **Custom Post Type** — `byrde_landing` with `/lp/...` URL structure, isolated from the active theme
+- **Visual Editor** — Live preview editor with color palettes, section visibility, and content editing
 - **12 Color Palettes** — Each section can use a different palette
 - **9 Configurable Sections** — Hero, Services, Testimonials, FAQ, Service Areas, CTAs, Footer
 - **SEO Optimized** — JSON-LD structured data, Open Graph, meta tags
@@ -17,16 +18,14 @@ A headless WordPress theme with a React frontend. WordPress handles the backend 
 - WordPress 6.0+
 - PHP 8.0+
 - Node.js 20+
-- [ACF Pro](https://www.advancedcustomfields.com/pro/) plugin
 
 ## Installation
 
 ### From GitHub Release (Recommended)
 
 1. Download `byrde.zip` from the [latest release](https://github.com/tales-bluecrocus/byrde/releases/latest)
-2. In WordPress, go to **Appearance → Themes → Add New → Upload Theme**
+2. In WordPress, go to **Plugins → Add New → Upload Plugin**
 3. Upload the ZIP and activate
-4. Install and activate the ACF Pro plugin
 
 ### From Source
 
@@ -39,11 +38,11 @@ cd ..
 composer install --no-dev
 ```
 
-Then symlink or copy the `byrde/` folder into `wp-content/themes/`.
+Then symlink or copy the `byrde/` folder into `wp-content/plugins/`.
 
 ## Configuration
 
-### Theme Settings
+### Plugin Settings
 
 Go to **Settings → Theme Settings** in the WordPress admin. Configure:
 
@@ -56,7 +55,7 @@ Go to **Settings → Theme Settings** in the WordPress admin. Configure:
 
 ### Visual Editor
 
-Go to **Appearance → Byrde Editor** or click **Edit with Byrde** on any page.
+Go to **Byrde Pages** in the admin menu, then click **Edit with Byrde** on any landing page.
 
 The editor lets you:
 
@@ -77,13 +76,15 @@ The editor lets you:
 | Styling | Tailwind CSS |
 | UI Components | shadcn/ui (Radix primitives) |
 | State Management | React Context API |
-| Settings | ACF Pro |
+| Settings | Native WordPress options (`byrde_theme_settings`) |
 | Auto-Updates | Plugin Update Checker via GitHub Releases |
 
 ## Project Structure
 
 ```
 byrde/
+├── byrde.php                     # Plugin entry point
+├── functions.php                 # Plugin bootstrap (requires all modules)
 ├── front-end/                    # React application
 │   ├── src/
 │   │   ├── components/           # React components (one per section)
@@ -93,10 +94,11 @@ byrde/
 │   │   └── assets/images/        # Static assets (logo fallback)
 │   └── dist/                     # Production build (generated)
 ├── inc/                          # PHP modules
-│   ├── acf-theme-settings.php    # ACF options page + settings
-│   ├── analytics.php             # GA4, GTM, Meta Pixel injection
-│   ├── cleanup.php               # Removes posts/comments from WP
-│   ├── constants.php             # Theme constants
+│   ├── cpt-landing.php           # byrde_landing CPT registration
+│   ├── template-loader.php       # Template override + asset isolation
+│   ├── migration.php             # Theme-to-plugin data migration
+│   ├── cleanup.php               # XML-RPC/pingback security
+│   ├── constants.php             # Plugin constants
 │   ├── contact-form-handler.php  # Contact form REST endpoint
 │   ├── page-theme-editor.php     # Visual editor (iframe + REST API)
 │   ├── rate-limiter.php          # Rate limiting for REST endpoints
@@ -105,16 +107,15 @@ byrde/
 │   ├── seo.php                   # Meta tags, JSON-LD, Open Graph
 │   ├── update-checker.php        # GitHub-based auto-updater
 │   └── validators.php            # Input validation & sanitization
+├── templates/
+│   ├── template-landing.php      # Standalone HTML for landing pages
+│   └── template-legal.php        # Server-rendered legal pages
 ├── .config/                      # Release & build scripts
 │   ├── bump-version.sh           # Auto-increment version (patch/minor/major)
 │   ├── create-release.sh         # Create a tagged release
 │   └── build-zip.sh              # Build local ZIP for manual upload
-├── .github/workflows/
-│   └── release.yml               # GitHub Actions: build + release on tag
-├── functions.php                 # Theme bootstrap
-├── index.php                     # Main template (renders <div id="root">)
-├── page.php                      # Page template (uses index.php)
-└── style.css                     # Theme metadata
+└── .github/workflows/
+    └── release.yml               # GitHub Actions: build + release on tag
 ```
 
 ## Sections
@@ -142,7 +143,7 @@ Base URL: `/wp-json/byrde/v1`
 | `GET` | `/pages/{id}/content` | Get section content | `edit_post` |
 | `PUT` | `/pages/{id}/content` | Save section content | `edit_post` |
 | `PUT` | `/pages/{id}/save-all` | Atomic save (theme + content) | `edit_post` |
-| `GET` | `/settings` | Get theme settings | Public |
+| `GET` | `/settings` | Get plugin settings | Public |
 | `POST` | `/upload-image` | Upload an image | `upload_files` |
 
 All authenticated endpoints require the `X-WP-Nonce` header.
@@ -172,7 +173,14 @@ cd front-end
 npm run build  # Outputs to front-end/dist/
 ```
 
-The WordPress theme automatically loads `front-end/dist/assets/main.js` and `style.css`.
+### Tests
+
+```bash
+cd front-end
+npm test             # Run all tests
+npm run test:watch   # Watch mode
+npm run test:coverage # Coverage report
+```
 
 ## Releasing
 
@@ -194,7 +202,7 @@ The WordPress theme automatically loads `front-end/dist/assets/main.js` and `sty
 
 This will:
 
-1. Update the version in `style.css`
+1. Update the version in `byrde.php`
 2. Commit and create a git tag
 3. Push to GitHub
 4. GitHub Actions builds the frontend, packages the ZIP, and creates a release
@@ -209,9 +217,9 @@ This will:
 
 ## How Auto-Updates Work
 
-The theme includes `inc/update-checker.php` which uses the [Plugin Update Checker](https://github.com/YahniS98/plugin-update-checker) library to poll GitHub Releases. When a new release is published:
+The plugin includes `inc/update-checker.php` which uses the [Plugin Update Checker](https://github.com/YahniS98/plugin-update-checker) library to poll GitHub Releases. When a new release is published:
 
-1. WordPress checks for updates periodically (or manually via **Appearance → Themes**)
+1. WordPress checks for updates periodically (or manually via **Plugins → Installed Plugins**)
 2. If a newer version exists on GitHub, WordPress shows an update notification
 3. The admin clicks **Update** and WordPress downloads the release ZIP automatically
 

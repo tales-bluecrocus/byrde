@@ -1,113 +1,106 @@
-# Byrde - Landing Page
+# Byrde - Frontend
 
-Landing page de alta conversao para servicos de junk removal em North Idaho e Spokane.
+React frontend for the Byrde WordPress plugin. Renders landing pages for PPC campaigns.
 
 ## Stack
 
-- **React 19** + **TypeScript**
+- **React 18** + **TypeScript**
 - **Vite** - Build tool
 - **Tailwind CSS 4** - Styling
+- **shadcn/ui** - UI components (Radix primitives)
 
 ## Scripts
 
 ```bash
-npm run dev      # Inicia servidor de desenvolvimento
-npm run build    # Build de producao
-npm run preview  # Preview do build
-npm run lint     # Lint do codigo
+npm run dev        # Start dev server (hot-reload)
+npm run build      # Production build → dist/
+npm run preview    # Preview production build
+npm run lint       # ESLint check
+npm test           # Run Jest tests
+npm run test:watch # Watch mode
 ```
 
-## Estrutura do Projeto
+## Project Structure
 
 ```
 src/
-├── assets/
-│   └── images/           # Logo, hero background
+├── assets/images/           # Logo, hero background
 ├── components/
-│   ├── Header.tsx        # Header com logo, badge Google, CTA
-│   ├── Hero.tsx          # Hero section com form de contato
+│   ├── Header.tsx           # Header with logo, Google badge, CTA
+│   ├── Hero.tsx             # Hero section with contact form
 │   ├── FeaturedTestimonial.tsx
-│   ├── ServicesGrid.tsx  # Grid de servicos oferecidos
-│   ├── MidPageCTA.tsx    # CTA intermediario
-│   ├── ServiceAreas.tsx  # Areas de atendimento
+│   ├── ServicesGrid.tsx     # Services grid
+│   ├── MidPageCTA.tsx       # Mid-page CTA
+│   ├── ServiceAreas.tsx     # Service areas
 │   ├── TestimonialsGrid.tsx
-│   ├── FAQ.tsx           # Accordion de perguntas frequentes
+│   ├── FAQ.tsx              # FAQ accordion
 │   ├── Footer.tsx
-│   ├── SEO.tsx           # Meta tags e JSON-LD
-│   ├── ThemedSection.tsx # Wrapper para secoes com tema
-│   ├── ThemeSidebar.tsx  # Sidebar de configuracao de temas (dev only)
-│   └── Toast.tsx         # Sistema de notificacoes
-└── context/
-    ├── SectionThemeContext.tsx  # Contexto de temas por secao
-    └── HeaderConfigContext.tsx  # Configuracoes do header
+│   ├── ThemedSection.tsx    # Wrapper for themed sections
+│   ├── PaletteInjector.tsx  # Injects CSS variables from palette
+│   ├── GoogleReviewBadge.tsx
+│   └── ThemeEditor/         # Visual editor (admin only)
+├── context/
+│   ├── GlobalConfigContext.tsx   # Brand colors, mode, form config
+│   ├── SectionThemeContext.tsx   # Per-section themes and palettes
+│   ├── SettingsContext.tsx       # Plugin settings from window.byrdeSettings
+│   ├── ContentContext.tsx        # Section content from window.byrdeContent
+│   └── HeaderConfigContext.tsx   # Header configuration
+├── hooks/
+│   ├── useAnalytics.ts      # Analytics tracking hooks
+│   └── useSettings.ts       # Settings accessor hook
+├── lib/
+│   └── analytics.ts         # GA4/GTM/Meta tracking, UTM capture
+├── utils/
+│   └── colorUtils.ts        # Color conversions, palette generation
+└── config/
+    └── sectionPalettes.ts   # 16 pre-defined palettes (8 dark, 8 light)
 ```
 
-## Sistema de Theming
+## Data Sources
 
-O projeto possui um sistema de theming por secao que permite customizar cores de cada bloco da pagina.
+The React app receives data from WordPress via `window.*` globals:
 
-### Funcionalidades
+1. **`window.byrdeSettings`** — Plugin settings (logo, phone, social URLs)
+2. **`window.byrdeConfig`** — Page config (colors, palettes, visibility)
+3. **`window.byrdeContent`** — Section content (headlines, text)
 
-- **Sidebar fixa** (apenas em modo dev) estilo Webflow
-- **Configuracao por secao** via accordion
-- **Propriedades disponiveis**:
-  - Background color
-  - Text color
-- **Header configuravel**:
-  - Fixed/sticky toggle
-  - Topbar show/hide
-  - Topbar background color
-- **Persistencia em localStorage**
-- **Export JSON** com toast notification
+In editor mode (`?byrde_preview=1`), content is fetched via REST API.
 
-### Como usar
+## Theming System
 
-1. Rode `npm run dev`
-2. A sidebar de theming aparece no lado esquerdo
-3. Clique em qualquer secao para expandir
-4. Ajuste as cores usando os color pickers
-5. Clique em "Copy Config (JSON)" para exportar
+### Brand Colors
+- **GlobalConfigContext** defines primary/secondary colors and mode (light/dark)
+- **PaletteInjector** injects CSS variables dynamically on `:root`
+- Palette generated automatically with light, base, dark variants
 
-### CSS Variables
+### Section Palettes (16 pre-defined)
+8 dark (Charcoal, Midnight, Forest, etc.) + 8 light (Snow, Cream, Ice, etc.)
 
-As secoes utilizam CSS custom properties que podem ser sobrescritas:
+Each palette includes: `bgPrimary`, `bgSecondary`, `bgTertiary`, `textPrimary`, `textSecondary`, `textAccent`, `borderColor`
+
+## CSS Variables
 
 ```css
---section-bg-primary      /* Background principal da secao */
---section-bg-secondary    /* Background de cards/containers */
---section-bg-tertiary     /* Background de elementos internos */
---section-text-primary    /* Cor do texto principal */
---section-text-secondary  /* Cor do texto secundario */
---section-text-accent     /* Cor de destaque/accent */
---section-button-bg       /* Background de botoes */
---section-button-text     /* Cor do texto dos botoes */
---section-border          /* Cor das bordas */
+/* Brand */
+--color-primary-500, --color-secondary-500
+
+/* Buttons */
+--color-button-bg, --color-button-hover
+
+/* Section-specific (via ThemedSection) */
+--section-bg-primary, --section-bg-secondary, --section-bg-tertiary
+--section-text-primary, --section-text-secondary, --section-text-accent
+--section-button-bg, --section-button-text, --section-border
 ```
 
-## SEO
+## Testing
 
-O componente `SEO.tsx` inclui:
+Tests use Jest with jsdom environment. No running WordPress server needed.
 
-- Meta tags basicas (title, description)
-- Open Graph tags
-- Twitter Cards
-- JSON-LD structured data (LocalBusiness, FAQ)
+```bash
+npm test                    # Run all tests
+npm run test:watch          # Watch mode
+npm run test:coverage       # Coverage report
+```
 
-## Desenvolvimento
-
-### Adicionar nova secao
-
-1. Crie o componente em `src/components/`
-2. Adicione o ID em `SectionThemeContext.tsx` no tipo `SectionId`
-3. Adicione o label em `SECTION_LABELS`
-4. Envolva com `<ThemedSection id="seu-id">` no `App.tsx`
-
-### Configurar Header
-
-O header suporta:
-
-- **isFixed**: Header fixo ao rolar
-- **showTopbar**: Barra superior com contato
-- **showPhone**: Botao de telefone
-- **showBadge**: Badge de avaliacao Google
-- **Rating dinamico**: Estrelas de 0-5.0 com suporte a meia estrela
+Test files live in `__tests__/` directories next to their source files.

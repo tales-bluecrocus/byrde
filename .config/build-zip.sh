@@ -68,7 +68,7 @@ rsync -a "$PLUGIN_DIR/" "$BUILD_DIR/byrde/" \
   --exclude='front-end/claude.md' \
   --exclude='front-end/content.md' \
   --exclude='front-end/reference.md' \
-  --exclude='style.css' \
+  --exclude='/style.css' \
   --exclude='page-legal.php' \
   --exclude='.gitignore' \
   --exclude='.gitattributes' \

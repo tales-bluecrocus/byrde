@@ -1,8 +1,8 @@
-# Byrde Theme - Development Instructions
+# Byrde Plugin - Development Instructions
 
 ## Architecture
 
-Headless WordPress theme: PHP backend (data + REST API) with React frontend rendering all UI.
+WordPress plugin with headless landing pages: PHP backend (CPT, data storage, REST API) with React frontend rendering all UI. Runs alongside any active theme — landing pages use standalone templates that bypass the theme entirely.
 
 ## Tech Stack
 
@@ -19,15 +19,24 @@ Headless WordPress theme: PHP backend (data + REST API) with React frontend rend
 - `front-end/src/context/` — React Contexts (global state)
 - `front-end/src/hooks/` — Custom hooks
 - `inc/` — PHP modules (each `require`d in `functions.php`)
+- `templates/` — Standalone HTML templates (landing + legal)
 - `.config/` — Release/build scripts
 - `.github/workflows/` — GitHub Actions (release automation)
+
+## Plugin Architecture
+
+- **Entry point**: `byrde.php` defines constants (`BYRDE_PLUGIN_FILE`, `BYRDE_PLUGIN_DIR`, `BYRDE_PLUGIN_URL`)
+- **CPT**: `byrde_landing` registered in `inc/cpt-landing.php`, rewrite slug `/lp/`
+- **Template loader**: `inc/template-loader.php` intercepts via `template_include` filter at priority 99
+- **Asset isolation**: `byrde_isolate_assets()` at priority 999 dequeues all non-Byrde styles/scripts on landing pages
+- **Migration**: `inc/migration.php` converts old theme pages to CPT on activation
 
 ## Data Flow
 
 Three data sources injected into React via `window.*`:
 
-1. **`window.byrdeSettings`** — Theme settings (logo, phone, social URLs). Stored in `wp_options` as `byrde_theme_settings`.
-2. **`window.byrdeConfig`** — Theme config (colors, palettes, visibility). Stored in `wp_postmeta` as `_byrde_theme_config`.
+1. **`window.byrdeSettings`** — Plugin settings (logo, phone, social URLs). Stored in `wp_options` as `byrde_theme_settings`.
+2. **`window.byrdeConfig`** — Page config (colors, palettes, visibility). Stored in `wp_postmeta` as `_byrde_theme_config`.
 3. **`window.byrdeContent`** — Section content (headlines, text). Stored in `wp_postmeta` as `_byrde_content`.
 
 In editor mode (`?byrde_preview=1`), content is fetched via REST API instead.
@@ -43,8 +52,8 @@ Base: `/wp-json/byrde/v1`
 | GET | `/pages/{id}/content` | Get section content | `edit_post` |
 | PUT | `/pages/{id}/content` | Save section content | `edit_post` |
 | PUT | `/pages/{id}/save-all` | Atomic save (theme + content) | `edit_post` |
-| GET | `/settings` | Get theme settings | Public |
-| PUT | `/settings` | Update theme settings | `manage_options` |
+| GET | `/settings` | Get plugin settings | Public |
+| PUT | `/settings` | Update plugin settings | `manage_options` |
 | POST | `/upload-image` | Upload image | `upload_files` |
 
 ## Build Commands
@@ -52,6 +61,7 @@ Base: `/wp-json/byrde/v1`
 ```bash
 cd front-end && npm run dev     # Dev server with HMR
 cd front-end && npm run build   # Production build → front-end/dist/
+cd front-end && npm test        # Run Jest tests
 ```
 
 ## Release System
@@ -67,8 +77,9 @@ Tag push triggers GitHub Actions → builds frontend → creates release ZIP →
 
 ## Important Rules
 
-- **No posts** — Only Pages exist. Posts/comments disabled via `cleanup.php`.
+- **CPT only** — Landing pages use `byrde_landing` CPT, not regular pages. All hooks guard with `is_singular(BYRDE_CPT_LANDING)`.
 - **No `json_encode`** on save — WordPress serializes post_meta arrays automatically.
 - **Nonce required** — All authenticated requests need `X-WP-Nonce` header.
-- **Multisite aware** — Use `byrde_theme_uri()` instead of `get_template_directory_uri()`.
-- **Fixed filenames** — Vite outputs `main.js` and `style.css` (no hashes). Version-based cache busting via `style.css` Version field.
+- **Multisite aware** — Use `byrde_plugin_uri()` instead of `plugins_url()` directly.
+- **Fixed filenames** — Vite outputs `main.js` and `style.css` (no hashes). Version-based cache busting via `byrde.php` Version field.
+- **Version source** — Plugin version lives in `byrde.php` header, read by `get_plugin_data()`.
