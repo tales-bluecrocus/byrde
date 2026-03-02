@@ -3,7 +3,7 @@
  * Plugin Name: BlueCrocus PPC
  * Plugin URI: https://bluecrocus.ca
  * Description: Headless landing page builder with visual editor for PPC campaigns.
- * Version: 2.0.5
+ * Version: 2.0.6
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 8.0
