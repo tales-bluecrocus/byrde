@@ -59,15 +59,41 @@ function byrde_is_core_asset( string $handle, $registry ): bool {
 }
 
 /**
+ * Check if a handle is allowed on Byrde landing pages.
+ *
+ * @param string $handle     Asset handle name.
+ * @param string $type       'style' or 'script'.
+ * @param bool   $is_preview Whether this is an editor preview.
+ * @return bool True if the handle should be kept.
+ */
+function byrde_is_allowed_handle( string $handle, string $type, bool $is_preview ): bool {
+    $allowed = array( 'byrde-main', 'admin-bar' );
+    if ( 'style' === $type ) {
+        $allowed[] = 'dashicons';
+    }
+
+    if ( in_array( $handle, $allowed, true ) ) {
+        return true;
+    }
+
+    // In editor preview, keep WP core assets (media library, jQuery)
+    if ( $is_preview ) {
+        $registry = ( 'style' === $type ) ? $GLOBALS['wp_styles'] : $GLOBALS['wp_scripts'];
+        return byrde_is_core_asset( $handle, $registry );
+    }
+
+    return false;
+}
+
+/**
  * Isolate Byrde assets on landing pages.
  *
- * Dequeues everything that is NOT:
- * - A Byrde asset (byrde-main)
- * - WordPress admin bar / dashicons
- * - WordPress core (wp-includes/) — only kept in editor preview for media library
+ * Two layers of protection:
+ * 1. Dequeue everything not allowed during wp_enqueue_scripts (priority 999)
+ * 2. Block any surviving tags via style_loader_tag / script_loader_tag filters
  *
  * This prevents theme CSS, other plugin CSS/JS, and third-party injections
- * from leaking into landing pages.
+ * from leaking into landing pages — even when enqueued after priority 999.
  */
 function byrde_isolate_assets(): void {
     if ( ! is_singular( BYRDE_CPT_LANDING ) ) {
@@ -79,34 +105,59 @@ function byrde_isolate_assets(): void {
 
     global $wp_styles, $wp_scripts;
 
-    // Handles we always keep
-    $allowed_styles  = array( 'byrde-main', 'admin-bar', 'dashicons' );
-    $allowed_scripts = array( 'byrde-main', 'admin-bar' );
-
+    // Layer 1: dequeue non-allowed assets
     if ( $wp_styles ) {
         foreach ( $wp_styles->queue as $handle ) {
-            if ( in_array( $handle, $allowed_styles, true ) ) {
-                continue;
+            if ( ! byrde_is_allowed_handle( $handle, 'style', $is_preview ) ) {
+                wp_dequeue_style( $handle );
             }
-            // In editor preview, keep WP core styles (media library UI)
-            if ( $is_preview && byrde_is_core_asset( $handle, $wp_styles ) ) {
-                continue;
-            }
-            wp_dequeue_style( $handle );
         }
     }
 
     if ( $wp_scripts ) {
         foreach ( $wp_scripts->queue as $handle ) {
-            if ( in_array( $handle, $allowed_scripts, true ) ) {
-                continue;
+            if ( ! byrde_is_allowed_handle( $handle, 'script', $is_preview ) ) {
+                wp_dequeue_script( $handle );
             }
-            // In editor preview, keep WP core scripts (media library, jQuery)
-            if ( $is_preview && byrde_is_core_asset( $handle, $wp_scripts ) ) {
-                continue;
-            }
-            wp_dequeue_script( $handle );
         }
     }
+
+    // Layer 2: tag-level filters catch anything enqueued after this hook
+    add_filter( 'style_loader_tag', 'byrde_filter_style_tag', 999, 2 );
+    add_filter( 'script_loader_tag', 'byrde_filter_script_tag', 999, 2 );
 }
 add_action( 'wp_enqueue_scripts', 'byrde_isolate_assets', 999 );
+
+/**
+ * Block non-allowed stylesheet tags from rendering.
+ *
+ * @param string $tag    Full <link> tag.
+ * @param string $handle Asset handle.
+ * @return string Tag or empty string.
+ */
+function byrde_filter_style_tag( string $tag, string $handle ): string {
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    $is_preview = ! empty( $_GET['byrde_preview'] );
+
+    if ( byrde_is_allowed_handle( $handle, 'style', $is_preview ) ) {
+        return $tag;
+    }
+    return '';
+}
+
+/**
+ * Block non-allowed script tags from rendering.
+ *
+ * @param string $tag    Full <script> tag.
+ * @param string $handle Asset handle.
+ * @return string Tag or empty string.
+ */
+function byrde_filter_script_tag( string $tag, string $handle ): string {
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    $is_preview = ! empty( $_GET['byrde_preview'] );
+
+    if ( byrde_is_allowed_handle( $handle, 'script', $is_preview ) ) {
+        return $tag;
+    }
+    return '';
+}
