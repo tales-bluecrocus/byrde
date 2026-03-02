@@ -71,19 +71,14 @@ jobs:
                     --exclude='front-end/jest.config.ts' \
                     --exclude='front-end/README.md' \
                     --exclude='front-end/claude.md' \
-                    --exclude='front-end/content.md' \
-                    --exclude='front-end/reference.md' \
                     --exclude='/style.css' \
-                    --exclude='page-legal.php' \
                     --exclude='.gitignore' \
                     --exclude='.gitattributes' \
                     --exclude='composer.json' \
                     --exclude='composer.lock' \
-                    --exclude='build.sh' \
-                    --exclude='diagnose.php' \
+                    --exclude='docs/' \
                     --exclude='CLAUDE.md' \
-                    --exclude='IMPLEMENTATION.md' \
-                    --exclude='plugins/' \
+                    --exclude='README.md' \
                     --exclude='*.log'
 
             - name: Create ZIP file

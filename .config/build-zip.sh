@@ -66,18 +66,14 @@ rsync -a "$PLUGIN_DIR/" "$BUILD_DIR/byrde/" \
   --exclude='front-end/jest.config.ts' \
   --exclude='front-end/README.md' \
   --exclude='front-end/claude.md' \
-  --exclude='front-end/content.md' \
-  --exclude='front-end/reference.md' \
   --exclude='/style.css' \
-  --exclude='page-legal.php' \
   --exclude='.gitignore' \
   --exclude='.gitattributes' \
   --exclude='composer.json' \
   --exclude='composer.lock' \
-  --exclude='build.sh' \
-  --exclude='diagnose.php' \
+  --exclude='docs/' \
   --exclude='CLAUDE.md' \
-  --exclude='IMPLEMENTATION.md' \
+  --exclude='README.md' \
   --exclude='*.log'
 
 # Create ZIP
