@@ -330,9 +330,17 @@ export function ThemeEditor() {
     setIsSaving(true);
 
     try {
+      // Re-inject visibility into each section theme before saving
+      const sectionThemesWithVisibility = Object.fromEntries(
+        Object.entries(sectionThemes).map(([id, theme]) => [
+          id,
+          { ...theme, visible: isSectionVisible(id as SectionId) },
+        ])
+      );
+
       const configPayload = {
         globalConfig,
-        sectionThemes,
+        sectionThemes: sectionThemesWithVisibility,
         sectionOrder,
         header: headerConfig,
         topbar: topbarConfig,
