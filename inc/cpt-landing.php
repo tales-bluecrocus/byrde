@@ -19,7 +19,7 @@ function byrde_register_landing_cpt(): void {
         'labels' => array(
             'name'               => __( 'Landing Pages', 'byrde' ),
             'singular_name'      => __( 'Landing Page', 'byrde' ),
-            'menu_name'          => __( 'Byrde Pages', 'byrde' ),
+            'menu_name'          => __( 'PPC Pages', 'byrde' ),
             'add_new'            => __( 'Add New', 'byrde' ),
             'add_new_item'       => __( 'Add Landing Page', 'byrde' ),
             'edit_item'          => __( 'Edit Landing Page', 'byrde' ),
