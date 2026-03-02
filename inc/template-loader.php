@@ -44,13 +44,20 @@ function byrde_isolate_assets(): void {
         return;
     }
 
+    // In editor preview mode, WordPress media library and other admin
+    // scripts are needed — skip isolation entirely.
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    if ( ! empty( $_GET['byrde_preview'] ) ) {
+        return;
+    }
+
     global $wp_styles, $wp_scripts;
 
     // Styles we must keep
     $allowed_styles = array( 'byrde-main', 'admin-bar', 'dashicons' );
 
     // Scripts we must keep
-    $allowed_scripts = array( 'byrde-main', 'admin-bar', 'wp-mediaelement' );
+    $allowed_scripts = array( 'byrde-main', 'admin-bar' );
 
     if ( $wp_styles ) {
         foreach ( $wp_styles->queue as $handle ) {
