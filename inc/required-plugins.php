@@ -22,11 +22,6 @@ function byrde_register_required_plugins(): void {
 
 	$plugins = array(
 		array(
-			'name'     => 'Classic Editor',
-			'slug'     => 'classic-editor',
-			'required' => true,
-		),
-		array(
 			'name'     => 'Site Kit by Google',
 			'slug'     => 'google-site-kit',
 			'required' => true,
