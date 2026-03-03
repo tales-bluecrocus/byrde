@@ -322,9 +322,23 @@ body {
   background-clip: text;
 }
 
+/* Defensive reset — prevent external themes from styling our form inputs */
+.themed-section input,
+.themed-section textarea,
+.themed-section select {
+  text-transform: none;
+}
+
 /* Section Theming */
 .themed-section {
   background-color: var(--section-bg-primary, inherit);
+}
+
+/* When gradient overlay is active, make children backgrounds transparent so gradient shows through */
+.has-gradient > * .section-bg-primary,
+.has-gradient > * .section-bg-even,
+.has-gradient > * .section-bg-odd {
+  background-color: transparent;
 }
 
 .section-bg-primary {

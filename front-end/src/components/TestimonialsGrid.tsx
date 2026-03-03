@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent, type TestimonialItem } from '../context/ContentContext';
-import { renderHeadline } from '../utils/renderHeadline';
+import { renderHeadline, renderHeadlineStyled } from '../utils/renderHeadline';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const StarIcon = ({ filled = true }: { filled?: boolean }) => (
   <svg
-    className={`w-4 h-4 ${filled ? 'text-yellow-400' : 'text-dark-600'}`}
+    className={`w-4 h-4 ${filled ? 'text-yellow-400' : 'opacity-20 section-text-secondary'}`}
     fill="currentColor"
     viewBox="0 0 20 20"
   >
@@ -27,10 +27,22 @@ const GoogleIcon = () => (
 
 const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('');
 
-function TestimonialCard({ testimonial, reviewLabel, className = '' }: { testimonial: TestimonialItem; reviewLabel: string; className?: string }) {
+interface CardColors {
+  cardBg?: string;
+  cardText?: string;
+  cardAuthor?: string;
+  cardBorder?: string;
+  reviewLabel?: string;
+}
+
+function TestimonialCard({ testimonial, reviewLabel, className = '', colors }: { testimonial: TestimonialItem; reviewLabel: string; className?: string; colors?: CardColors }) {
   return (
     <article
       className={`group section-bg-secondary rounded-2xl p-6 section-border border hover:border-opacity-70 shadow-sm hover:shadow-xl hover:shadow-black/20 transition-all duration-500 hover:-translate-y-1 ${className}`}
+      style={{
+        ...(colors?.cardBg ? { backgroundColor: colors.cardBg } : {}),
+        ...(colors?.cardBorder ? { borderColor: colors.cardBorder } : {}),
+      }}
     >
       {/* Stars */}
       <div className="flex gap-0.5 mb-4">
@@ -41,18 +53,27 @@ function TestimonialCard({ testimonial, reviewLabel, className = '' }: { testimo
 
       {/* Quote */}
       <blockquote className="mb-6">
-        <p className="section-text-secondary leading-relaxed text-sm" style={{ color: 'var(--section-text-secondary, var(--color-gray-300))' }}>
+        <p
+          className="section-text-secondary leading-relaxed text-sm"
+          style={{ color: colors?.cardText || 'var(--section-text-secondary, var(--color-gray-300))' }}
+        >
           &ldquo;{testimonial.quote}&rdquo;
         </p>
       </blockquote>
 
       {/* Author */}
-      <div className="flex items-center gap-3 pt-4 section-border border-t">
+      <div
+        className="flex items-center gap-3 pt-4 section-border border-t"
+        style={colors?.cardBorder ? { borderColor: colors.cardBorder } : undefined}
+      >
         <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
           {getInitials(testimonial.authorName)}
         </div>
         <div>
-          <p className="font-semibold section-text-primary text-sm">
+          <p
+            className="font-semibold section-text-primary text-sm"
+            style={colors?.cardAuthor ? { color: colors.cardAuthor } : undefined}
+          >
             {testimonial.authorName}
           </p>
           <p className="section-text-secondary text-xs opacity-70">
@@ -62,7 +83,10 @@ function TestimonialCard({ testimonial, reviewLabel, className = '' }: { testimo
       </div>
 
       {/* Google Badge */}
-      <div className="mt-4 flex items-center gap-1.5 section-text-secondary text-xs opacity-70">
+      <div
+        className="mt-4 flex items-center gap-1.5 section-text-secondary text-xs opacity-70"
+        style={colors?.reviewLabel ? { color: colors.reviewLabel } : undefined}
+      >
         <GoogleIcon />
         {reviewLabel}
       </div>
@@ -70,7 +94,7 @@ function TestimonialCard({ testimonial, reviewLabel, className = '' }: { testimo
   );
 }
 
-function TestimonialsSlider({ testimonials, reviewLabel }: { testimonials: TestimonialItem[]; reviewLabel: string }) {
+function TestimonialsSlider({ testimonials, reviewLabel, cardColors, dotColor }: { testimonials: TestimonialItem[]; reviewLabel: string; cardColors?: CardColors; dotColor?: string }) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: 'start', slidesToScroll: 1 },
     [Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true })]
@@ -98,7 +122,7 @@ function TestimonialsSlider({ testimonials, reviewLabel }: { testimonials: Testi
         <div className="flex -ml-6">
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="flex-[0_0_100%] min-w-0 pl-6 md:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
-              <TestimonialCard testimonial={testimonial} reviewLabel={reviewLabel} className="h-full" />
+              <TestimonialCard testimonial={testimonial} reviewLabel={reviewLabel} className="h-full" colors={cardColors} />
             </div>
           ))}
         </div>
@@ -121,9 +145,10 @@ function TestimonialsSlider({ testimonials, reviewLabel }: { testimonials: Testi
               onClick={() => scrollTo(index)}
               className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                 index === selectedIndex
-                  ? 'bg-primary-500 w-8'
+                  ? `${dotColor ? '' : 'bg-primary-500'} w-8`
                   : 'bg-dark-600 hover:bg-dark-500'
               }`}
+              style={dotColor && index === selectedIndex ? { backgroundColor: dotColor } : undefined}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
@@ -150,6 +175,15 @@ export default function TestimonialsGrid() {
 
   const useSlider = content.testimonials.length > 3;
 
+  // Testimonial-specific colors from theme
+  const cardColors: CardColors = {
+    cardBg: theme.tmCardBg,
+    cardText: theme.tmCardText,
+    cardAuthor: theme.tmCardAuthor,
+    cardBorder: theme.tmCardBorder,
+    reviewLabel: theme.tmReviewLabelColor,
+  };
+
   return (
     <div id="reviews" className={`section-padding relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Background */}
@@ -161,20 +195,31 @@ export default function TestimonialsGrid() {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">
+          <span
+            className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4"
+            style={theme.tmBadgeColor ? { color: theme.tmBadgeColor } : undefined}
+          >
             {content.badgeText}
           </span>
-          <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6">
-            {renderHeadline(content.headline, 'section-text-accent')}
+          <h2
+            className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6"
+            style={theme.tmHeadlineColor ? { color: theme.tmHeadlineColor } : undefined}
+          >
+            {theme.tmHeadlineAccent
+              ? renderHeadlineStyled(content.headline, { color: theme.tmHeadlineAccent })
+              : renderHeadline(content.headline, 'section-text-accent')}
           </h2>
-          <p className="section-text-secondary text-lg max-w-2xl mx-auto">
+          <p
+            className="section-text-secondary text-lg max-w-2xl mx-auto"
+            style={theme.tmSubheadlineColor ? { color: theme.tmSubheadlineColor } : undefined}
+          >
             {content.subheadline}
           </p>
         </div>
 
         {/* Testimonials: Grid or Slider */}
         {useSlider ? (
-          <TestimonialsSlider testimonials={content.testimonials} reviewLabel={content.reviewLabel} />
+          <TestimonialsSlider testimonials={content.testimonials} reviewLabel={content.reviewLabel} cardColors={cardColors} dotColor={theme.tmDotColor} />
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {content.testimonials.map((testimonial) => (
@@ -182,6 +227,7 @@ export default function TestimonialsGrid() {
                 key={testimonial.id}
                 testimonial={testimonial}
                 reviewLabel={content.reviewLabel}
+                colors={cardColors}
               />
             ))}
           </div>

@@ -76,6 +76,11 @@ function byrde_is_allowed_handle( string $handle, string $type, bool $is_preview
         return true;
     }
 
+    // Allow Query Monitor assets for logged-in admins (debugging tool)
+    if ( current_user_can( 'manage_options' ) && str_starts_with( $handle, 'query-monitor' ) ) {
+        return true;
+    }
+
     // In editor preview, keep WP core assets (media library, jQuery)
     if ( $is_preview ) {
         $registry = ( 'style' === $type ) ? $GLOBALS['wp_styles'] : $GLOBALS['wp_scripts'];

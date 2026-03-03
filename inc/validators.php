@@ -64,6 +64,8 @@ function byrde_validate_theme_config( array $config ): array {
 
 	// Validate sections
 	$allowed_sections = array(
+		'topheader',
+		'header',
 		'hero',
 		'services',
 		'testimonials',
@@ -102,6 +104,40 @@ function byrde_validate_theme_config( array $config ): array {
 				if ( $opacity < 0 || $opacity > 1 ) {
 					$errors[] = "Invalid opacity in section $section_id (must be 0-1)";
 				}
+			}
+
+			// Validate gradient fields
+			$gradient_color_fields = array( 'gradientColor1', 'gradientColor2' );
+			foreach ( $gradient_color_fields as $field ) {
+				if ( ! empty( $section_config[ $field ] ) && $section_config[ $field ] !== 'transparent' && ! byrde_is_valid_color( $section_config[ $field ] ) ) {
+					$errors[] = "Invalid gradient color in section $section_id: $field";
+				}
+			}
+			if ( ! empty( $section_config['gradientType'] ) && ! in_array( $section_config['gradientType'], array( 'linear', 'radial' ), true ) ) {
+				$errors[] = "Invalid gradient type in section $section_id";
+			}
+			$location_fields = array( 'gradientLocation1', 'gradientLocation2' );
+			foreach ( $location_fields as $field ) {
+				if ( isset( $section_config[ $field ] ) ) {
+					$loc = (int) $section_config[ $field ];
+					if ( $loc < 0 || $loc > 100 ) {
+						$errors[] = "Invalid gradient location in section $section_id: $field (must be 0-100)";
+					}
+				}
+			}
+			if ( isset( $section_config['gradientAngle'] ) ) {
+				$angle = (int) $section_config['gradientAngle'];
+				if ( $angle < 0 || $angle > 360 ) {
+					$errors[] = "Invalid gradient angle in section $section_id (must be 0-360)";
+				}
+			}
+			if ( ! empty( $section_config['gradientPosition'] ) && ! in_array( $section_config['gradientPosition'], array( 'center', 'top', 'bottom', 'left', 'right' ), true ) ) {
+				$errors[] = "Invalid gradient position in section $section_id";
+			}
+
+			// Validate form palette mode
+			if ( ! empty( $section_config['formPaletteMode'] ) && ! in_array( $section_config['formPaletteMode'], array( 'dark', 'light' ), true ) ) {
+				$errors[] = "Invalid form palette mode in section $section_id";
 			}
 		}
 	}

@@ -15,7 +15,7 @@ import { useSettings } from '../hooks/useSettings';
 import { useFormTracking } from '../hooks/useAnalytics';
 import { trackFormSubmitted, trackFormError, trackPhoneClick, getAttributionForSubmission } from '../lib/analytics';
 import GoogleReviewBadge from './GoogleReviewBadge';
-import { getContrastColor, lighten } from '../utils/colorUtils';
+import { getContrastColor, lighten, generateBrandPalette } from '../utils/colorUtils';
 import * as LucideIcons from 'lucide-react';
 
 // ============================================
@@ -291,27 +291,76 @@ export default function Hero() {
 
     const accentColor = isOverriding ? (heroTheme.accent || palette.accent[500]) : palette.accent[500];
     const overlayColor = isOverriding ? (heroTheme.bgPrimary || fallbacks.bgPrimary) : palette.background.primary;
-    const cardBgColor = isOverriding ? (heroTheme.bgSecondary || fallbacks.bgSecondary) : palette.background.secondary;
-    const borderColor = isOverriding ? (heroTheme.borderColor || fallbacks.borderColor) : palette.border;
     const textPrimary = isOverriding ? (heroTheme.textPrimary || fallbacks.textPrimary) : palette.text.primary;
     const textSecondary = isOverriding ? (heroTheme.textSecondary || fallbacks.textSecondary) : palette.text.secondary;
 
+    // Form mode: independent from section mode when formPaletteMode is set
+    const formMode = heroTheme.formPaletteMode || effectiveMode;
+    const formModeOverridden = formMode !== effectiveMode;
+    const formFallbacks = formMode === 'light' ? LIGHT_FALLBACKS : DARK_FALLBACKS;
+
+    // Generate form-specific palette when form mode differs from section mode
+    let formPalette = palette;
+    if (formModeOverridden) {
+      const b = globalConfig.brand;
+      const isFormDark = formMode === 'dark';
+      formPalette = generateBrandPalette(
+        isFormDark ? b.darkPrimary : b.lightPrimary,
+        isFormDark ? b.darkAccent : b.lightAccent,
+        formMode,
+        isFormDark ? b.darkBg : b.lightBg,
+        isFormDark ? b.darkText : b.lightText,
+        {
+          textSecondary: isFormDark ? b.darkTextSecondary : b.lightTextSecondary,
+          bgSecondary: isFormDark ? b.darkBgSecondary : b.lightBgSecondary,
+          border: isFormDark ? b.darkBorder : b.lightBorder,
+        },
+      );
+    }
+
+    // Section-level colors (hero text, benefits, etc.)
+    const borderColor = isOverriding ? (heroTheme.borderColor || fallbacks.borderColor) : palette.border;
+
+    // Form card colors — form-specific overrides take highest priority, then form mode, then section
+    const cardBgColor = heroTheme.formBg
+      || (formModeOverridden ? formFallbacks.bgSecondary : undefined)
+      || (isOverriding ? (heroTheme.bgSecondary || fallbacks.bgSecondary) : palette.background.secondary);
+    const formBorderColor = heroTheme.formBorder
+      || (formModeOverridden ? formFallbacks.borderColor : undefined)
+      || borderColor;
+    const formTextPrimary = heroTheme.formText
+      || (formModeOverridden ? formFallbacks.textPrimary : undefined)
+      || textPrimary;
+    const formTextSecondary = heroTheme.formTextSecondary
+      || (formModeOverridden ? formFallbacks.textSecondary : undefined)
+      || textSecondary;
+
     const formConfig = globalConfig.form;
-    const inputBg = isOverriding
-      ? (heroTheme.bgTertiary || fallbacks.bgTertiary)
-      : (formConfig.inputBg || palette.background.tertiary);
-    const inputBorder = isOverriding
-      ? borderColor
-      : (formConfig.inputBorder || palette.border);
-    const inputText = isOverriding
-      ? textPrimary
-      : (formConfig.inputText || palette.text.primary);
-    const inputFocusBorder = formConfig.inputFocusBorder || palette.primary[500];
-    const labelColor = isOverriding
-      ? textSecondary
-      : (formConfig.labelColor || palette.text.secondary);
+    const formAccentColor = heroTheme.formAccent
+      || (formModeOverridden ? formPalette.primary[500] : undefined)
+      || accentColor;
+
+    const inputBg = heroTheme.formBg
+      ? lighten(heroTheme.formBg, 3)
+      : (formModeOverridden
+        ? formFallbacks.bgTertiary
+        : (isOverriding
+          ? (heroTheme.bgTertiary || fallbacks.bgTertiary)
+          : (formConfig.inputBg || palette.background.tertiary)));
+    const inputBorder = heroTheme.formBorder
+      || (formModeOverridden ? formFallbacks.borderColor : undefined)
+      || (isOverriding ? borderColor : (formConfig.inputBorder || palette.border));
+    const inputText = heroTheme.formText
+      || (formModeOverridden ? formFallbacks.textPrimary : undefined)
+      || (isOverriding ? textPrimary : (formConfig.inputText || palette.text.primary));
+    const inputFocusBorder = heroTheme.formAccent
+      || (formModeOverridden ? formPalette.primary[500] : undefined)
+      || (formConfig.inputFocusBorder || palette.primary[500]);
+    const labelColor = heroTheme.formTextSecondary
+      || (formModeOverridden ? formFallbacks.textSecondary : undefined)
+      || (isOverriding ? textSecondary : (formConfig.labelColor || palette.text.secondary));
     const defaultButtonColor = resolveButtonColor(heroTheme.buttonStyle, globalConfig.brand, palette.primary[500]);
-    const buttonBg = formConfig.buttonBg || defaultButtonColor;
+    const buttonBg = heroTheme.formAccent || formConfig.buttonBg || defaultButtonColor;
     const buttonHoverBg = lighten(buttonBg, 15);
 
     const hasBgImage = !!heroTheme.bgImage;
@@ -321,11 +370,16 @@ export default function Hero() {
     return {
       isOverriding,
       isLightMode,
+      isFormLightMode: formMode === 'light',
       hasBgImage,
       accentColor,
+      formAccentColor,
       overlayColor,
       cardBgColor,
       borderColor,
+      formBorderColor,
+      formTextPrimary,
+      formTextSecondary,
       textPrimary,
       textSecondary,
       inputBg,
@@ -586,17 +640,19 @@ export default function Hero() {
           <div className="opacity-0 animate-[slide-up_0.8s_ease-out_0.4s_forwards]">
             <div className="relative">
               {/* Floating Card Effect */}
-              <div className="absolute -inset-4 rounded-3xl blur-2xl opacity-60" style={{ background: `linear-gradient(to right, ${themeStyles.accentColor}33, ${themeStyles.accentColor}1a, ${themeStyles.accentColor}33)` }} />
+              <div className="absolute -inset-4 rounded-3xl blur-2xl opacity-60" style={{ background: `linear-gradient(to right, ${themeStyles.formAccentColor}33, ${themeStyles.formAccentColor}1a, ${themeStyles.formAccentColor}33)` }} />
 
               <div
                 className="relative backdrop-blur-sm rounded-2xl shadow-2xl p-8 border"
                 style={{
                   backgroundColor: themeStyles.cardBgColor,
-                  borderColor: themeStyles.borderColor,
+                  borderColor: themeStyles.formBorderColor,
+                  '--section-text-primary': themeStyles.formTextPrimary,
+                  '--section-text-secondary': themeStyles.formTextSecondary,
                   boxShadow: heroTheme.bgPrimary
                     ? '0 25px 50px -12px rgba(0, 0, 0, 0.35)'
-                    : (themeStyles.isLightMode ? '0 25px 50px -12px rgba(0, 0, 0, 0.15)' : '0 25px 50px -12px rgba(0, 0, 0, 0.5)')
-                }}
+                    : (themeStyles.isFormLightMode ? '0 25px 50px -12px rgba(0, 0, 0, 0.15)' : '0 25px 50px -12px rgba(0, 0, 0, 0.5)')
+                } as React.CSSProperties}
               >
                 {/* Form Header */}
                 <div className="text-center mb-8">
@@ -609,12 +665,12 @@ export default function Hero() {
                   {/* Quick Call CTA for phone-preferring users */}
                   {settings.phone_raw && (
                     <div className="flex items-center justify-center gap-2 text-sm">
-                      <span style={{ color: themeStyles.textSecondary }}>Or call now:</span>
+                      <span style={{ color: themeStyles.formTextSecondary }}>Or call now:</span>
                       <a
                         href={`tel:${settings.phone_raw}`}
                         onClick={() => trackPhoneClick('hero_form_header')}
                         className="text-lg font-semibold hover:underline transition-colors"
-                        style={{ color: themeStyles.accentColor }}
+                        style={{ color: themeStyles.formAccentColor }}
                       >
                         {settings.phone}
                       </a>
@@ -624,8 +680,8 @@ export default function Hero() {
 
                 {isSuccess ? (
                   <div className="text-center py-8">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${themeStyles.accentColor}33` }}>
-                      <svg className="w-8 h-8" fill="none" stroke={themeStyles.accentColor} viewBox="0 0 24 24">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${themeStyles.formAccentColor}33` }}>
+                      <svg className="w-8 h-8" fill="none" stroke={themeStyles.formAccentColor} viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -720,7 +776,7 @@ export default function Hero() {
                     {/* Message */}
                     <div>
                       <label htmlFor="message" className="block text-sm font-medium mb-1.5" style={{ color: themeStyles.labelColor }}>
-                        Message <span style={{ color: themeStyles.textSecondary, opacity: 0.7 }}>(optional)</span>
+                        Message <span style={{ color: themeStyles.formTextSecondary, opacity: 0.7 }}>(optional)</span>
                       </label>
                       <textarea
                         id="message"
@@ -763,7 +819,7 @@ export default function Hero() {
                     {/* Privacy Note */}
                     <p className="text-center text-xs text-gray-500">
                       By submitting, you agree to our{' '}
-                      <a href={settings.privacy_policy_url} className="hover:underline" style={{ color: themeStyles.accentColor }}>
+                      <a href={settings.privacy_policy_url} className="hover:underline" style={{ color: themeStyles.formAccentColor }}>
                         Privacy Policy
                       </a>
                     </p>

@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent, type ServiceItem } from '../context/ContentContext';
-import { renderHeadline } from '../utils/renderHeadline';
+import { renderHeadline, renderHeadlineStyled } from '../utils/renderHeadline';
 import * as LucideIcons from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
@@ -42,10 +42,22 @@ const ServiceIcon = memo(({ service }: { service: ServiceItem }) => {
 });
 ServiceIcon.displayName = 'ServiceIcon';
 
-function ServiceCard({ service, iconBgEnabled = true, iconBgColor, className = '' }: { service: ServiceItem; iconBgEnabled?: boolean; iconBgColor?: string; className?: string }) {
+interface SvcCardColors {
+  cardBg?: string;
+  cardBorder?: string;
+  cardTitle?: string;
+  cardText?: string;
+  iconColor?: string;
+}
+
+function ServiceCard({ service, iconBgEnabled = true, iconBgColor, className = '', colors }: { service: ServiceItem; iconBgEnabled?: boolean; iconBgColor?: string; className?: string; colors?: SvcCardColors }) {
   return (
     <article
       className={`group relative section-bg-secondary rounded-2xl p-8 section-border border hover:border-opacity-70 shadow-sm hover:shadow-xl hover:shadow-black/20 transition-all duration-500 hover:-translate-y-1 ${className}`}
+      style={{
+        ...(colors?.cardBg ? { backgroundColor: colors.cardBg } : {}),
+        ...(colors?.cardBorder ? { borderColor: colors.cardBorder } : {}),
+      }}
     >
       {/* Hover Gradient */}
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary-500/5 via-transparent to-primary-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -58,18 +70,27 @@ function ServiceCard({ service, iconBgEnabled = true, iconBgColor, className = '
               ? `${iconBgColor ? '' : 'bg-primary-500 shadow-lg shadow-primary-500/20'} text-white`
               : 'section-text-accent'
           }`}
-          style={iconBgEnabled && iconBgColor ? { backgroundColor: iconBgColor } : undefined}
+          style={{
+            ...(iconBgEnabled && iconBgColor ? { backgroundColor: iconBgColor } : {}),
+            ...(colors?.iconColor ? { color: colors.iconColor } : {}),
+          }}
         >
           <ServiceIcon service={service} />
         </div>
 
         {/* Title */}
-        <h3 className="font-[var(--font-display)] text-xl font-bold section-text-primary mb-3 group-hover:text-primary-400 transition-colors duration-300">
+        <h3
+          className="font-[var(--font-display)] text-xl font-bold section-text-primary mb-3 group-hover:text-primary-400 transition-colors duration-300"
+          style={colors?.cardTitle ? { color: colors.cardTitle } : undefined}
+        >
           {service.title}
         </h3>
 
         {/* Description */}
-        <p className="section-text-secondary leading-relaxed">
+        <p
+          className="section-text-secondary leading-relaxed"
+          style={colors?.cardText ? { color: colors.cardText } : undefined}
+        >
           {service.description}
         </p>
       </div>
@@ -82,7 +103,7 @@ function ServiceCard({ service, iconBgEnabled = true, iconBgColor, className = '
   );
 }
 
-function ServicesSlider({ services, iconBgEnabled, iconBgColor }: { services: ServiceItem[]; iconBgEnabled?: boolean; iconBgColor?: string }) {
+function ServicesSlider({ services, iconBgEnabled, iconBgColor, cardColors, dotColor }: { services: ServiceItem[]; iconBgEnabled?: boolean; iconBgColor?: string; cardColors?: SvcCardColors; dotColor?: string }) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: 'start', slidesToScroll: 1 },
     [Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })]
@@ -110,7 +131,7 @@ function ServicesSlider({ services, iconBgEnabled, iconBgColor }: { services: Se
         <div className="flex -ml-6">
           {services.map((service) => (
             <div key={service.id} className="flex-[0_0_100%] min-w-0 pl-6 md:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
-              <ServiceCard service={service} iconBgEnabled={iconBgEnabled} iconBgColor={iconBgColor} className="h-full" />
+              <ServiceCard service={service} iconBgEnabled={iconBgEnabled} iconBgColor={iconBgColor} className="h-full" colors={cardColors} />
             </div>
           ))}
         </div>
@@ -133,9 +154,10 @@ function ServicesSlider({ services, iconBgEnabled, iconBgColor }: { services: Se
               onClick={() => scrollTo(index)}
               className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                 index === selectedIndex
-                  ? 'bg-primary-500 w-8'
+                  ? `${dotColor ? '' : 'bg-primary-500'} w-8`
                   : 'bg-dark-600 hover:bg-dark-500'
               }`}
+              style={dotColor && index === selectedIndex ? { backgroundColor: dotColor } : undefined}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
@@ -165,6 +187,15 @@ export default function ServicesGrid() {
   const count = content.services.length;
   const useSlider = count > 6;
 
+  // Service-specific colors from theme
+  const cardColors: SvcCardColors = {
+    cardBg: theme.svcCardBg,
+    cardBorder: theme.svcCardBorder,
+    cardTitle: theme.svcCardTitle,
+    cardText: theme.svcCardText,
+    iconColor: theme.svcIconColor,
+  };
+
   // Grid layout logic
   const getGridClass = () => {
     if (count === 4) return 'grid md:grid-cols-2 gap-8';
@@ -193,20 +224,31 @@ export default function ServicesGrid() {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">
+          <span
+            className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4"
+            style={theme.svcBadgeColor ? { color: theme.svcBadgeColor } : undefined}
+          >
             {content.badgeText}
           </span>
-          <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6">
-            {renderHeadline(content.headline, 'section-text-accent')}
+          <h2
+            className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6"
+            style={theme.svcHeadlineColor ? { color: theme.svcHeadlineColor } : undefined}
+          >
+            {theme.svcHeadlineAccent
+              ? renderHeadlineStyled(content.headline, { color: theme.svcHeadlineAccent })
+              : renderHeadline(content.headline, 'section-text-accent')}
           </h2>
-          <p className="section-text-secondary text-lg max-w-3xl mx-auto">
+          <p
+            className="section-text-secondary text-lg max-w-3xl mx-auto"
+            style={theme.svcSubheadlineColor ? { color: theme.svcSubheadlineColor } : undefined}
+          >
             {content.subheadline}
           </p>
         </div>
 
         {/* Services: Grid or Slider */}
         {useSlider ? (
-          <ServicesSlider services={content.services} iconBgEnabled={iconBgEnabled} iconBgColor={iconBgColor} />
+          <ServicesSlider services={content.services} iconBgEnabled={iconBgEnabled} iconBgColor={iconBgColor} cardColors={cardColors} dotColor={theme.svcDotColor} />
         ) : (
           <div className={getGridClass()}>
             {content.services.map((service, index) => (
@@ -216,6 +258,7 @@ export default function ServicesGrid() {
                 iconBgEnabled={iconBgEnabled}
                 iconBgColor={iconBgColor}
                 className={getCardClass(index)}
+                colors={cardColors}
               />
             ))}
           </div>

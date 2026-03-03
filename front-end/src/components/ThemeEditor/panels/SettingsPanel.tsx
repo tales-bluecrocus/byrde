@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { useSectionTheme, type SectionId, SECTION_LABELS } from '../../../context/SectionThemeContext';
-import { useHeaderConfig, type HeaderPadding, type BadgeTheme } from '../../../context/HeaderConfigContext';
+import { useHeaderConfig, type BadgeTheme } from '../../../context/HeaderConfigContext';
 import { useToast } from '../../Toast';
 import { Eye, EyeOff, Image, Upload, Trash2, Settings2 } from 'lucide-react';
 
@@ -194,21 +194,6 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
               </>
             )}
 
-            <Separator className="bg-zinc-800/60" />
-
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-zinc-400">Header Padding</Label>
-              <Select value={headerConfig.style.headerPadding} onValueChange={(v) => updateHeaderStyle({ headerPadding: v as HeaderPadding })}>
-                <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-800 border-zinc-800 z-[10001]">
-                  <SelectItem value="compact" className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">Compact</SelectItem>
-                  <SelectItem value="default" className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">Default</SelectItem>
-                  <SelectItem value="spacious" className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">Spacious</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </CardContent>
         </Card>
       )}

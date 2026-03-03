@@ -7,6 +7,67 @@ export interface SectionTheme {
   overrideGlobalColors?: boolean; // If true, use palette colors instead of global
   paletteId?: string;             // ID of the selected palette (only used when override is true)
   paletteMode?: 'dark' | 'light'; // Individual dark/light mode for this section
+  formPaletteMode?: 'dark' | 'light'; // Independent form card mode (follows section mode if unset)
+  // Form card-specific color overrides (hero only, independent of section colors)
+  formBg?: string;            // Form card background
+  formText?: string;          // Form text primary (headings, inputs)
+  formTextSecondary?: string; // Form labels, secondary text
+  formBorder?: string;        // Form card border + input borders
+  formAccent?: string;        // Focus ring + button color
+  // Testimonials section-specific color overrides
+  tmBadgeColor?: string;        // Badge text color
+  tmHeadlineColor?: string;     // Headline text color
+  tmHeadlineAccent?: string;    // Headline strong/accent color
+  tmSubheadlineColor?: string;  // Subheadline text color
+  tmReviewLabelColor?: string;  // Review label text color
+  tmCardBg?: string;            // Card background color
+  tmCardText?: string;          // Card quote text color
+  tmCardAuthor?: string;        // Card author name color
+  tmCardBorder?: string;        // Card border color
+  tmDotColor?: string;          // Pagination dot active color
+  // Services section-specific color overrides
+  svcBadgeColor?: string;       // Badge text color
+  svcHeadlineColor?: string;    // Headline text color
+  svcHeadlineAccent?: string;   // Headline strong/accent color
+  svcSubheadlineColor?: string; // Subheadline text color
+  svcCardBg?: string;           // Card background color
+  svcCardBorder?: string;       // Card border color
+  svcCardTitle?: string;        // Card title color
+  svcCardText?: string;         // Card description text color
+  svcIconColor?: string;        // Icon color
+  svcDotColor?: string;         // Pagination dot active color
+  // Featured Testimonial section-specific color overrides
+  ftBadgeColor?: string;        // Badge text color
+  ftQuoteColor?: string;        // Quote text color
+  ftAuthorColor?: string;       // Author name color
+  ftAuthorTitle?: string;       // Author title/subtitle color
+  // Mid-Page CTA section-specific color overrides
+  mcBadgeColor?: string;        // Badge text color
+  mcHeadlineColor?: string;     // Headline text color
+  mcHeadlineAccent?: string;    // Headline strong/accent color
+  mcSubheadlineColor?: string;  // Subheadline text color
+  // Service Areas section-specific color overrides
+  saBadgeColor?: string;        // Badge text color
+  saHeadlineColor?: string;     // Headline text color
+  saHeadlineAccent?: string;    // Headline strong/accent color
+  saSubheadlineColor?: string;  // Subheadline text color
+  saTagBg?: string;             // Area tag background color
+  saTagText?: string;           // Area tag text color
+  saTagBorder?: string;         // Area tag border color
+  // FAQ section-specific color overrides
+  faqBadgeColor?: string;       // Badge text color
+  faqHeadlineColor?: string;    // Headline text color
+  faqHeadlineAccent?: string;   // Headline strong/accent color
+  faqSubheadlineColor?: string; // Subheadline text color
+  faqQuestionColor?: string;    // Question text color
+  faqAnswerColor?: string;      // Answer text color
+  faqItemBg?: string;           // Accordion item background
+  faqItemBorder?: string;       // Accordion item border
+  faqIconColor?: string;        // Chevron icon color
+  // Footer CTA section-specific color overrides
+  fcHeadlineColor?: string;     // Headline text color
+  fcHeadlineAccent?: string;    // Headline strong/accent color
+  fcSubheadlineColor?: string;  // Subheadline text color
   buttonStyle?: 1 | 2 | 3 | 4;    // 1 = primary, 2 = accent, 3 = dark background, 4 = dark text
   iconBgEnabled?: boolean;   // Show icon box background (default true)
   iconBgColor?: string;      // Custom icon box background color (default: section primary)
@@ -31,6 +92,16 @@ export interface SectionTheme {
   bgImagePosition?: string;  // CSS background-position value
   bgImageSize?: string;      // CSS background-size value (cover, contain, etc)
   bgImageOverlayColor?: string; // Custom overlay color on top of image
+
+  // Gradient overlay
+  gradientEnabled?: boolean;           // Toggle on/off
+  gradientType?: 'linear' | 'radial'; // Gradient type (default: linear)
+  gradientColor1?: string;             // First color (defaults to section bg)
+  gradientColor2?: string;             // Second color (defaults to transparent)
+  gradientLocation1?: number;          // Color 1 stop position 0-100% (default: 0)
+  gradientLocation2?: number;          // Color 2 stop position 0-100% (default: 100)
+  gradientAngle?: number;              // 0-360 degrees for linear (default: 180)
+  gradientPosition?: string;           // Position for radial: center|top|bottom|left|right
 }
 
 // Resolved theme with all colors
@@ -51,6 +122,14 @@ export interface ResolvedSectionTheme {
   bgImagePosition?: string;
   bgImageSize?: string;
   bgImageOverlayColor?: string;
+  gradientEnabled?: boolean;
+  gradientType?: 'linear' | 'radial';
+  gradientColor1?: string;
+  gradientColor2?: string;
+  gradientLocation1?: number;
+  gradientLocation2?: number;
+  gradientAngle?: number;
+  gradientPosition?: string;
 }
 
 // All sections in the page
@@ -275,6 +354,14 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
       bgImagePosition: theme.bgImagePosition,
       bgImageSize: theme.bgImageSize,
       bgImageOverlayColor: theme.bgImageOverlayColor,
+      gradientEnabled: theme.gradientEnabled,
+      gradientType: theme.gradientType,
+      gradientColor1: theme.gradientColor1,
+      gradientColor2: theme.gradientColor2,
+      gradientLocation1: theme.gradientLocation1,
+      gradientLocation2: theme.gradientLocation2,
+      gradientAngle: theme.gradientAngle,
+      gradientPosition: theme.gradientPosition,
     };
   }, [sectionThemes]);
 
@@ -333,10 +420,11 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
       styles['--color-button-text'] = theme.buttonText;
     }
 
-    // Border color
+    // Border color + muted backgrounds
     if (theme.borderColor) {
       styles['--color-border'] = theme.borderColor;
       styles['--color-dark-700'] = theme.borderColor;
+      styles['--color-dark-600'] = theme.borderColor;
     }
 
     // Apply accent as primary color for buttons/highlights inside this section

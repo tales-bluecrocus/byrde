@@ -256,17 +256,29 @@ function byrde_sanitize_theme_settings( array $settings ): array {
 
 	// Brand Colors (per-mode)
 	if ( isset( $settings['brand_colors'] ) ) {
+		$bc = $settings['brand_colors'];
+		$sanitize_optional = function( $val ) {
+			if ( empty( $val ) ) return '';
+			return byrde_sanitize_hex_color_alpha( $val ) ?: '';
+		};
+
 		$sanitized['brand_colors'] = array(
-			'dark_primary'  => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['dark_primary'] ?? '#3ab342' ) ?: '#3ab342',
-			'dark_accent'   => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['dark_accent'] ?? '#f97316' ) ?: '#f97316',
-			'dark_bg'       => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['dark_bg'] ?? '#171717' ) ?: '#171717',
-			'dark_text'     => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['dark_text'] ?? '#efefef' ) ?: '#efefef',
-			'light_primary' => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['light_primary'] ?? '#3ab342' ) ?: '#3ab342',
-			'light_accent'  => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['light_accent'] ?? '#f97316' ) ?: '#f97316',
-			'light_bg'      => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['light_bg'] ?? '#ffffff' ) ?: '#ffffff',
-			'light_text'    => byrde_sanitize_hex_color_alpha( $settings['brand_colors']['light_text'] ?? '#2a2a2a' ) ?: '#2a2a2a',
-			'mode'          => in_array( $settings['brand_colors']['mode'] ?? 'dark', array( 'light', 'dark' ), true )
-				? $settings['brand_colors']['mode']
+			'dark_primary'        => byrde_sanitize_hex_color_alpha( $bc['dark_primary'] ?? '#3ab342' ) ?: '#3ab342',
+			'dark_accent'         => byrde_sanitize_hex_color_alpha( $bc['dark_accent'] ?? '#f97316' ) ?: '#f97316',
+			'dark_bg'             => byrde_sanitize_hex_color_alpha( $bc['dark_bg'] ?? '#171717' ) ?: '#171717',
+			'dark_text'           => byrde_sanitize_hex_color_alpha( $bc['dark_text'] ?? '#efefef' ) ?: '#efefef',
+			'dark_text_secondary' => $sanitize_optional( $bc['dark_text_secondary'] ?? '' ),
+			'dark_bg_secondary'   => $sanitize_optional( $bc['dark_bg_secondary'] ?? '' ),
+			'dark_border'         => $sanitize_optional( $bc['dark_border'] ?? '' ),
+			'light_primary'        => byrde_sanitize_hex_color_alpha( $bc['light_primary'] ?? '#3ab342' ) ?: '#3ab342',
+			'light_accent'         => byrde_sanitize_hex_color_alpha( $bc['light_accent'] ?? '#f97316' ) ?: '#f97316',
+			'light_bg'             => byrde_sanitize_hex_color_alpha( $bc['light_bg'] ?? '#ffffff' ) ?: '#ffffff',
+			'light_text'           => byrde_sanitize_hex_color_alpha( $bc['light_text'] ?? '#2a2a2a' ) ?: '#2a2a2a',
+			'light_text_secondary' => $sanitize_optional( $bc['light_text_secondary'] ?? '' ),
+			'light_bg_secondary'   => $sanitize_optional( $bc['light_bg_secondary'] ?? '' ),
+			'light_border'         => $sanitize_optional( $bc['light_border'] ?? '' ),
+			'mode'                 => in_array( $bc['mode'] ?? 'dark', array( 'light', 'dark' ), true )
+				? $bc['mode']
 				: 'dark',
 		);
 	}
@@ -401,15 +413,21 @@ function byrde_get_all_settings(): array {
 	$flattened['cookie_settings_url'] = $cookie ?: home_url( '/lp/cookie-settings' );
 
 	// Brand Colors (per-mode)
-	$flattened['brand_dark_primary']  = $settings['brand_colors']['dark_primary'] ?? '#3ab342';
-	$flattened['brand_dark_accent']   = $settings['brand_colors']['dark_accent'] ?? '#f97316';
-	$flattened['brand_dark_bg']       = $settings['brand_colors']['dark_bg'] ?? '#171717';
-	$flattened['brand_dark_text']     = $settings['brand_colors']['dark_text'] ?? '#efefef';
-	$flattened['brand_light_primary'] = $settings['brand_colors']['light_primary'] ?? '#3ab342';
-	$flattened['brand_light_accent']  = $settings['brand_colors']['light_accent'] ?? '#f97316';
-	$flattened['brand_light_bg']      = $settings['brand_colors']['light_bg'] ?? '#ffffff';
-	$flattened['brand_light_text']    = $settings['brand_colors']['light_text'] ?? '#2a2a2a';
-	$flattened['brand_mode']          = $settings['brand_colors']['mode'] ?? 'dark';
+	$flattened['brand_dark_primary']        = $settings['brand_colors']['dark_primary'] ?? '#3ab342';
+	$flattened['brand_dark_accent']         = $settings['brand_colors']['dark_accent'] ?? '#f97316';
+	$flattened['brand_dark_bg']             = $settings['brand_colors']['dark_bg'] ?? '#171717';
+	$flattened['brand_dark_text']           = $settings['brand_colors']['dark_text'] ?? '#efefef';
+	$flattened['brand_dark_text_secondary'] = $settings['brand_colors']['dark_text_secondary'] ?? '';
+	$flattened['brand_dark_bg_secondary']   = $settings['brand_colors']['dark_bg_secondary'] ?? '';
+	$flattened['brand_dark_border']         = $settings['brand_colors']['dark_border'] ?? '';
+	$flattened['brand_light_primary']        = $settings['brand_colors']['light_primary'] ?? '#3ab342';
+	$flattened['brand_light_accent']         = $settings['brand_colors']['light_accent'] ?? '#f97316';
+	$flattened['brand_light_bg']             = $settings['brand_colors']['light_bg'] ?? '#ffffff';
+	$flattened['brand_light_text']           = $settings['brand_colors']['light_text'] ?? '#2a2a2a';
+	$flattened['brand_light_text_secondary'] = $settings['brand_colors']['light_text_secondary'] ?? '';
+	$flattened['brand_light_bg_secondary']   = $settings['brand_colors']['light_bg_secondary'] ?? '';
+	$flattened['brand_light_border']         = $settings['brand_colors']['light_border'] ?? '';
+	$flattened['brand_mode']                 = $settings['brand_colors']['mode'] ?? 'dark';
 	// Button style (per-mode + shared)
 	$flattened['button_dark_bg']            = $settings['button_style']['dark_bg'] ?? '';
 	$flattened['button_dark_text']          = $settings['button_style']['dark_text'] ?? '#ffffff';

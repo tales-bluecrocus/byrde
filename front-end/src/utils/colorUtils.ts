@@ -287,10 +287,18 @@ export interface BrandPalette {
   border: string;
 }
 
+/** Optional overrides for derived palette colors (textSecondary, bgSecondary, border) */
+export interface PaletteOverrides {
+  textSecondary?: string;
+  bgSecondary?: string;
+  border?: string;
+}
+
 /**
  * Generate the complete brand palette from brand colors + mode.
  * Primary and accent colors become the 500 shade, all others are auto-generated.
  * Background and text colors define the surface/text; mode determines derivation direction.
+ * Optional overrides replace the algorithmically derived textSecondary, bgSecondary, border.
  */
 export function generateBrandPalette(
   primaryColor: string,
@@ -298,6 +306,7 @@ export function generateBrandPalette(
   mode: ColorMode,
   backgroundColor: string = '#171717',
   textColor: string = '#efefef',
+  overrides?: PaletteOverrides,
 ): BrandPalette {
   const primary = generateShades(primaryColor);
   const accent = generateShades(accentColor);
@@ -308,15 +317,15 @@ export function generateBrandPalette(
       accent,
       background: {
         primary: backgroundColor,
-        secondary: lighten(backgroundColor, 4),
+        secondary: overrides?.bgSecondary || lighten(backgroundColor, 4),
         tertiary: lighten(backgroundColor, 8),
       },
       text: {
         primary: textColor,
-        secondary: darken(textColor, 18),
+        secondary: overrides?.textSecondary || darken(textColor, 18),
         muted: darken(textColor, 38),
       },
-      border: lighten(backgroundColor, 16),
+      border: overrides?.border || lighten(backgroundColor, 16),
     };
   }
 
@@ -326,15 +335,15 @@ export function generateBrandPalette(
     accent,
     background: {
       primary: backgroundColor,
-      secondary: darken(backgroundColor, 2),
+      secondary: overrides?.bgSecondary || darken(backgroundColor, 2),
       tertiary: darken(backgroundColor, 5),
     },
     text: {
       primary: textColor,
-      secondary: lighten(textColor, 25),
+      secondary: overrides?.textSecondary || lighten(textColor, 25),
       muted: lighten(textColor, 45),
     },
-    border: darken(backgroundColor, 12),
+    border: overrides?.border || darken(backgroundColor, 12),
   };
 }
 

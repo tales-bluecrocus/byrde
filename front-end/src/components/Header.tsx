@@ -256,15 +256,38 @@ export default function Header() {
 		}
 	};
 
-	// Get header padding based on config
-	const getHeaderPadding = () => {
-		switch (headerConfig.style.headerPadding) {
-			case 'compact': return 'py-2';
-			case 'spacious': return 'py-6 sm:py-8';
-			case 'default':
-			default: return 'py-4';
-		}
+	// Header padding from section theme (same system as other sections)
+	const HEADER_PADDING: Record<string, string> = {
+		sm: '0.5rem',
+		md: '1rem',
+		lg: '1.5rem',
+		xl: '2rem',
 	};
+	const headerPadding = HEADER_PADDING[headerTheme.padding || 'md'] || '1rem';
+
+	// Gradient overlay for header
+	const hasGradient = !!headerTheme.gradientEnabled;
+	const headerGradientStyle = hasGradient ? (() => {
+		const type = headerTheme.gradientType || 'linear';
+		const color1 = headerTheme.gradientColor1 || bgColor;
+		const color2 = headerTheme.gradientColor2 || 'transparent';
+		const loc1 = headerTheme.gradientLocation1 ?? 0;
+		const loc2 = headerTheme.gradientLocation2 ?? 100;
+		const angle = headerTheme.gradientAngle ?? 180;
+		const position = headerTheme.gradientPosition || 'center';
+
+		const gradient = type === 'radial'
+			? `radial-gradient(circle at ${position}, ${color1} ${loc1}%, ${color2} ${loc2}%)`
+			: `linear-gradient(${angle}deg, ${color1} ${loc1}%, ${color2} ${loc2}%)`;
+
+		return {
+			position: 'absolute' as const,
+			inset: 0,
+			background: gradient,
+			pointerEvents: 'none' as const,
+			zIndex: 0,
+		};
+	})() : null;
 
 	return (
 		<>
@@ -285,17 +308,21 @@ export default function Header() {
 				{/* Main Header */}
 				<header
 					id="header-section"
-					className={`${
+					className={`relative overflow-hidden ${
 						shouldBeFixed
 							? "backdrop-blur-md shadow-lg shadow-black/20"
 							: ""
-					} ${getHeaderPadding()}`}
+					}`}
 					style={{
 						backgroundColor: shouldBeFixed ? withAlpha(bgColor, 0.95) : (isOverriding ? bgColor : 'transparent'),
 						color: textPrimary,
+						paddingTop: headerPadding,
+						paddingBottom: headerPadding,
 					}}
 				>
-					<div className="max-w-7xl mx-auto px-6 lg:px-8">
+					{/* Gradient overlay */}
+					{hasGradient && !shouldBeFixed && <div style={headerGradientStyle!} aria-hidden="true" />}
+					<div className="max-w-7xl mx-auto px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
 						<div className="flex items-center justify-between">
 							{/* Logo */}
 							{logo && (

@@ -79,15 +79,15 @@ export default function FooterCTA() {
         {/* Headline */}
         <h2
           className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
-          style={{ color: textPrimary }}
+          style={{ color: ctaTheme.fcHeadlineColor || textPrimary }}
         >
-          {renderHeadlineStyled(content.headline, { color: accentColor })}
+          {renderHeadlineStyled(content.headline, { color: ctaTheme.fcHeadlineAccent || accentColor })}
         </h2>
 
         {/* Subheadline */}
         <p
           className="text-lg sm:text-xl max-w-2xl mx-auto mb-10"
-          style={{ color: textSecondary }}
+          style={{ color: ctaTheme.fcSubheadlineColor || textSecondary }}
         >
           {content.subheadline}
         </p>

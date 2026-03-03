@@ -104,12 +104,12 @@ export default function MidPageCTA() {
           className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold mb-8 shadow-lg"
           style={{
             backgroundColor: badgeBg,
-            color: badgeText,
+            color: ctaTheme.mcBadgeColor || badgeText,
           }}
         >
           <span
             className="w-2 h-2 rounded-full animate-pulse"
-            style={{ backgroundColor: accentColor }}
+            style={{ backgroundColor: ctaTheme.mcHeadlineAccent || accentColor }}
           />
           <span>{content.badge}</span>
         </div>
@@ -117,15 +117,15 @@ export default function MidPageCTA() {
         {/* Headline */}
         <h2
           className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
-          style={{ color: textPrimary, fontFamily: 'var(--font-display)' }}
+          style={{ color: ctaTheme.mcHeadlineColor || textPrimary, fontFamily: 'var(--font-display)' }}
         >
-          {renderHeadlineStyled(content.headline, { color: accentColor })}
+          {renderHeadlineStyled(content.headline, { color: ctaTheme.mcHeadlineAccent || accentColor })}
         </h2>
 
         {/* Subtext */}
         <p
           className="text-lg sm:text-xl max-w-2xl mx-auto mb-10"
-          style={{ color: textSecondary }}
+          style={{ color: ctaTheme.mcSubheadlineColor || textSecondary }}
         >
           {content.subheadline}
         </p>

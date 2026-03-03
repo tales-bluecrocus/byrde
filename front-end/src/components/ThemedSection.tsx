@@ -72,6 +72,10 @@ function paletteToStyles(p: BrandPalette, btnSettings?: ButtonSettings): Record<
   styles['--color-border'] = p.border;
   styles['--color-dark-700'] = p.border;
 
+  // Muted backgrounds (pagination dots, scrollbar, etc.)
+  styles['--color-dark-600'] = p.border;      // Slightly lighter than border
+  styles['--color-dark-500'] = p.text.muted;  // Muted text color as bg
+
   return styles;
 }
 
@@ -101,6 +105,11 @@ export default function ThemedSection({
       sectionMode,
       isDark ? b.darkBg : b.lightBg,
       isDark ? b.darkText : b.lightText,
+      {
+        textSecondary: isDark ? b.darkTextSecondary : b.lightTextSecondary,
+        bgSecondary: isDark ? b.darkBgSecondary : b.lightBgSecondary,
+        border: isDark ? b.darkBorder : b.lightBorder,
+      },
     );
   }, [theme.paletteMode, globalConfig.brand]);
 
@@ -181,19 +190,47 @@ export default function ThemedSection({
     zIndex: 1,
   } : {};
 
+  // Gradient overlay
+  const hasGradient = !!theme.gradientEnabled;
+  const gradientStyle: CSSProperties = hasGradient ? (() => {
+    const type = theme.gradientType || 'linear';
+    const color1 = theme.gradientColor1 || effectivePalette.background.primary;
+    const color2 = theme.gradientColor2 || 'transparent';
+    const loc1 = theme.gradientLocation1 ?? 0;
+    const loc2 = theme.gradientLocation2 ?? 100;
+    const angle = theme.gradientAngle ?? 180;
+    const position = theme.gradientPosition || 'center';
+
+    const gradient = type === 'radial'
+      ? `radial-gradient(circle at ${position}, ${color1} ${loc1}%, ${color2} ${loc2}%)`
+      : `linear-gradient(${angle}deg, ${color1} ${loc1}%, ${color2} ${loc2}%)`;
+
+    return {
+      position: 'absolute',
+      inset: 0,
+      background: gradient,
+      pointerEvents: 'none',
+      zIndex: 2,
+    };
+  })() : {};
+
+  const contentZIndex = hasGradient ? 3 : 2;
+
   return (
     <Component
       id={`${id}-section`}
       data-section={id}
-      className={`themed-section relative overflow-hidden ${alternatingClass} ${className}`}
+      className={`themed-section relative overflow-hidden ${alternatingClass} ${hasGradient ? 'has-gradient' : ''} ${className}`}
       style={combinedStyles}
     >
       {/* Background image layer */}
       {hasBgImage && <div style={bgImageLayerStyle} aria-hidden="true" />}
       {/* Color overlay for readability */}
       {hasBgImage && <div style={colorOverlayStyle} aria-hidden="true" />}
+      {/* Gradient overlay */}
+      {hasGradient && <div style={gradientStyle} aria-hidden="true" />}
       {/* Content */}
-      <div style={{ position: 'relative', zIndex: 2 }}>
+      <div style={{ position: 'relative', zIndex: contentZIndex }}>
         {children}
       </div>
     </Component>

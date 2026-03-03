@@ -3,7 +3,7 @@ import { useContent } from '../context/ContentContext';
 
 const StarIcon = ({ filled = true }: { filled?: boolean }) => (
   <svg
-    className={`w-5 h-5 ${filled ? 'text-yellow-400' : 'text-dark-600'}`}
+    className={`w-5 h-5 ${filled ? 'text-yellow-400' : 'opacity-20 section-text-secondary'}`}
     fill="currentColor"
     viewBox="0 0 20 20"
   >
@@ -43,7 +43,10 @@ export default function FeaturedTestimonial() {
 
       <div className="relative max-w-4xl mx-auto px-8 text-center">
         {/* Section Label */}
-        <div className="inline-flex items-center gap-2 section-bg-secondary backdrop-blur-sm section-text-accent px-4 py-2 rounded-full text-sm font-medium mb-8 section-border border">
+        <div
+          className="inline-flex items-center gap-2 section-bg-secondary backdrop-blur-sm section-text-accent px-4 py-2 rounded-full text-sm font-medium mb-8 section-border border"
+          style={theme.ftBadgeColor ? { color: theme.ftBadgeColor } : undefined}
+        >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -62,7 +65,10 @@ export default function FeaturedTestimonial() {
 
         {/* Quote */}
         <blockquote className="mb-10">
-          <p className="font-[var(--font-display)] text-xl sm:text-2xl lg:text-3xl section-text-primary leading-relaxed font-medium">
+          <p
+            className="font-[var(--font-display)] text-xl sm:text-2xl lg:text-3xl section-text-primary leading-relaxed font-medium"
+            style={theme.ftQuoteColor ? { color: theme.ftQuoteColor } : undefined}
+          >
             {content.quote}
           </p>
         </blockquote>
@@ -78,8 +84,14 @@ export default function FeaturedTestimonial() {
           </div>
 
           <div className="text-center">
-            <h3 className="section-text-primary font-semibold text-lg">{content.authorName}</h3>
-            <p className="section-text-secondary text-sm">{content.authorTitle}</p>
+            <h3
+              className="section-text-primary font-semibold text-lg"
+              style={theme.ftAuthorColor ? { color: theme.ftAuthorColor } : undefined}
+            >{content.authorName}</h3>
+            <p
+              className="section-text-secondary text-sm"
+              style={theme.ftAuthorTitle ? { color: theme.ftAuthorTitle } : undefined}
+            >{content.authorTitle}</p>
           </div>
 
           {/* Google Badge */}
@@ -98,7 +110,7 @@ export default function FeaturedTestimonial() {
         <div className="mt-12">
           <a
             href={content.ctaLink}
-            className="inline-flex items-center gap-3 btn-themed px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-black/25"
+            className="inline-flex items-center gap-3 btn-section px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-black/25"
           >
             <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />

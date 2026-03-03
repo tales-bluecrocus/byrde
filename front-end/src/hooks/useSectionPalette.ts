@@ -32,6 +32,11 @@ export function useSectionPalette(sectionId: SectionId): BrandPalette {
       sectionMode,
       isDark ? b.darkBg : b.lightBg,
       isDark ? b.darkText : b.lightText,
+      {
+        textSecondary: isDark ? b.darkTextSecondary : b.lightTextSecondary,
+        bgSecondary: isDark ? b.darkBgSecondary : b.lightBgSecondary,
+        border: isDark ? b.darkBorder : b.lightBorder,
+      },
     );
   }, [theme.paletteMode, globalConfig.brand, palette]);
 }

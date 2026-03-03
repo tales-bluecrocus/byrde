@@ -19,10 +19,16 @@ export interface ThemeSettings {
   brand_dark_accent: string;
   brand_dark_bg: string;
   brand_dark_text: string;
+  brand_dark_text_secondary: string;   // Optional override (auto-derived if empty)
+  brand_dark_bg_secondary: string;     // Optional override (auto-derived if empty)
+  brand_dark_border: string;           // Optional override (auto-derived if empty)
   brand_light_primary: string;
   brand_light_accent: string;
   brand_light_bg: string;
   brand_light_text: string;
+  brand_light_text_secondary: string;  // Optional override (auto-derived if empty)
+  brand_light_bg_secondary: string;    // Optional override (auto-derived if empty)
+  brand_light_border: string;          // Optional override (auto-derived if empty)
   brand_mode: string;
 
   // Button Style (per-mode colors + shared structure)
@@ -95,10 +101,16 @@ export const DEFAULT_SETTINGS: ThemeSettings = {
   brand_dark_accent: '#f97316',
   brand_dark_bg: '#171717',
   brand_dark_text: '#efefef',
+  brand_dark_text_secondary: '#a1a1aa',
+  brand_dark_bg_secondary: '#1e1e1e',
+  brand_dark_border: '',
   brand_light_primary: '#3ab342',
   brand_light_accent: '#f97316',
   brand_light_bg: '#ffffff',
   brand_light_text: '#2a2a2a',
+  brand_light_text_secondary: '#71717a',
+  brand_light_bg_secondary: '#f4f4f5',
+  brand_light_border: '',
   brand_mode: 'dark',
 
   // Button Style (per-mode colors + shared structure)

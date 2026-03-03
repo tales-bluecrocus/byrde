@@ -267,6 +267,19 @@ export function SiteSettingsPanel() {
               <ContrastBadge bg={settings.brand_dark_bg} text={settings.brand_dark_accent} />
             </Field>
           </div>
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <Field label="Text Secondary">
+              <ColorPicker value={settings.brand_dark_text_secondary} onChange={(val) => update('brand_dark_text_secondary', val)} />
+            </Field>
+            <Field label="Background 2">
+              <ColorPicker value={settings.brand_dark_bg_secondary} onChange={(val) => update('brand_dark_bg_secondary', val)} />
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <Field label="Border">
+              <ColorPicker value={settings.brand_dark_border} onChange={(val) => update('brand_dark_border', val)} />
+            </Field>
+          </div>
         </div>
 
         {/* Light Mode */}
@@ -292,6 +305,19 @@ export function SiteSettingsPanel() {
             <Field label="Accent">
               <ColorPicker value={settings.brand_light_accent} onChange={(val) => update('brand_light_accent', val)} />
               <ContrastBadge bg={settings.brand_light_bg} text={settings.brand_light_accent} />
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <Field label="Text Secondary">
+              <ColorPicker value={settings.brand_light_text_secondary} onChange={(val) => update('brand_light_text_secondary', val)} />
+            </Field>
+            <Field label="Background 2">
+              <ColorPicker value={settings.brand_light_bg_secondary} onChange={(val) => update('brand_light_bg_secondary', val)} />
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <Field label="Border">
+              <ColorPicker value={settings.brand_light_border} onChange={(val) => update('brand_light_border', val)} />
             </Field>
           </div>
         </div>

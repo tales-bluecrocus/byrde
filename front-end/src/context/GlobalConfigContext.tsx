@@ -12,16 +12,22 @@ export interface TrustBadge {
   sublabel?: string;
 }
 
-// Brand color configuration (per-mode primary, accent, bg, text)
+// Brand color configuration (per-mode primary, accent, bg, text + optional overrides)
 export interface BrandColors {
   darkPrimary: string;
   darkAccent: string;
   darkBg: string;
   darkText: string;
+  darkTextSecondary?: string;   // Override auto-derived text.secondary
+  darkBgSecondary?: string;     // Override auto-derived background.secondary
+  darkBorder?: string;          // Override auto-derived border
   lightPrimary: string;
   lightAccent: string;
   lightBg: string;
   lightText: string;
+  lightTextSecondary?: string;
+  lightBgSecondary?: string;
+  lightBorder?: string;
   mode: ColorMode;
   // Per-page override: null = inherit site default, 'dark'/'light' = explicit override
   modeOverride?: 'dark' | 'light' | null;
@@ -180,10 +186,16 @@ function loadConfig(): GlobalConfig {
       darkAccent: s.brand_dark_accent || base.brand.darkAccent,
       darkBg: s.brand_dark_bg || base.brand.darkBg,
       darkText: s.brand_dark_text || base.brand.darkText,
+      darkTextSecondary: s.brand_dark_text_secondary || undefined,
+      darkBgSecondary: s.brand_dark_bg_secondary || undefined,
+      darkBorder: s.brand_dark_border || undefined,
       lightPrimary: s.brand_light_primary || base.brand.lightPrimary,
       lightAccent: s.brand_light_accent || base.brand.lightAccent,
       lightBg: s.brand_light_bg || base.brand.lightBg,
       lightText: s.brand_light_text || base.brand.lightText,
+      lightTextSecondary: s.brand_light_text_secondary || undefined,
+      lightBgSecondary: s.brand_light_bg_secondary || undefined,
+      lightBorder: s.brand_light_border || undefined,
       mode: effectiveMode,
       modeOverride,
     };
@@ -210,6 +222,11 @@ export function GlobalConfigProvider({ children }: { children: ReactNode }) {
       b.mode,
       isDark ? b.darkBg : b.lightBg,
       isDark ? b.darkText : b.lightText,
+      {
+        textSecondary: isDark ? b.darkTextSecondary : b.lightTextSecondary,
+        bgSecondary: isDark ? b.darkBgSecondary : b.lightBgSecondary,
+        border: isDark ? b.darkBorder : b.lightBorder,
+      },
     );
   }, [globalConfig.brand]);
 
