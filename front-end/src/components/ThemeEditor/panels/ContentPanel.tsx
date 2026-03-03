@@ -342,7 +342,7 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
         <SectionTitle>Headlines</SectionTitle>
         <div className="space-y-4 mt-3">
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Fast & Reliable <strong>Junk Removal</strong>" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Fast & Reliable <strong>Service</strong>" />
           </FormField>
           <FormField label="Subheadline">
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" rows={3} />
@@ -559,10 +559,10 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
           <FormField label="Badge Text (small uppercase)">
-            <Input value={content.badgeText || ''} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Full-Service Junk Removal & More" />
+            <Input value={content.badgeText || ''} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Full-Service Service & More" />
           </FormField>
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Full-Service <strong>Junk Removal</strong>" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Full-Service <strong>Service</strong>" />
           </FormField>
           <FormField label="Subheadline">
             <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" />
@@ -703,10 +703,10 @@ function ServiceAreasContentEditor({ content, onChange }: { content: ServiceArea
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Areas We Serve" />
           </FormField>
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Serving <strong>North Idaho</strong>" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Serving <strong>Your Area</strong>" />
           </FormField>
           <FormField label="Subheadline">
-            <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Professional junk removal across the region." />
+            <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Professional services across the region." />
           </FormField>
           <FormField label="Locations Heading">
             <Input value={content.locationsHeading} onChange={(e) => onChange({ locationsHeading: e.target.value })} placeholder="Service Locations" />
@@ -955,13 +955,7 @@ function FooterContentEditor({ content, onChange }: { content: FooterContent; on
     <div className="space-y-6">
       <div>
         <SectionTitle>Footer Content</SectionTitle>
-        <div className="space-y-4 mt-3">
-          <FormField label="Description">
-            <Textarea value={content.description} onChange={(e) => onChange({ description: e.target.value })} placeholder="Company description..." rows={3} />
-          </FormField>
-        </div>
       </div>
-      <Separator />
       <div>
         <SectionTitle>Legal Links</SectionTitle>
         <div className="space-y-4 mt-3">
@@ -1008,7 +1002,7 @@ function TopbarContentEditor() {
             <Input
               value={topbarConfig.message}
               onChange={(e) => updateTopbarConfig({ message: e.target.value })}
-              placeholder="Serving North Idaho & Spokane Area"
+              placeholder="Serving Your Local Area"
               className="bg-zinc-800 border-zinc-600 text-zinc-100 placeholder:text-zinc-500"
             />
           </FormField>

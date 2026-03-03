@@ -205,13 +205,13 @@ export type ContentSectionId = keyof SectionContentMap;
 // ============================================
 
 const DEFAULT_HERO_CONTENT: HeroContent = {
-  headline: 'Fast & Reliable Junk Removal',
-  subheadline: 'Professional junk removal services in North Idaho and Spokane. Licensed, insured, and locally owned.',
+  headline: 'Your Headline Goes Here',
+  subheadline: 'Professional services you can count on. Licensed, insured, and locally owned.',
   ctaText: 'Call For Free Quote',
-  ctaLink: 'tel:2089980054',
+  ctaLink: 'tel:0000000000',
   // Benefits
   benefits: [
-    'Fully Licensed & Insured Pros',
+    'Fully Licensed & Insured',
     'Same-Day Services Available',
     'Locally Owned & Operated',
     'Honest & Upfront Pricing',
@@ -220,7 +220,7 @@ const DEFAULT_HERO_CONTENT: HeroContent = {
   formTitle: 'Fill Out This Form for Your Free Estimate',
   formSubtitle: "We'll get back to you within 30 minutes",
   formSubmitText: 'Get My Free Quote',
-  formDefaultService: 'junk-removal',
+  formDefaultService: 'general',
   // Hero badge
   heroBadgeText: 'Fully Insured. Peace of Mind.',
   showHeroBadge: true,
@@ -238,32 +238,32 @@ const DEFAULT_HERO_CONTENT: HeroContent = {
 const DEFAULT_FEATURED_TESTIMONIAL_CONTENT: FeaturedTestimonialContent = {
   badgeText: 'Featured Review',
   verifiedText: 'Verified Google Review',
-  quote: '"Great bunch of hard working guys. I had a 100 year old shed that had a roof which fell in 30 years ago. It was full of unknown junk. The gave me a fair quote. They showed up the next day and he and his team leveled the shed. They loaded up everything and charged me what we had agreed to."',
-  authorName: 'Joshua Smith',
+  quote: '"Outstanding service from start to finish. The team was professional, on time, and delivered exactly what they promised. Fair pricing and great communication throughout. Highly recommended!"',
+  authorName: 'John D.',
   authorTitle: 'Verified Customer',
   rating: 5,
-  ctaText: 'Call For Reliable Junk Removal',
-  ctaLink: 'tel:2089980054',
+  ctaText: 'Call For Reliable Service',
+  ctaLink: 'tel:0000000000',
 };
 
 const DEFAULT_SERVICES_CONTENT: ServicesContent = {
-  badgeText: 'Full-Service Junk Removal & More',
-  headline: 'Full-Service <strong>Junk Removal & More</strong>',
-  subheadline: 'From household clutter to light demolition, we have the heavy equipment and manpower to handle any job safely, efficiently, and professionally.',
+  badgeText: 'Our Services',
+  headline: 'What We <strong>Offer</strong>',
+  subheadline: 'We provide a full range of professional services to meet your needs safely, efficiently, and affordably.',
   services: [
-    { id: '1', icon: 'trash', iconType: 'lucide', title: 'Junk Removal', description: 'Full-service junk removal for homes, offices, and construction sites.' },
-    { id: '2', icon: 'home', iconType: 'lucide', title: 'Estate Cleanouts', description: 'Compassionate estate and foreclosure cleanout services.' },
-    { id: '3', icon: 'building', iconType: 'lucide', title: 'Commercial Services', description: 'Reliable commercial waste removal and recycling solutions.' },
-    { id: '4', icon: 'truck', iconType: 'lucide', title: 'Dumpster Rentals', description: 'Convenient 14, 15, and 20-yard dumpster rentals for your DIY clean-up projects.' },
+    { id: '1', icon: 'briefcase', iconType: 'lucide', title: 'Service One', description: 'Description of your first service offering.' },
+    { id: '2', icon: 'home', iconType: 'lucide', title: 'Service Two', description: 'Description of your second service offering.' },
+    { id: '3', icon: 'building', iconType: 'lucide', title: 'Service Three', description: 'Description of your third service offering.' },
+    { id: '4', icon: 'truck', iconType: 'lucide', title: 'Service Four', description: 'Description of your fourth service offering.' },
   ],
 };
 
 const DEFAULT_MID_CTA_CONTENT: MidCtaContent = {
-  badge: 'Ready to Clear the Clutter?',
+  badge: 'Ready to Get Started?',
   headline: 'Get Your Free Quote Today',
-  subheadline: 'Fast response, fair pricing, and professional service. We make junk removal easy.',
+  subheadline: 'Fast response, fair pricing, and professional service.',
   ctaText: 'Call Now',
-  ctaLink: 'tel:2089980054',
+  ctaLink: 'tel:0000000000',
   features: [
     { id: '1', icon: 'ShieldCheck', text: 'Free Estimates' },
     { id: '2', icon: 'Clock', text: 'Same-Day Service' },
@@ -273,35 +273,33 @@ const DEFAULT_MID_CTA_CONTENT: MidCtaContent = {
 
 const DEFAULT_SERVICE_AREAS_CONTENT: ServiceAreasContent = {
   badgeText: 'Areas We Serve',
-  headline: 'Serving <strong>North Idaho</strong>',
-  subheadline: 'Professional junk removal across the region.',
+  headline: 'Serving <strong>Your Area</strong>',
+  subheadline: 'Professional services across the region.',
   locationsHeading: 'Service Locations',
   missingAreaText: "Don't see your area? Contact us - we may still be able to help!",
   areas: [
-    { id: '1', name: "Coeur d'Alene", state: 'ID', highlighted: true },
-    { id: '2', name: 'Post Falls', state: 'ID', highlighted: true },
-    { id: '3', name: 'Hayden', state: 'ID', highlighted: true },
-    { id: '4', name: 'Rathdrum', state: 'ID', highlighted: false },
-    { id: '5', name: 'Sandpoint', state: 'ID', highlighted: false },
-    { id: '6', name: 'Harrison', state: 'ID', highlighted: false },
-    { id: '7', name: 'Athol', state: 'ID', highlighted: false },
+    { id: '1', name: 'City One', state: 'ST', highlighted: true },
+    { id: '2', name: 'City Two', state: 'ST', highlighted: true },
+    { id: '3', name: 'City Three', state: 'ST', highlighted: true },
+    { id: '4', name: 'City Four', state: 'ST', highlighted: false },
+    { id: '5', name: 'City Five', state: 'ST', highlighted: false },
   ],
   ctaText: 'Get Service In Your Area',
-  ctaLink: 'tel:2089980054',
+  ctaLink: 'tel:0000000000',
 };
 
 const DEFAULT_TESTIMONIALS_CONTENT: TestimonialsContent = {
   badgeText: 'Testimonials',
-  headline: 'Trusted By <strong>Your Neighbors</strong>',
-  subheadline: 'See why homeowners consistently love our fast response, fair pricing, and spotless results.',
+  headline: 'Trusted By <strong>Our Customers</strong>',
+  subheadline: 'See why customers consistently love our fast response, fair pricing, and professional results.',
   reviewLabel: 'Google Review',
   testimonials: [
-    { id: '1', quote: 'Caleb and team did an excellent job at removing all the stuff from my duplex.', authorName: 'Sharene May', rating: 5 },
-    { id: '2', quote: 'Byrde made everything so easy for me. Caleb is a great guy.', authorName: 'Brady Coker', rating: 5 },
-    { id: '3', quote: "Byrde is the only hauling company I'll use.", authorName: 'Makaila Wallace', rating: 5 },
+    { id: '1', quote: 'Excellent service! The team was professional and got the job done quickly.', authorName: 'Jane D.', rating: 5 },
+    { id: '2', quote: 'Great experience from start to finish. Highly recommended!', authorName: 'Mike S.', rating: 5 },
+    { id: '3', quote: 'Fair pricing and outstanding customer service. Will use again.', authorName: 'Sarah K.', rating: 5 },
   ],
   ctaText: 'Call To Get Started',
-  ctaLink: 'tel:2089980054',
+  ctaLink: 'tel:0000000000',
 };
 
 const DEFAULT_FAQ_CONTENT: FaqContent = {
@@ -310,26 +308,26 @@ const DEFAULT_FAQ_CONTENT: FaqContent = {
   subheadline: 'Clear answers to common concerns so you can book with confidence.',
   contactTitle: 'Still have questions?',
   contactDescription: 'Our team is ready to help. Give us a call and we\'ll answer any questions you have.',
-  contactCtaText: '(208) 998-0054',
-  contactCtaLink: 'tel:2089980054',
+  contactCtaText: '(000) 000-0000',
+  contactCtaLink: 'tel:0000000000',
   faqs: [
-    { id: '1', question: 'Do you offer same-day junk removal?', answer: 'Yes. We often provide same-day or next-day service depending on scheduling availability.' },
-    { id: '2', question: 'How does pricing work?', answer: 'We provide upfront, firm quotes before any work begins.' },
-    { id: '3', question: 'Can you handle large estate or hoarder cleanouts?', answer: 'Absolutely. We specialize in large-scale cleanouts.' },
+    { id: '1', question: 'Do you offer same-day service?', answer: 'Yes. We often provide same-day or next-day service depending on scheduling availability.' },
+    { id: '2', question: 'How does pricing work?', answer: 'We provide upfront, transparent quotes before any work begins.' },
+    { id: '3', question: 'What areas do you serve?', answer: 'We serve the greater metro area and surrounding communities. Contact us to confirm availability in your area.' },
   ],
 };
 
 const DEFAULT_FOOTER_CTA_CONTENT: FooterCtaContent = {
-  headline: 'Ready to <strong>Clear the Clutter?</strong>',
+  headline: 'Ready to <strong>Get Started?</strong>',
   subheadline: 'Get your free quote today. Fast response, fair pricing, professional service.',
   reassuranceText: 'No obligation \u00b7 Free estimates \u00b7 Fast response',
   ctaText: 'Call For Free Quote',
-  ctaLink: 'tel:2089980054',
+  ctaLink: 'tel:0000000000',
 };
 
 const DEFAULT_FOOTER_CONTENT: FooterContent = {
-  description: 'Fast, reliable junk removal services in North Idaho and Spokane. Licensed, insured, and locally owned.',
-  copyright: '\u00a9 2024 Byrde. All rights reserved.',
+  description: 'Professional services you can count on. Licensed, insured, and locally owned.',
+  copyright: `\u00a9 ${new Date().getFullYear()} Company. All rights reserved.`,
   privacyLabel: 'Privacy Policy',
   privacyLink: '/privacy',
   termsLabel: 'Terms & Conditions',

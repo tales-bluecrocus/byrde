@@ -69,7 +69,7 @@ const DEFAULT_HEADER_CONFIG: HeaderConfig = {
 };
 
 const DEFAULT_TOPBAR_CONFIG: TopbarConfig = {
-  message: 'Serving North Idaho & Spokane Area',
+  message: 'Serving Your Local Area',
   icon: 'map-pin',
   textAlign: 'center',
   iconPosition: 'before',

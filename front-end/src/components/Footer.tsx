@@ -68,7 +68,7 @@ export default function Footer() {
             {/* Description */}
             {footerConfig.showDescription && (
               <p className="section-text-secondary text-sm mb-6 leading-relaxed">
-                {settings.footer_description || 'Fast, reliable junk removal services in North Idaho and Spokane. Licensed, insured, and locally owned.'}
+                {settings.footer_description || 'Professional services you can count on. Licensed, insured, and locally owned.'}
               </p>
             )}
 

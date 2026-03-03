@@ -199,9 +199,11 @@ export function SiteSettingsPanel() {
             value={settings.phone}
             onChange={(e) => {
               const phone = e.target.value;
-              updateSettings({ phone, phone_raw: phone.replace(/\D/g, '') });
+              const hasPlus = phone.trimStart().startsWith('+');
+              const digits = phone.replace(/\D/g, '');
+              updateSettings({ phone, phone_raw: hasPlus ? `+${digits}` : digits });
             }}
-            placeholder="(208) 998-0054"
+            placeholder="(000) 000-0000"
             className={inputCls}
           />
         </Field>

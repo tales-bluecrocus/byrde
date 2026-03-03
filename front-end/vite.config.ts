@@ -34,6 +34,10 @@ export default defineConfig({
             './src/components/ThemeEditor/panels/ContentPanel.tsx',
             './src/components/ThemeEditor/panels/SettingsPanel.tsx',
           ],
+          // Onboarding wizard — only loaded on setup page
+          'onboarding': [
+            './src/components/Onboarding/OnboardingWizard.tsx',
+          ],
         },
       },
     },
