@@ -13,6 +13,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Convert a display phone number to tel:-compatible raw format.
+ * Strips everything except digits, but preserves a leading + for international numbers.
+ *
+ * @param string $phone Display phone (e.g., "+1 (479) 877-5803" or "(208) 998-0054").
+ * @return string Raw phone for tel: links (e.g., "+14798775803" or "2089980054").
+ */
+function byrde_phone_to_raw( string $phone ): string {
+	$phone = trim( $phone );
+	if ( '' === $phone ) {
+		return '';
+	}
+	$has_plus = str_starts_with( $phone, '+' );
+	$digits   = preg_replace( '/\D/', '', $phone );
+	return $has_plus ? '+' . $digits : $digits;
+}
+
+/**
  * Get default theme settings structure
  *
  * @return array Default settings with all fields.
@@ -39,11 +56,11 @@ function byrde_get_default_settings(): array {
 
 		// Footer
 		'footer'         => array(
-			'tagline'     => '',
-			'description' => '',
-			'address'     => '',
-			'business_hours' => '',
-			'copyright'   => '',
+			'tagline'     => 'Your Trusted Local Service Provider',
+			'description' => 'Professional services you can count on. Licensed, insured, and locally owned.',
+			'address'     => '123 Main St, City, ST',
+			'business_hours' => 'Mon-Sat: 7AM – 7PM',
+			'copyright'   => '© ' . gmdate( 'Y' ) . ' Company. All rights reserved.',
 		),
 
 		// Social Media
@@ -95,16 +112,26 @@ function byrde_get_default_settings(): array {
 			'cookie_settings_url' => '/lp/cookie-settings',
 		),
 
-		// Button Style (per-mode colors + shared structure)
+		// Button Style (shape + per-mode text colors + shadow)
 		'button_style'   => array(
-			'dark_bg'            => '',
-			'dark_text'          => '#ffffff',
-			'dark_border_color'  => '',
-			'light_bg'           => '',
-			'light_text'         => '#ffffff',
-			'light_border_color' => '',
-			'border_width'       => '0',
-			'border_radius'      => '12',
+			'border_width'             => '0',
+			'border_radius'            => '12',
+			'dark_text_color'          => '#ffffff',
+			'dark_accent_text_color'   => '#ffffff',
+			'light_text_color'         => '#ffffff',
+			'light_accent_text_color'  => '#000000',
+			'shadow'                   => 'md',
+		),
+
+		// Brand Colors (per-mode primary + accent + text + default mode)
+		'brand_colors'   => array(
+			'dark_primary'  => '#3ab342',
+			'dark_accent'   => '#f97316',
+			'dark_text'     => '#efefef',
+			'light_primary' => '#3ab342',
+			'light_accent'  => '#f97316',
+			'light_text'    => '#2a2a2a',
+			'mode'          => 'dark',
 		),
 
 		// Contact Form (server-only, not exposed to frontend)
@@ -160,7 +187,7 @@ function byrde_sanitize_theme_settings( array $settings ): array {
 				'alt' => sanitize_text_field( $settings['brand']['logo']['alt'] ?? '' ),
 			) : array( 'url' => '', 'alt' => '' ),
 			'phone'     => sanitize_text_field( $settings['brand']['phone'] ?? '' ),
-			'phone_raw' => preg_replace( '/\D/', '', $settings['brand']['phone'] ?? '' ),
+			'phone_raw' => byrde_phone_to_raw( $settings['brand']['phone'] ?? '' ),
 			'email'     => sanitize_email( $settings['brand']['email'] ?? '' ),
 		);
 	}
@@ -254,52 +281,34 @@ function byrde_sanitize_theme_settings( array $settings ): array {
 		);
 	}
 
-	// Brand Colors (per-mode)
+	// Brand Colors (per-mode primary + accent + text + mode)
 	if ( isset( $settings['brand_colors'] ) ) {
 		$bc = $settings['brand_colors'];
-		$sanitize_optional = function( $val ) {
-			if ( empty( $val ) ) return '';
-			return byrde_sanitize_hex_color_alpha( $val ) ?: '';
-		};
-
 		$sanitized['brand_colors'] = array(
-			'dark_primary'        => byrde_sanitize_hex_color_alpha( $bc['dark_primary'] ?? '#3ab342' ) ?: '#3ab342',
-			'dark_accent'         => byrde_sanitize_hex_color_alpha( $bc['dark_accent'] ?? '#f97316' ) ?: '#f97316',
-			'dark_bg'             => byrde_sanitize_hex_color_alpha( $bc['dark_bg'] ?? '#171717' ) ?: '#171717',
-			'dark_text'           => byrde_sanitize_hex_color_alpha( $bc['dark_text'] ?? '#efefef' ) ?: '#efefef',
-			'dark_text_secondary' => $sanitize_optional( $bc['dark_text_secondary'] ?? '' ),
-			'dark_bg_secondary'   => $sanitize_optional( $bc['dark_bg_secondary'] ?? '' ),
-			'dark_border'         => $sanitize_optional( $bc['dark_border'] ?? '' ),
-			'light_primary'        => byrde_sanitize_hex_color_alpha( $bc['light_primary'] ?? '#3ab342' ) ?: '#3ab342',
-			'light_accent'         => byrde_sanitize_hex_color_alpha( $bc['light_accent'] ?? '#f97316' ) ?: '#f97316',
-			'light_bg'             => byrde_sanitize_hex_color_alpha( $bc['light_bg'] ?? '#ffffff' ) ?: '#ffffff',
-			'light_text'           => byrde_sanitize_hex_color_alpha( $bc['light_text'] ?? '#2a2a2a' ) ?: '#2a2a2a',
-			'light_text_secondary' => $sanitize_optional( $bc['light_text_secondary'] ?? '' ),
-			'light_bg_secondary'   => $sanitize_optional( $bc['light_bg_secondary'] ?? '' ),
-			'light_border'         => $sanitize_optional( $bc['light_border'] ?? '' ),
-			'mode'                 => in_array( $bc['mode'] ?? 'dark', array( 'light', 'dark' ), true )
+			'dark_primary'  => byrde_sanitize_hex_color_alpha( $bc['dark_primary'] ?? '#3ab342' ) ?: '#3ab342',
+			'dark_accent'   => byrde_sanitize_hex_color_alpha( $bc['dark_accent'] ?? '#f97316' ) ?: '#f97316',
+			'dark_text'     => byrde_sanitize_hex_color_alpha( $bc['dark_text'] ?? '#efefef' ) ?: '#efefef',
+			'light_primary' => byrde_sanitize_hex_color_alpha( $bc['light_primary'] ?? '#3ab342' ) ?: '#3ab342',
+			'light_accent'  => byrde_sanitize_hex_color_alpha( $bc['light_accent'] ?? '#f97316' ) ?: '#f97316',
+			'light_text'    => byrde_sanitize_hex_color_alpha( $bc['light_text'] ?? '#2a2a2a' ) ?: '#2a2a2a',
+			'mode'          => in_array( $bc['mode'] ?? 'dark', array( 'light', 'dark' ), true )
 				? $bc['mode']
 				: 'dark',
 		);
 	}
 
-	// Button Style (per-mode colors + shared structure)
+	// Button Style
 	if ( isset( $settings['button_style'] ) ) {
 		$bs = $settings['button_style'];
-		$sanitize_btn_color = function( $val, $default = '' ) {
-			if ( empty( $val ) ) return $default;
-			return byrde_sanitize_hex_color_alpha( $val ) ?: $default;
-		};
-
+		$valid_shadows = array( 'none', 'sm', 'md', 'lg' );
 		$sanitized['button_style'] = array(
-			'dark_bg'            => $sanitize_btn_color( $bs['dark_bg'] ?? '' ),
-			'dark_text'          => $sanitize_btn_color( $bs['dark_text'] ?? '#ffffff', '#ffffff' ),
-			'dark_border_color'  => $sanitize_btn_color( $bs['dark_border_color'] ?? '' ),
-			'light_bg'           => $sanitize_btn_color( $bs['light_bg'] ?? '' ),
-			'light_text'         => $sanitize_btn_color( $bs['light_text'] ?? '#ffffff', '#ffffff' ),
-			'light_border_color' => $sanitize_btn_color( $bs['light_border_color'] ?? '' ),
-			'border_width'       => max( 0, min( 10, intval( $bs['border_width'] ?? '0' ) ) ) . '',
-			'border_radius'      => max( 0, min( 9999, intval( $bs['border_radius'] ?? '12' ) ) ) . '',
+			'border_width'             => max( 0, min( 10, intval( $bs['border_width'] ?? '0' ) ) ) . '',
+			'border_radius'            => max( 0, min( 9999, intval( $bs['border_radius'] ?? '12' ) ) ) . '',
+			'dark_text_color'          => byrde_sanitize_hex_color_alpha( $bs['dark_text_color'] ?? '#ffffff' ) ?: '#ffffff',
+			'dark_accent_text_color'   => byrde_sanitize_hex_color_alpha( $bs['dark_accent_text_color'] ?? '#ffffff' ) ?: '#ffffff',
+			'light_text_color'         => byrde_sanitize_hex_color_alpha( $bs['light_text_color'] ?? '#ffffff' ) ?: '#ffffff',
+			'light_accent_text_color'  => byrde_sanitize_hex_color_alpha( $bs['light_accent_text_color'] ?? '#000000' ) ?: '#000000',
+			'shadow'                   => in_array( $bs['shadow'] ?? 'md', $valid_shadows, true ) ? $bs['shadow'] : 'md',
 		);
 	}
 
@@ -413,30 +422,21 @@ function byrde_get_all_settings(): array {
 	$flattened['cookie_settings_url'] = $cookie ?: home_url( '/lp/cookie-settings' );
 
 	// Brand Colors (per-mode)
-	$flattened['brand_dark_primary']        = $settings['brand_colors']['dark_primary'] ?? '#3ab342';
-	$flattened['brand_dark_accent']         = $settings['brand_colors']['dark_accent'] ?? '#f97316';
-	$flattened['brand_dark_bg']             = $settings['brand_colors']['dark_bg'] ?? '#171717';
-	$flattened['brand_dark_text']           = $settings['brand_colors']['dark_text'] ?? '#efefef';
-	$flattened['brand_dark_text_secondary'] = $settings['brand_colors']['dark_text_secondary'] ?? '';
-	$flattened['brand_dark_bg_secondary']   = $settings['brand_colors']['dark_bg_secondary'] ?? '';
-	$flattened['brand_dark_border']         = $settings['brand_colors']['dark_border'] ?? '';
-	$flattened['brand_light_primary']        = $settings['brand_colors']['light_primary'] ?? '#3ab342';
-	$flattened['brand_light_accent']         = $settings['brand_colors']['light_accent'] ?? '#f97316';
-	$flattened['brand_light_bg']             = $settings['brand_colors']['light_bg'] ?? '#ffffff';
-	$flattened['brand_light_text']           = $settings['brand_colors']['light_text'] ?? '#2a2a2a';
-	$flattened['brand_light_text_secondary'] = $settings['brand_colors']['light_text_secondary'] ?? '';
-	$flattened['brand_light_bg_secondary']   = $settings['brand_colors']['light_bg_secondary'] ?? '';
-	$flattened['brand_light_border']         = $settings['brand_colors']['light_border'] ?? '';
-	$flattened['brand_mode']                 = $settings['brand_colors']['mode'] ?? 'dark';
-	// Button style (per-mode + shared)
-	$flattened['button_dark_bg']            = $settings['button_style']['dark_bg'] ?? '';
-	$flattened['button_dark_text']          = $settings['button_style']['dark_text'] ?? '#ffffff';
-	$flattened['button_dark_border_color']  = $settings['button_style']['dark_border_color'] ?? '';
-	$flattened['button_light_bg']           = $settings['button_style']['light_bg'] ?? '';
-	$flattened['button_light_text']         = $settings['button_style']['light_text'] ?? '#ffffff';
-	$flattened['button_light_border_color'] = $settings['button_style']['light_border_color'] ?? '';
-	$flattened['button_border_width']       = $settings['button_style']['border_width'] ?? '0';
-	$flattened['button_border_radius']      = $settings['button_style']['border_radius'] ?? '12';
+	$flattened['brand_dark_primary']  = $settings['brand_colors']['dark_primary'] ?? '#3ab342';
+	$flattened['brand_dark_accent']   = $settings['brand_colors']['dark_accent'] ?? '#f97316';
+	$flattened['brand_dark_text']     = $settings['brand_colors']['dark_text'] ?? '#efefef';
+	$flattened['brand_light_primary'] = $settings['brand_colors']['light_primary'] ?? '#3ab342';
+	$flattened['brand_light_accent']  = $settings['brand_colors']['light_accent'] ?? '#f97316';
+	$flattened['brand_light_text']    = $settings['brand_colors']['light_text'] ?? '#2a2a2a';
+	$flattened['brand_mode']          = $settings['brand_colors']['mode'] ?? 'dark';
+	// Button style
+	$flattened['button_border_width']            = $settings['button_style']['border_width'] ?? '0';
+	$flattened['button_border_radius']           = $settings['button_style']['border_radius'] ?? '12';
+	$flattened['button_dark_text_color']         = $settings['button_style']['dark_text_color'] ?? '#ffffff';
+	$flattened['button_dark_accent_text_color']  = $settings['button_style']['dark_accent_text_color'] ?? '#ffffff';
+	$flattened['button_light_text_color']        = $settings['button_style']['light_text_color'] ?? '#ffffff';
+	$flattened['button_light_accent_text_color'] = $settings['button_style']['light_accent_text_color'] ?? '#000000';
+	$flattened['button_shadow']                  = $settings['button_style']['shadow'] ?? 'md';
 
 	// Ensure all values are strings (PHP 8.1+ wp_localize_script compat)
 	return array_map( 'strval', $flattened );

@@ -67,7 +67,7 @@ function byrde_shortcode_phone( $atts = array() ): string {
     }
 
     if ( 'yes' === $atts['link'] ) {
-        return '<a href="tel:' . esc_attr( $phone_raw ?: preg_replace( '/\D/', '', $phone ) ) . '">' . esc_html( $phone ) . '</a>';
+        return '<a href="tel:' . esc_attr( $phone_raw ?: byrde_phone_to_raw( $phone ) ) . '">' . esc_html( $phone ) . '</a>';
     }
 
     return esc_html( $phone );

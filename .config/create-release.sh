@@ -73,12 +73,14 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-# Update version in byrde.php
+# Update version in byrde.php (header + constant)
 echo -e "${GREEN}Atualizando versão no byrde.php...${NC}"
 if [[ "$OSTYPE" == "darwin"* ]]; then
     sed -i '' "s/Version: .*/Version: $VERSION/" byrde.php
+    sed -i '' "s/define( 'BYRDE_VERSION', '.*' )/define( 'BYRDE_VERSION', '$VERSION' )/" byrde.php
 else
     sed -i "s/Version: .*/Version: $VERSION/" byrde.php
+    sed -i "s/define( 'BYRDE_VERSION', '.*' )/define( 'BYRDE_VERSION', '$VERSION' )/" byrde.php
 fi
 
 # Verify the change

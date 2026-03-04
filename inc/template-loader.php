@@ -67,7 +67,7 @@ function byrde_is_core_asset( string $handle, $registry ): bool {
  * @return bool True if the handle should be kept.
  */
 function byrde_is_allowed_handle( string $handle, string $type, bool $is_preview ): bool {
-    $allowed = array( 'byrde-main', 'admin-bar' );
+    $allowed = array( 'byrde-main', 'admin-bar', 'hoverintent-js' );
     if ( 'style' === $type ) {
         $allowed[] = 'dashicons';
     }

@@ -36,6 +36,16 @@ $myUpdateChecker->setBranch( 'main' );
 // Use GitHub Releases (ZIP attached by the release workflow)
 $myUpdateChecker->getVcsApi()->enableReleaseAssets();
 
+// Plugin icon shown in wp-admin (Plugins → Updates screen)
+$myUpdateChecker->addResultFilter( function ( $info ) {
+	$icon_url = byrde_plugin_uri() . '/front-end/dist/assets/logo.webp';
+	$info->icons = array(
+		'1x'      => $icon_url,
+		'default' => $icon_url,
+	);
+	return $info;
+} );
+
 /**
  * Fix folder name during update installation.
  *

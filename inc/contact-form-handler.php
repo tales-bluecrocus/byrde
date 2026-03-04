@@ -80,7 +80,7 @@ function byrde_leads_column_content( string $column, int $post_id ): void {
         case 'phone':
             $phone = get_post_meta( $post_id, '_lead_phone', true );
             if ( $phone ) {
-                $raw = preg_replace( '/\D/', '', $phone );
+                $raw = byrde_phone_to_raw( $phone );
                 echo '<a href="tel:' . esc_attr( $raw ) . '">' . esc_html( $phone ) . '</a>';
             }
             break;
@@ -146,7 +146,7 @@ function byrde_render_lead_meta_box( WP_Post $post ): void {
             <th>Phone</th>
             <td>
                 <?php if ( $phone ) : ?>
-                    <a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $phone ) ); ?>"><?php echo esc_html( $phone ); ?></a>
+                    <a href="tel:<?php echo esc_attr( byrde_phone_to_raw( $phone ) ); ?>"><?php echo esc_html( $phone ); ?></a>
                 <?php endif; ?>
             </td>
         </tr>
@@ -438,7 +438,7 @@ function byrde_send_postmark_email( string $name, string $email, string $phone, 
 }
 
 function byrde_build_lead_email_html( string $name, string $email, string $phone, string $service, string $message ): string {
-    $phone_raw = preg_replace( '/\D/', '', $phone );
+    $phone_raw = byrde_phone_to_raw( $phone );
     $site_name = get_bloginfo( 'name' );
 
     $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;">';

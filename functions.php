@@ -13,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Include plugin modules
  */
 require_once BYRDE_PLUGIN_DIR . 'inc/constants.php';
-require_once BYRDE_PLUGIN_DIR . 'inc/required-plugins.php';
 require_once BYRDE_PLUGIN_DIR . 'inc/cleanup.php';
 require_once BYRDE_PLUGIN_DIR . 'inc/validators.php';
 require_once BYRDE_PLUGIN_DIR . 'inc/rate-limiter.php';
@@ -30,6 +29,8 @@ require_once BYRDE_PLUGIN_DIR . 'inc/cookie-consent.php';
 require_once BYRDE_PLUGIN_DIR . 'inc/cache.php';
 require_once BYRDE_PLUGIN_DIR . 'inc/update-checker.php';
 require_once BYRDE_PLUGIN_DIR . 'inc/migration.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/migration-colors.php';
+require_once BYRDE_PLUGIN_DIR . 'inc/onboarding.php';
 
 /**
  * Get the plugin directory URI, multisite-aware.
@@ -67,9 +68,9 @@ function byrde_get_logo_data(): array {
 
     // Fallback to bundled logo
     $dist_dir = BYRDE_PLUGIN_DIR . 'front-end/dist';
-    if ( file_exists( $dist_dir . '/assets/byrde-logo.webp' ) ) {
+    if ( file_exists( $dist_dir . '/assets/logo.webp' ) ) {
         return array(
-            'url' => byrde_plugin_uri() . '/front-end/dist/assets/byrde-logo.webp',
+            'url' => byrde_plugin_uri() . '/front-end/dist/assets/logo.webp',
             'alt' => $site_name,
         );
     }
@@ -106,7 +107,7 @@ function byrde_render_shell(): void {
                     />
                 <?php endif; ?>
                 <?php if ( $phone ) : ?>
-                    <a href="tel:<?php echo esc_attr( preg_replace( '/\D/', '', $phone ) ); ?>" style="display:none"></a>
+                    <a href="tel:<?php echo esc_attr( byrde_phone_to_raw( $phone ) ); ?>" style="display:none"></a>
                 <?php endif; ?>
             </div>
         </header>
@@ -148,6 +149,13 @@ function byrde_enqueue_assets(): void {
         // Pass theme settings + API URL to React
         $settings            = byrde_get_all_settings();
         $settings['apiUrl']  = rest_url( 'byrde/v1' );
+
+        // Apply logo fallback if no logo is configured
+        if ( empty( $settings['logo'] ) ) {
+            $logo_data            = byrde_get_logo_data();
+            $settings['logo']     = $logo_data['url'];
+            $settings['logo_alt'] = $logo_data['alt'];
+        }
 
         // Include contact form settings for admins (not exposed publicly)
         if ( current_user_can( 'manage_options' ) ) {
