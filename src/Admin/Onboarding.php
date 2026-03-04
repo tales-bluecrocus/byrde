@@ -5,7 +5,6 @@ namespace Byrde\Admin;
 use Byrde\Core\Constants;
 use Byrde\Core\Helpers;
 use Byrde\Settings\Manager;
-use Byrde\Settings\Cache;
 
 /**
  * Onboarding Wizard
@@ -19,11 +18,9 @@ class Onboarding {
     public const OPTION_ONBOARDING_COMPLETE = 'byrde_onboarding_complete';
 
     private Manager $settings;
-    private Cache $cache;
 
-    public function __construct( Manager $settings, Cache $cache ) {
+    public function __construct( Manager $settings ) {
         $this->settings = $settings;
-        $this->cache    = $cache;
     }
 
     /**
@@ -150,7 +147,20 @@ class Onboarding {
     private function render_onboarding_page(): void {
         $dist_dir = BYRDE_PLUGIN_DIR . 'front-end/dist';
         $dist_uri = Helpers::plugin_uri() . '/front-end/dist';
-        $version  = $this->cache->get_version();
+
+        // Resolve hashed filenames from Vite manifest.
+        $manifest_path = $dist_dir . '/.vite/manifest.json';
+        $manifest      = file_exists( $manifest_path )
+            ? (array) json_decode( (string) file_get_contents( $manifest_path ), true )
+            : [];
+        $entry      = $manifest['index.html'] ?? [];
+        $js_file    = isset( $entry['file'] ) ? $dist_uri . '/' . $entry['file'] : '';
+        $css_files  = isset( $entry['css'] ) ? (array) $entry['css'] : [];
+        $css_url    = ! empty( $css_files ) ? $dist_uri . '/' . $css_files[0] : '';
+        $vendor_key = isset( $entry['imports'][0] ) ? $entry['imports'][0] : '';
+        $vendor_url = isset( $manifest[ $vendor_key ]['file'] )
+            ? $dist_uri . '/' . $manifest[ $vendor_key ]['file']
+            : '';
 
         // Current settings for pre-filling wizard fields.
         $settings            = $this->settings->get_all();
@@ -175,12 +185,12 @@ class Onboarding {
             wp_print_head_scripts();
             ?>
             <?php
-            // Plugin styles (loaded AFTER WP styles so Tailwind resets take effect).
-            if ( file_exists( $dist_dir . '/assets/style.css' ) ) {
-                printf(
-                    '<link rel="stylesheet" href="%s">',
-                    esc_url( $dist_uri . '/assets/style.css?ver=' . $version )
-                );
+            // Plugin styles — resolved from Vite manifest (content-hashed filename).
+            if ( $css_url ) {
+                printf( '<link rel="stylesheet" href="%s">', esc_url( $css_url ) );
+            }
+            if ( $vendor_url ) {
+                printf( '<link rel="modulepreload" href="%s">', esc_url( $vendor_url ) );
             }
             ?>
             <style>
@@ -239,11 +249,9 @@ class Onboarding {
             wp_print_footer_scripts();
             wp_print_media_templates();
 
-            if ( file_exists( $dist_dir . '/assets/main.js' ) ) {
-                printf(
-                    '<script type="module" src="%s"></script>',
-                    esc_url( $dist_uri . '/assets/main.js?ver=' . $version )
-                );
+            // Main bundle — resolved from Vite manifest (content-hashed filename).
+            if ( $js_file ) {
+                printf( '<script type="module" src="%s"></script>', esc_url( $js_file ) );
             }
             ?>
         </body>

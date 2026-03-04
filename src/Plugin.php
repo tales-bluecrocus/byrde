@@ -67,7 +67,7 @@ class Plugin {
         // Admin
         ( new PageEditor() )->register();
 
-        $this->onboarding = new Onboarding( $this->settings, $this->cache );
+        $this->onboarding = new Onboarding( $this->settings );
         $this->onboarding->register();
 
         // Migrations

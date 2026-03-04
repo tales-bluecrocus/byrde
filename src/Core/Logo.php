@@ -62,7 +62,7 @@ class Logo {
         ?>
         <div data-skeleton style="background:var(--color-dark-950,#09090b);min-height:100vh">
             <?php // Header skeleton — invisible but preserves layout space ?>
-            <header style="padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;visibility:hidden">
+            <header style="padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;opacity:0">
                 <?php if ( ! empty( $logo['url'] ) ) : ?>
                     <img src="<?php echo esc_url( $logo['url'] ); ?>"
                          alt="<?php echo esc_attr( $logo['alt'] ); ?>"
@@ -76,7 +76,7 @@ class Logo {
             </header>
 
             <?php // Hero skeleton — invisible but preserves layout space ?>
-            <div style="padding:3rem 1.5rem;max-width:80rem;margin:0 auto;visibility:hidden">
+            <div style="padding:3rem 1.5rem;max-width:80rem;margin:0 auto;opacity:0">
                 <?php if ( $headline ) : ?>
                     <h1 style="font-family:Outfit,system-ui,sans-serif;font-size:clamp(2.25rem,5vw,3.75rem);font-weight:800;line-height:1.1;margin:0 0 1rem">
                         <?php echo wp_kses_post( $headline ); ?>
