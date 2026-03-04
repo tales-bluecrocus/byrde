@@ -79,7 +79,8 @@ jobs:
                     --exclude='docs/' \
                     --exclude='CLAUDE.md' \
                     --exclude='README.md' \
-                    --exclude='*.log'
+                    --exclude='*.log' \
+                    --exclude='video/'
 
             - name: Create ZIP file
               run: |

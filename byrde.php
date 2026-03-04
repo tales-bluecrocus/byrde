@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// Plugin constants
+// Plugin constants (defined before autoload — used by all modules)
 define( 'BYRDE_VERSION', '2.0.8' );
 define( 'BYRDE_PLUGIN_FILE', __FILE__ );
 define( 'BYRDE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -33,25 +33,34 @@ set_error_handler( function ( $errno, $errstr, $errfile ) { // phpcs:ignore Gene
 	return false;
 }, E_DEPRECATED );
 
+// Composer autoload (PSR-4)
+require_once __DIR__ . '/vendor/autoload.php';
+
+/**
+ * Global accessor for the plugin instance.
+ */
+function byrde(): \Byrde\Plugin {
+    static $instance;
+    return $instance ??= new \Byrde\Plugin();
+}
+
 // Bootstrap
-require_once BYRDE_PLUGIN_DIR . 'functions.php';
+byrde()->boot();
 
 // Activation: create default pages + flush rewrite rules
-register_activation_hook( __FILE__, function() {
-    // Suppress PHP 8.1+ deprecation warnings from WP core calling
-    // wp_normalize_path(null) / wp_is_stream(null) during flush_rewrite_rules().
+register_activation_hook( __FILE__, function () {
     $prev = error_reporting( error_reporting() & ~E_DEPRECATED );
 
-    byrde_register_landing_cpt();
-    byrde_activate();
-    byrde_maybe_migrate_from_theme();
-    byrde_set_onboarding_redirect();
+    byrde()->cpt->register_cpt();
+    byrde()->activate();
+    \Byrde\Migration\ThemeMigration::maybe_migrate();
+    byrde()->onboarding->set_onboarding_redirect();
     flush_rewrite_rules();
 
     error_reporting( $prev );
 } );
 
 // Deactivation: clean up rewrite rules
-register_deactivation_hook( __FILE__, function() {
+register_deactivation_hook( __FILE__, function () {
     flush_rewrite_rules();
 } );

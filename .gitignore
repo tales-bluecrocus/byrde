@@ -12,6 +12,7 @@ front-end/dist
 dist-ssr
 vendor/
 dist-release/
+video/
 *.local
 
 # Editor directories and files

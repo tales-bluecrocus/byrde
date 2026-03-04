@@ -1,42 +1,36 @@
 <?php
+
+namespace Byrde\Content;
+
 /**
- * Legal Pages — Default Content
+ * Legal Pages -- Default Content.
  *
  * Returns default HTML content for legal pages (Privacy Policy,
  * Terms & Conditions, Cookie Settings). Content uses [byrde_*]
  * shortcodes so it auto-populates from Site Settings.
- *
- * @package Byrde
  */
+class LegalPages {
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
-
-/**
- * Get default legal page content by slug.
- *
- * @param string $slug Page slug (privacy-policy, terms-and-conditions, cookie-settings).
- * @return string HTML content with shortcodes.
- */
-function byrde_get_default_legal_content( string $slug ): string {
-    switch ( $slug ) {
-        case 'privacy-policy':
-            return byrde_privacy_policy_content();
-        case 'terms-and-conditions':
-            return byrde_terms_conditions_content();
-        case 'cookie-settings':
-            return byrde_cookie_settings_content();
-        default:
-            return '';
+    /**
+     * Get default legal page content by slug.
+     *
+     * @param string $slug Page slug (privacy-policy, terms-and-conditions, cookie-settings).
+     * @return string HTML content with shortcodes.
+     */
+    public static function get_default_content( string $slug ): string {
+        return match ( $slug ) {
+            'privacy-policy'       => self::privacy_policy_content(),
+            'terms-and-conditions' => self::terms_conditions_content(),
+            'cookie-settings'      => self::cookie_settings_content(),
+            default                => '',
+        };
     }
-}
 
-/**
- * Privacy Policy content
- */
-function byrde_privacy_policy_content(): string {
-    return '
+    /**
+     * Privacy Policy content.
+     */
+    private static function privacy_policy_content(): string {
+        return '
 <p><strong>[byrde_company_name]</strong> ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website <strong>[byrde_site_url]</strong> and use our services.</p>
 
 <p>By accessing or using our website, you agree to the terms of this Privacy Policy. If you do not agree, please discontinue use of the site.</p>
@@ -126,13 +120,13 @@ function byrde_privacy_policy_content(): string {
 <li><strong>Phone:</strong> [byrde_phone]</li>
 <li><strong>Website:</strong> [byrde_site_url]</li>
 </ul>';
-}
+    }
 
-/**
- * Terms & Conditions content
- */
-function byrde_terms_conditions_content(): string {
-    return '
+    /**
+     * Terms & Conditions content.
+     */
+    private static function terms_conditions_content(): string {
+        return '
 <p>These Terms and Conditions ("Terms") govern your use of the website operated by <strong>[byrde_company_name]</strong> ("we," "us," or "our") at <strong>[byrde_site_url]</strong>. By accessing or using our website, you agree to be bound by these Terms.</p>
 
 <h2>1. Acceptance of Terms</h2>
@@ -206,16 +200,16 @@ function byrde_terms_conditions_content(): string {
 <li><strong>Phone:</strong> [byrde_phone]</li>
 <li><strong>Website:</strong> [byrde_site_url]</li>
 </ul>';
-}
+    }
 
-/**
- * Cookie Settings / Cookie Policy content
- *
- * Full page with Storage Preferences + category details.
- * "View Cookies" links open the cookie consent modal.
- */
-function byrde_cookie_settings_content(): string {
-    return '
+    /**
+     * Cookie Settings / Cookie Policy content.
+     *
+     * Full page with Storage Preferences + category details.
+     * "View Cookies" links open the cookie consent modal.
+     */
+    private static function cookie_settings_content(): string {
+        return '
 <h2>Storage Preferences</h2>
 <p>When you use [byrde_company_name], we may store or retrieve information in your browser using cookies and similar technologies. Cookies may be necessary for the core functionality of the platform as well as for other purposes. You have the option to disable certain types of cookies, though doing so may impact your experience with the site and app.</p>
 
@@ -241,4 +235,5 @@ function byrde_cookie_settings_content(): string {
 
 <h2>Do Not Sell or Share My Personal Information</h2>
 <p>By switching this setting on and saving, you indicate that you do not want [byrde_company_name] to sell or share your personal information for online targeted advertising. Please note that if you use different devices or browsers, you will need to set your preferences for each one.</p>';
+    }
 }

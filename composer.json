@@ -6,6 +6,11 @@
         "php": ">=8.0",
         "yahnis-elsts/plugin-update-checker": "^5.6"
     },
+    "autoload": {
+        "psr-4": {
+            "Byrde\\": "src/"
+        }
+    },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true

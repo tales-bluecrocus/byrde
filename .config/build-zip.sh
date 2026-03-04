@@ -74,7 +74,8 @@ rsync -a "$PLUGIN_DIR/" "$BUILD_DIR/byrde/" \
   --exclude='docs/' \
   --exclude='CLAUDE.md' \
   --exclude='README.md' \
-  --exclude='*.log'
+  --exclude='*.log' \
+  --exclude='video/'
 
 # Create ZIP
 cd "$BUILD_DIR"

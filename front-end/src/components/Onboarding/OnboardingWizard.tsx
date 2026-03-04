@@ -7,6 +7,7 @@ import {
   Upload, Phone, Mail, Building2, MapPin, Clock,
   Palette, Star, Share2, ArrowRight, ArrowLeft, Check, X,
 } from 'lucide-react';
+import { handlePhoneInput } from '../../lib/phone';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -112,40 +113,6 @@ function initData(): WizardData {
   };
 }
 
-/**
- * Format phone as user types: (123) 456-7890 or +1 (234) 567-8901.
- * Keeps raw digits (plus optional leading +) and applies mask on the fly.
- */
-function formatPhone(raw: string): string {
-  const trimmed = raw.trim();
-  if (!trimmed) return '';
-
-  const hasPlus = trimmed.startsWith('+');
-  const digits = trimmed.replace(/\D/g, '');
-
-  // International: +N (NNN) NNN-NNNN
-  if (hasPlus) {
-    const cc = digits.slice(0, 1);   // country code (1 digit)
-    const area = digits.slice(1, 4);
-    const pre = digits.slice(4, 7);
-    const line = digits.slice(7, 11);
-
-    if (digits.length <= 1) return `+${cc}`;
-    if (digits.length <= 4) return `+${cc} (${area}`;
-    if (digits.length <= 7) return `+${cc} (${area}) ${pre}`;
-    return `+${cc} (${area}) ${pre}-${line}`;
-  }
-
-  // Domestic: (NNN) NNN-NNNN
-  const area = digits.slice(0, 3);
-  const pre = digits.slice(3, 6);
-  const line = digits.slice(6, 10);
-
-  if (digits.length <= 3) return `(${area}`;
-  if (digits.length <= 6) return `(${area}) ${pre}`;
-  return `(${area}) ${pre}-${line}`;
-}
-
 function buildPayload(data: WizardData) {
   return {
     brand: {
@@ -244,15 +211,7 @@ function BrandStep({ data, update }: { data: WizardData; update: (d: Partial<Wiz
           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <Input
             value={data.phone}
-            onChange={(e) => {
-              const v = e.target.value;
-              // Allow only digits, +, and mask characters during typing
-              const stripped = v.replace(/[^0-9+]/g, '');
-              // Limit: +1NNNNNNNNNN (11 digits) or NNNNNNNNNN (10 digits)
-              const maxDigits = stripped.startsWith('+') ? 12 : 10;
-              const capped = stripped.slice(0, maxDigits);
-              update({ phone: formatPhone(capped) });
-            }}
+            onChange={(e) => update({ phone: handlePhoneInput(e.target.value).phone })}
             placeholder="(000) 000-0000"
             inputMode="tel"
             className={cls.input}

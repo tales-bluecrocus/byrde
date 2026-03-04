@@ -1,45 +1,57 @@
 <?php
+
+namespace Byrde\Security;
+
+use Byrde\Core\Constants;
+use Byrde\Settings\Manager;
+
 /**
- * Cookie Consent — Two-step modal (bottom-left)
+ * Cookie Consent -- Two-step modal (bottom-left).
  *
  * By default all cookies are auto-accepted (no banner shown).
  * Clicking "Cookie Settings" in the footer opens a bottom-left modal
- * with two views: intro → customize (3 toggle categories).
+ * with two views: intro -> customize (3 toggle categories).
  *
  * Storage: localStorage key "byrde_cookie_consent"
- *
- * @package Byrde
  */
+class CookieConsent {
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
+    public function __construct(
+        private Manager $settings,
+    ) {}
 
-/**
- * Output cookie consent modal HTML + CSS + JS
- */
-function byrde_cookie_consent_output(): void {
-    // Skip in admin, preview mode, or non-Byrde pages
-    if ( is_admin() ) {
-        return;
-    }
-    if ( ! is_singular( BYRDE_CPT_LANDING ) ) {
-        return;
-    }
-    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-    if ( ! empty( $_GET['byrde_preview'] ) ) {
-        return;
+    /**
+     * Hook into WordPress.
+     */
+    public function register(): void {
+        add_action( 'wp_footer', [ $this, 'output' ], 99 );
     }
 
-    $settings = byrde_get_all_settings();
-    $cookie_url = esc_url( $settings['cookie_settings_url'] ?? home_url( '/cookie-settings' ) );
-    $mode = $settings['brand_mode'] ?? 'dark';
-    $brand_primary = esc_attr(
-        $mode === 'light'
-            ? ( $settings['brand_light_primary'] ?? '#3ab342' )
-            : ( $settings['brand_dark_primary'] ?? '#3ab342' )
-    );
-    ?>
+    /**
+     * Output cookie consent modal HTML + CSS + JS.
+     */
+    public function output(): void {
+        // Skip in admin, preview mode, or non-Byrde pages.
+        if ( is_admin() ) {
+            return;
+        }
+        if ( ! is_singular( Constants::CPT_LANDING ) ) {
+            return;
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( ! empty( $_GET[ Constants::QUERY_PREVIEW ] ) ) {
+            return;
+        }
+
+        $all_settings  = $this->settings->get_all();
+        $cookie_url    = esc_url( $all_settings['cookie_settings_url'] ?? home_url( '/cookie-settings' ) );
+        $mode          = $all_settings['brand_mode'] ?? 'dark';
+        $brand_primary = esc_attr(
+            $mode === 'light'
+                ? ( $all_settings['brand_light_primary'] ?? '#3ab342' )
+                : ( $all_settings['brand_dark_primary'] ?? '#3ab342' )
+        );
+        ?>
 <!-- Byrde Cookie Consent -->
 <div id="byrde-cc" class="byrde-cc" style="display:none" role="dialog" aria-label="Cookie settings" aria-modal="true">
 
@@ -180,7 +192,7 @@ function byrde_cookie_consent_output(): void {
     // ---- State ----
     var state = loadState();
 
-    // First visit → auto-accept all silently (no banner)
+    // First visit -> auto-accept all silently (no banner)
     if (!state) {
         state = { necessary:true, analytics:true, marketing:true, doNotSell:false, timestamp:Date.now() };
         saveState(state);
@@ -332,6 +344,6 @@ function byrde_cookie_consent_output(): void {
 })();
 </script>
 <!-- /Byrde Cookie Consent -->
-    <?php
+        <?php
+    }
 }
-add_action( 'wp_footer', 'byrde_cookie_consent_output', 99 );

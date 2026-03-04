@@ -30,6 +30,7 @@ import {
   MousePointerClick,
 } from 'lucide-react';
 import type { ThemeSettings } from '../../../hooks/useSettings';
+import { handlePhoneInput } from '../../../lib/phone';
 
 // Collapsible section wrapper (accordion: only one open at a time)
 function Section({
@@ -176,12 +177,7 @@ export function SiteSettingsPanel() {
         <Field label="Phone">
           <Input
             value={settings.phone}
-            onChange={(e) => {
-              const phone = e.target.value;
-              const hasPlus = phone.trimStart().startsWith('+');
-              const digits = phone.replace(/\D/g, '');
-              updateSettings({ phone, phone_raw: hasPlus ? `+${digits}` : digits });
-            }}
+            onChange={(e) => updateSettings(handlePhoneInput(e.target.value))}
             placeholder="(000) 000-0000"
             className={inputCls}
           />

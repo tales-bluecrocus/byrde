@@ -13,14 +13,17 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+use Byrde\Content\LegalPages;
+use Byrde\Settings\Manager;
+
 // Dequeue React bundle — not needed on legal pages
 add_action( 'wp_print_footer_scripts', function() {
     wp_dequeue_script( 'byrde-main' );
 }, 1 );
 
 // Page data
-$logo      = byrde_get_logo_data();
-$settings  = byrde_get_all_settings();
+$logo      = byrde()->logo->get_data();
+$settings  = byrde()->settings->get_all();
 $phone     = $settings['phone'] ?? '';
 $phone_raw = $settings['phone_raw'] ?? '';
 $site_name = $settings['site_name'] ?? get_bloginfo( 'name' );
@@ -42,7 +45,7 @@ if ( ! empty( trim( wp_strip_all_tags( $post_content ) ) ) ) {
     $content = apply_filters( 'the_content', $post_content );
 } else {
     $slug    = get_post_field( 'post_name', get_the_ID() );
-    $content = byrde_get_default_legal_content( $slug );
+    $content = LegalPages::get_default_content( $slug );
     $content = do_shortcode( wpautop( $content ) );
 }
 ?>
@@ -130,7 +133,7 @@ if ( ! empty( trim( wp_strip_all_tags( $post_content ) ) ) ) {
     <!-- Content -->
     <main class="byrde-lp-content">
         <div class="byrde-lp-content-inner">
-            <h1><?php the_title(); ?></h1>
+            <h1><?php echo esc_html( get_the_title() ); ?></h1>
             <p class="byrde-lp-updated">Last updated: <?php echo esc_html( get_the_modified_date( 'F j, Y' ) ); ?></p>
             <?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Content is from post_content or pre-escaped default ?>
         </div>
