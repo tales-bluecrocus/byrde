@@ -34,7 +34,7 @@ jobs:
               working-directory: front-end
 
             - name: Build frontend
-              run: npm run build
+              run: rm -rf dist && npm run build
               working-directory: front-end
 
             - name: Install Composer dependencies (production only)

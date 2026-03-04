@@ -10,8 +10,14 @@ use Byrde\Settings\Cache;
 
 /**
  * Front-end asset management: enqueue, preload, critical CSS, async loading.
+ *
+ * Uses Vite manifest (.vite/manifest.json) to resolve hashed filenames,
+ * ensuring CDN-safe cache busting without relying on ?ver= query params.
  */
 class AssetManager {
+
+    /** @var array<string, array{file: string, css?: string[]}> Vite manifest cache. */
+    private ?array $manifest = null;
 
     public function __construct(
         private Manager $settings,
@@ -31,7 +37,69 @@ class AssetManager {
     }
 
     /**
-     * Enqueue front-end assets (fixed filenames, version-based cache busting).
+     * Read and cache the Vite manifest.
+     *
+     * @return array<string, array{file: string, css?: string[]}>
+     */
+    private function get_manifest(): array {
+        if ( null !== $this->manifest ) {
+            return $this->manifest;
+        }
+
+        $manifest_path = BYRDE_PLUGIN_DIR . 'front-end/dist/.vite/manifest.json';
+        if ( ! file_exists( $manifest_path ) ) {
+            $this->manifest = [];
+            return $this->manifest;
+        }
+
+        $json = file_get_contents( $manifest_path );
+        $this->manifest = json_decode( $json, true ) ?: [];
+        return $this->manifest;
+    }
+
+    /**
+     * Resolve a source file to its hashed dist URL.
+     *
+     * @param string $entry Source entry (e.g. 'index.html').
+     * @return string|null Full URL or null if not found.
+     */
+    private function asset_url( string $entry ): ?string {
+        $manifest = $this->get_manifest();
+        if ( ! isset( $manifest[ $entry ]['file'] ) ) {
+            return null;
+        }
+        return Helpers::plugin_uri() . '/front-end/dist/' . $manifest[ $entry ]['file'];
+    }
+
+    /**
+     * Resolve a source file to its hashed dist path.
+     *
+     * @param string $entry Source entry (e.g. 'index.html').
+     * @return string|null Absolute filesystem path or null if not found.
+     */
+    private function asset_path( string $entry ): ?string {
+        $manifest = $this->get_manifest();
+        if ( ! isset( $manifest[ $entry ]['file'] ) ) {
+            return null;
+        }
+        return BYRDE_PLUGIN_DIR . 'front-end/dist/' . $manifest[ $entry ]['file'];
+    }
+
+    /**
+     * Get CSS files associated with a manifest entry.
+     *
+     * @param string $entry Source entry.
+     * @return string[] Array of full CSS URLs.
+     */
+    private function css_urls( string $entry ): array {
+        $manifest = $this->get_manifest();
+        $css      = $manifest[ $entry ]['css'] ?? [];
+        $base     = Helpers::plugin_uri() . '/front-end/dist/';
+        return array_map( fn( $file ) => $base . $file, $css );
+    }
+
+    /**
+     * Enqueue front-end assets using Vite manifest for hashed filenames.
      */
     public function enqueue(): void {
         // Only enqueue on byrde_landing pages.
@@ -39,25 +107,26 @@ class AssetManager {
             return;
         }
 
-        $dist_dir = BYRDE_PLUGIN_DIR . 'front-end/dist';
-        $dist_uri = Helpers::plugin_uri() . '/front-end/dist';
-        $version  = $this->cache->get_version();
+        $js_url  = $this->asset_url( 'index.html' );
+        $js_path = $this->asset_path( 'index.html' );
+        $css_urls = $this->css_urls( 'index.html' );
 
-        if ( file_exists( $dist_dir . '/assets/style.css' ) ) {
+        // Enqueue CSS (extracted by Vite from the JS entry).
+        if ( ! empty( $css_urls ) ) {
             wp_enqueue_style(
                 'byrde-main',
-                $dist_uri . '/assets/style.css',
+                $css_urls[0],
                 [],
-                $version
+                null // Hash is in the filename — no ?ver= needed.
             );
         }
 
-        if ( file_exists( $dist_dir . '/assets/main.js' ) ) {
+        if ( $js_url && $js_path && file_exists( $js_path ) ) {
             wp_enqueue_script(
                 'byrde-main',
-                $dist_uri . '/assets/main.js',
+                $js_url,
                 [],
-                $version,
+                null, // Hash is in the filename — no ?ver= needed.
                 true
             );
 
@@ -94,23 +163,22 @@ class AssetManager {
             return;
         }
 
-        $dist_dir = BYRDE_PLUGIN_DIR . 'front-end/dist';
-        $dist_uri = Helpers::plugin_uri() . '/front-end/dist';
-        $version  = $this->cache->get_version();
+        $css_urls = $this->css_urls( 'index.html' );
+        $js_url   = $this->asset_url( 'index.html' );
 
         // Preload CSS -- browser discovers stylesheet before parsing full HTML.
-        if ( file_exists( $dist_dir . '/assets/style.css' ) ) {
+        if ( ! empty( $css_urls ) ) {
             printf(
                 '<link rel="preload" as="style" href="%s">' . "\n",
-                esc_url( $dist_uri . '/assets/style.css?ver=' . $version )
+                esc_url( $css_urls[0] )
             );
         }
 
-        // Modulepreload JS bundle -- browser downloads in parallel with CSS (breaks sequential chain).
-        if ( file_exists( $dist_dir . '/assets/main.js' ) ) {
+        // Modulepreload JS bundle -- browser downloads in parallel with CSS.
+        if ( $js_url ) {
             printf(
                 '<link rel="modulepreload" href="%s">' . "\n",
-                esc_url( $dist_uri . '/assets/main.js?ver=' . $version )
+                esc_url( $js_url )
             );
         }
 

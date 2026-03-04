@@ -18,6 +18,18 @@ class TemplateLoader {
     public function register(): void {
         add_filter( 'template_include', [ $this, 'template_include' ], 99 );
         add_action( 'wp_enqueue_scripts', [ $this, 'isolate_assets' ], 999 );
+        add_action( 'wp_enqueue_scripts', [ $this, 'remove_emoji' ], 1 );
+    }
+
+    /**
+     * Remove WordPress emoji scripts and styles on landing pages.
+     */
+    public function remove_emoji(): void {
+        if ( ! is_singular( Constants::CPT_LANDING ) ) {
+            return;
+        }
+        remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+        remove_action( 'wp_print_styles', 'print_emoji_styles' );
     }
 
     /**
