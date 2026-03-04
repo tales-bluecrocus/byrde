@@ -80,7 +80,7 @@ export interface ServiceItem {
 
 export interface ServicesContent {
   badgeText: string; // Small uppercase text above heading
-  headline: string; // Use <strong> for accent color
+  headline: string; // Use [pr]...[/pr] or [ac]...[/ac] for colored text
   subheadline: string;
   services: ServiceItem[];
 }
@@ -109,7 +109,7 @@ export interface AreaItem {
 
 export interface ServiceAreasContent {
   badgeText: string;
-  headline: string; // Use <strong> for accent color
+  headline: string; // Use [pr]...[/pr] or [ac]...[/ac] for colored text
   subheadline: string;
   locationsHeading: string;
   missingAreaText: string;
@@ -128,7 +128,7 @@ export interface TestimonialItem {
 
 export interface TestimonialsContent {
   badgeText: string;
-  headline: string; // Use <strong> for accent color
+  headline: string; // Use [pr]...[/pr] or [ac]...[/ac] for colored text
   subheadline: string;
   reviewLabel: string;
   testimonials: TestimonialItem[];
@@ -144,7 +144,7 @@ export interface FaqItem {
 
 export interface FaqContent {
   badgeText: string;
-  headline: string; // Use <strong> for accent color
+  headline: string; // Use [pr]...[/pr] or [ac]...[/ac] for colored text
   subheadline: string;
   contactTitle: string;
   contactDescription: string;
@@ -154,7 +154,7 @@ export interface FaqContent {
 }
 
 export interface FooterCtaContent {
-  headline: string; // Use <strong> for accent color
+  headline: string; // Use [pr]...[/pr] or [ac]...[/ac] for colored text
   subheadline: string;
   reassuranceText: string;
   ctaText: string;
@@ -248,7 +248,7 @@ const DEFAULT_FEATURED_TESTIMONIAL_CONTENT: FeaturedTestimonialContent = {
 
 const DEFAULT_SERVICES_CONTENT: ServicesContent = {
   badgeText: 'Our Services',
-  headline: 'What We <strong>Offer</strong>',
+  headline: 'What We [pr]Offer[/pr]',
   subheadline: 'We provide a full range of professional services to meet your needs safely, efficiently, and affordably.',
   services: [
     { id: '1', icon: 'briefcase', iconType: 'lucide', title: 'Service One', description: 'Description of your first service offering.' },
@@ -273,7 +273,7 @@ const DEFAULT_MID_CTA_CONTENT: MidCtaContent = {
 
 const DEFAULT_SERVICE_AREAS_CONTENT: ServiceAreasContent = {
   badgeText: 'Areas We Serve',
-  headline: 'Serving <strong>Your Area</strong>',
+  headline: 'Serving [pr]Your Area[/pr]',
   subheadline: 'Professional services across the region.',
   locationsHeading: 'Service Locations',
   missingAreaText: "Don't see your area? Contact us - we may still be able to help!",
@@ -290,7 +290,7 @@ const DEFAULT_SERVICE_AREAS_CONTENT: ServiceAreasContent = {
 
 const DEFAULT_TESTIMONIALS_CONTENT: TestimonialsContent = {
   badgeText: 'Testimonials',
-  headline: 'Trusted By <strong>Our Customers</strong>',
+  headline: 'Trusted By [pr]Our Customers[/pr]',
   subheadline: 'See why customers consistently love our fast response, fair pricing, and professional results.',
   reviewLabel: 'Google Review',
   testimonials: [
@@ -304,7 +304,7 @@ const DEFAULT_TESTIMONIALS_CONTENT: TestimonialsContent = {
 
 const DEFAULT_FAQ_CONTENT: FaqContent = {
   badgeText: 'Frequently Asked Questions',
-  headline: 'Clear answers to <strong>common concerns</strong>',
+  headline: 'Clear answers to [pr]common concerns[/pr]',
   subheadline: 'Clear answers to common concerns so you can book with confidence.',
   contactTitle: 'Still have questions?',
   contactDescription: 'Our team is ready to help. Give us a call and we\'ll answer any questions you have.',
@@ -318,7 +318,7 @@ const DEFAULT_FAQ_CONTENT: FaqContent = {
 };
 
 const DEFAULT_FOOTER_CTA_CONTENT: FooterCtaContent = {
-  headline: 'Ready to <strong>Get Started?</strong>',
+  headline: 'Ready to [pr]Get Started?[/pr]',
   subheadline: 'Get your free quote today. Fast response, fair pricing, professional service.',
   reassuranceText: 'No obligation \u00b7 Free estimates \u00b7 Fast response',
   ctaText: 'Call For Free Quote',

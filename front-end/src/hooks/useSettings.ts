@@ -14,32 +14,23 @@ export interface ThemeSettings {
   phone_raw: string;
   email: string;
 
-  // Brand Colors (site-wide, per-mode)
+  // Brand Colors (per-mode primary + accent + text + default mode)
   brand_dark_primary: string;
   brand_dark_accent: string;
-  brand_dark_bg: string;
   brand_dark_text: string;
-  brand_dark_text_secondary: string;   // Optional override (auto-derived if empty)
-  brand_dark_bg_secondary: string;     // Optional override (auto-derived if empty)
-  brand_dark_border: string;           // Optional override (auto-derived if empty)
   brand_light_primary: string;
   brand_light_accent: string;
-  brand_light_bg: string;
   brand_light_text: string;
-  brand_light_text_secondary: string;  // Optional override (auto-derived if empty)
-  brand_light_bg_secondary: string;    // Optional override (auto-derived if empty)
-  brand_light_border: string;          // Optional override (auto-derived if empty)
   brand_mode: string;
 
-  // Button Style (per-mode colors + shared structure)
-  button_dark_bg: string;
-  button_dark_text: string;
-  button_dark_border_color: string;
-  button_light_bg: string;
-  button_light_text: string;
-  button_light_border_color: string;
+  // Button Style (per-mode text colors)
   button_border_width: string;
   button_border_radius: string;
+  button_dark_text_color: string;
+  button_dark_accent_text_color: string;
+  button_light_text_color: string;
+  button_light_accent_text_color: string;
+  button_shadow: string;
 
   // Google Reviews
   google_rating: string;
@@ -99,29 +90,20 @@ export const DEFAULT_SETTINGS: ThemeSettings = {
   // Brand Colors (per-mode)
   brand_dark_primary: '#3ab342',
   brand_dark_accent: '#f97316',
-  brand_dark_bg: '#171717',
   brand_dark_text: '#efefef',
-  brand_dark_text_secondary: '#a1a1aa',
-  brand_dark_bg_secondary: '#1e1e1e',
-  brand_dark_border: '',
   brand_light_primary: '#3ab342',
   brand_light_accent: '#f97316',
-  brand_light_bg: '#ffffff',
   brand_light_text: '#2a2a2a',
-  brand_light_text_secondary: '#71717a',
-  brand_light_bg_secondary: '#f4f4f5',
-  brand_light_border: '',
   brand_mode: 'dark',
 
-  // Button Style (per-mode colors + shared structure)
-  button_dark_bg: '',
-  button_dark_text: '#ffffff',
-  button_dark_border_color: '',
-  button_light_bg: '',
-  button_light_text: '#ffffff',
-  button_light_border_color: '',
+  // Button Style (per-mode text colors)
   button_border_width: '0',
   button_border_radius: '12',
+  button_dark_text_color: '#ffffff',
+  button_dark_accent_text_color: '#ffffff',
+  button_light_text_color: '#ffffff',
+  button_light_accent_text_color: '#000000',
+  button_shadow: 'md',
 
   // Google Reviews
   google_rating: '5.0',

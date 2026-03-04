@@ -36,7 +36,7 @@ import {
   type FooterContent,
 } from '../../../context/ContentContext';
 import { useHeaderConfig, type TopbarIcon, type TextAlign, type IconPosition } from '../../../context/HeaderConfigContext';
-import { useSectionTheme, type SectionId } from '../../../context/SectionThemeContext';
+import { type SectionId } from '../../../context/SectionThemeContext';
 import { Plus, Trash2, FileText, Star, Phone, Mail, MapPin, Ban, Shield, Clock, CheckCircle, Truck, Image as ImageIcon } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -318,7 +318,7 @@ function BadgeIconPicker({ value, onChange, label }: { value: BadgeIconType; onC
   );
 }
 
-const HEADLINE_HINT = 'Wrap text in <strong>...</strong> for accent color';
+const HEADLINE_HINT = 'Use [pr]...[/pr] or [ac]...[/ac] for colored text';
 
 // Hero Content Editor
 function HeroContentEditor({ content, onChange }: { content: HeroContent; onChange: (updates: Partial<HeroContent>) => void }) {
@@ -342,7 +342,7 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
         <SectionTitle>Headlines</SectionTitle>
         <div className="space-y-4 mt-3">
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Fast & Reliable <strong>Service</strong>" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Fast & Reliable [pr]Service[/pr]" />
           </FormField>
           <FormField label="Subheadline">
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" rows={3} />
@@ -490,11 +490,6 @@ function FeaturedTestimonialEditor({ content, onChange }: { content: FeaturedTes
 
 // Services Editor
 function ServicesContentEditor({ content, onChange }: { content: ServicesContent; onChange: (updates: Partial<ServicesContent>) => void }) {
-  const { sectionThemes, updateSectionTheme } = useSectionTheme();
-  const servicesTheme = sectionThemes['services'] || {};
-  const iconBgEnabled = servicesTheme.iconBgEnabled !== false;
-  const iconBgColor = servicesTheme.iconBgColor || '';
-
   const handleServiceChange = (index: number, updates: Partial<ServiceItem>) => {
     const newServices = [...content.services];
     newServices[index] = { ...newServices[index], ...updates };
@@ -511,50 +506,6 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
 
   return (
     <div className="space-y-6">
-      {/* Icon Background Control */}
-      <div>
-        <SectionTitle>Icon Style</SectionTitle>
-        <div className="space-y-3 mt-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs font-medium text-muted-foreground">Icon Background</Label>
-            <Switch
-              checked={iconBgEnabled}
-              onCheckedChange={(checked) => updateSectionTheme('services', { iconBgEnabled: checked })}
-            />
-          </div>
-          {iconBgEnabled && (
-            <div className="flex items-center gap-2">
-              <Label className="text-xs font-medium text-muted-foreground shrink-0">Color</Label>
-              <div className="flex items-center gap-2 flex-1">
-                <input
-                  type="color"
-                  value={iconBgColor || '#3ab342'}
-                  onChange={(e) => updateSectionTheme('services', { iconBgColor: e.target.value })}
-                  className="w-8 h-8 rounded cursor-pointer border border-border bg-transparent p-0.5"
-                />
-                <Input
-                  value={iconBgColor}
-                  onChange={(e) => updateSectionTheme('services', { iconBgColor: e.target.value })}
-                  placeholder="Default (primary)"
-                  className="flex-1 h-8 text-xs"
-                />
-                {iconBgColor && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => updateSectionTheme('services', { iconBgColor: undefined })}
-                    className="h-8 w-8 shrink-0 text-muted-foreground"
-                    title="Reset to default"
-                  >
-                    <LucideIcons.RotateCcw className="h-3.5 w-3.5" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      <Separator />
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
@@ -562,7 +513,7 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
             <Input value={content.badgeText || ''} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Full-Service Service & More" />
           </FormField>
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Full-Service <strong>Service</strong>" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Full-Service [pr]Service[/pr]" />
           </FormField>
           <FormField label="Subheadline">
             <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" />
@@ -631,7 +582,7 @@ function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; on
             <Input value={content.badge} onChange={(e) => onChange({ badge: e.target.value })} placeholder="Ready to Clear the Clutter?" />
           </FormField>
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Get Your <strong>Free Quote</strong> Today" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Get Your [pr]Free Quote[/pr] Today" />
           </FormField>
           <FormField label="Subheadline">
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" rows={2} />
@@ -703,7 +654,7 @@ function ServiceAreasContentEditor({ content, onChange }: { content: ServiceArea
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Areas We Serve" />
           </FormField>
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Serving <strong>Your Area</strong>" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Serving [pr]Your Area[/pr]" />
           </FormField>
           <FormField label="Subheadline">
             <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Professional services across the region." />
@@ -782,7 +733,7 @@ function TestimonialsContentEditor({ content, onChange }: { content: Testimonial
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Testimonials" />
           </FormField>
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Trusted By <strong>Your Neighbors</strong>" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Trusted By [pr]Your Neighbors[/pr]" />
           </FormField>
           <FormField label="Subheadline">
             <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="See why homeowners love us" />
@@ -862,7 +813,7 @@ function FaqContentEditor({ content, onChange }: { content: FaqContent; onChange
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Frequently Asked Questions" />
           </FormField>
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Clear answers to <strong>common concerns</strong>" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Clear answers to [pr]common concerns[/pr]" />
           </FormField>
           <FormField label="Subheadline">
             <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="So you can book with confidence" />
@@ -923,7 +874,7 @@ function FooterCtaContentEditor({ content, onChange }: { content: FooterCtaConte
         <SectionTitle>Content</SectionTitle>
         <div className="space-y-4 mt-3">
           <FormField label="Headline" hint={HEADLINE_HINT}>
-            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Ready to <strong>Clear the Clutter?</strong>" />
+            <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Ready to [pr]Clear the Clutter?[/pr]" />
           </FormField>
           <FormField label="Subheadline">
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Get your free quote today..." rows={2} />

@@ -12,7 +12,6 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import { useSettingsContext } from '../../../context/SettingsContext';
 import { useGlobalConfig } from '../../../context/GlobalConfigContext';
 import { useToast } from '../../Toast';
-import { getContrastRatio, meetsWCAG, formatContrastRatio } from '../../../utils/colorUtils';
 import {
   ChevronDown,
   Building,
@@ -70,26 +69,6 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="space-y-1.5">
       <Label className="text-[11px] font-medium text-zinc-400">{label}</Label>
       {children}
-    </div>
-  );
-}
-
-// Contrast badge: shows WCAG ratio + pass/fail
-function ContrastBadge({ bg, text }: { bg: string; text: string }) {
-  const ratio = getContrastRatio(bg, text);
-  const passes = meetsWCAG(ratio);
-  return (
-    <div className="flex items-center gap-1.5 mt-1.5">
-      <span
-        className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold"
-        style={{
-          backgroundColor: passes ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
-          color: passes ? '#22c55e' : '#ef4444',
-        }}
-      >
-        {passes ? 'AA' : 'Fail'}
-      </span>
-      <span className="text-[10px] text-zinc-500">{formatContrastRatio(ratio)}</span>
     </div>
   );
 }
@@ -218,262 +197,170 @@ export function SiteSettingsPanel() {
         </Field>
       </Section>
 
-      {/* Brand Colors */}
-      <Section icon={Palette} title="Brand Colors" open={openSection === 'colors'} onToggle={() => toggle('colors')}>
-        {/* Default Mode toggle */}
-        <div className="mb-3">
-          <Label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-            Default Mode
-          </Label>
+      {/* Colors */}
+      <Section icon={Palette} title="Colors" open={openSection === 'colors'} onToggle={() => toggle('colors')}>
+        {/* Default Mode */}
+        <div>
+          <Label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Default Mode</Label>
+          <p className="text-[10px] text-zinc-600 mt-0.5 mb-1.5">Choose the base appearance for your pages</p>
           <ToggleGroup
             type="single"
             value={settings.brand_mode || 'dark'}
-            onValueChange={(val) => {
-              if (val) update('brand_mode', val);
-            }}
-            className="w-full bg-zinc-800 p-1 rounded-lg mt-1.5"
+            onValueChange={(val) => { if (val) update('brand_mode', val); }}
+            className="w-full bg-zinc-800 p-1 rounded-lg"
           >
             <ToggleGroupItem value="dark" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
-              <Moon className="h-3 w-3" />
-              Dark
+              <Moon className="h-3 w-3" /> Dark
             </ToggleGroupItem>
             <ToggleGroupItem value="light" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
-              <Sun className="h-3 w-3" />
-              Light
+              <Sun className="h-3 w-3" /> Light
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
 
-        {/* Dark Mode */}
-        <div>
-          <div className="flex items-center gap-1.5 mb-2">
-            <Moon className="h-3 w-3 text-zinc-500" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Dark Mode</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Background">
-              <ColorPicker value={settings.brand_dark_bg} onChange={(val) => update('brand_dark_bg', val)} />
-            </Field>
-            <Field label="Text">
-              <ColorPicker value={settings.brand_dark_text} onChange={(val) => update('brand_dark_text', val)} />
-            </Field>
-          </div>
-          <ContrastBadge bg={settings.brand_dark_bg} text={settings.brand_dark_text} />
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <Field label="Primary">
-              <ColorPicker value={settings.brand_dark_primary} onChange={(val) => update('brand_dark_primary', val)} />
-              <ContrastBadge bg={settings.brand_dark_bg} text={settings.brand_dark_primary} />
-            </Field>
-            <Field label="Accent">
-              <ColorPicker value={settings.brand_dark_accent} onChange={(val) => update('brand_dark_accent', val)} />
-              <ContrastBadge bg={settings.brand_dark_bg} text={settings.brand_dark_accent} />
-            </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <Field label="Text Secondary">
-              <ColorPicker value={settings.brand_dark_text_secondary} onChange={(val) => update('brand_dark_text_secondary', val)} />
-            </Field>
-            <Field label="Background 2">
-              <ColorPicker value={settings.brand_dark_bg_secondary} onChange={(val) => update('brand_dark_bg_secondary', val)} />
-            </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <Field label="Border">
-              <ColorPicker value={settings.brand_dark_border} onChange={(val) => update('brand_dark_border', val)} />
-            </Field>
-          </div>
-        </div>
+        <div className="border-t border-zinc-800 my-1" />
 
-        {/* Light Mode */}
-        <div className="pt-2">
-          <div className="flex items-center gap-1.5 mb-2">
-            <Sun className="h-3 w-3 text-zinc-500" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Light Mode</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Background">
-              <ColorPicker value={settings.brand_light_bg} onChange={(val) => update('brand_light_bg', val)} />
-            </Field>
-            <Field label="Text">
-              <ColorPicker value={settings.brand_light_text} onChange={(val) => update('brand_light_text', val)} />
-            </Field>
-          </div>
-          <ContrastBadge bg={settings.brand_light_bg} text={settings.brand_light_text} />
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <Field label="Primary">
-              <ColorPicker value={settings.brand_light_primary} onChange={(val) => update('brand_light_primary', val)} />
-              <ContrastBadge bg={settings.brand_light_bg} text={settings.brand_light_primary} />
-            </Field>
-            <Field label="Accent">
-              <ColorPicker value={settings.brand_light_accent} onChange={(val) => update('brand_light_accent', val)} />
-              <ContrastBadge bg={settings.brand_light_bg} text={settings.brand_light_accent} />
-            </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <Field label="Text Secondary">
-              <ColorPicker value={settings.brand_light_text_secondary} onChange={(val) => update('brand_light_text_secondary', val)} />
-            </Field>
-            <Field label="Background 2">
-              <ColorPicker value={settings.brand_light_bg_secondary} onChange={(val) => update('brand_light_bg_secondary', val)} />
-            </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <Field label="Border">
-              <ColorPicker value={settings.brand_light_border} onChange={(val) => update('brand_light_border', val)} />
-            </Field>
-          </div>
-        </div>
+        {/* Mode colors */}
+        {(() => {
+          const [colorTab, setColorTab] = useState<'dark' | 'light'>(
+            (settings.brand_mode as 'dark' | 'light') || 'dark'
+          );
+          const prefix = colorTab === 'dark' ? 'brand_dark' : 'brand_light';
 
+          return (
+            <>
+              <div>
+                <Label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Mode Colors</Label>
+                <p className="text-[10px] text-zinc-600 mt-0.5 mb-1.5">Set brand colors for each mode</p>
+              </div>
+              <ToggleGroup
+                type="single"
+                value={colorTab}
+                onValueChange={(val) => { if (val) setColorTab(val as 'dark' | 'light'); }}
+                className="w-full bg-zinc-800 p-1 rounded-lg"
+              >
+                <ToggleGroupItem value="dark" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-600 data-[state=on]:text-zinc-100">
+                  <Moon className="h-3 w-3" /> Dark
+                </ToggleGroupItem>
+                <ToggleGroupItem value="light" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-600 data-[state=on]:text-zinc-100">
+                  <Sun className="h-3 w-3" /> Light
+                </ToggleGroupItem>
+              </ToggleGroup>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="Primary">
+                  <ColorPicker value={settings[`${prefix}_primary` as keyof ThemeSettings] as string} onChange={(val) => update(`${prefix}_primary` as keyof ThemeSettings, val)} />
+                </Field>
+                <Field label="Accent">
+                  <ColorPicker value={settings[`${prefix}_accent` as keyof ThemeSettings] as string} onChange={(val) => update(`${prefix}_accent` as keyof ThemeSettings, val)} />
+                </Field>
+              </div>
+              <Field label="Text">
+                <ColorPicker value={settings[`${prefix}_text` as keyof ThemeSettings] as string} onChange={(val) => update(`${prefix}_text` as keyof ThemeSettings, val)} />
+              </Field>
+            </>
+          );
+        })()}
       </Section>
 
-      {/* Button Style */}
-      <Section icon={MousePointerClick} title="Button Style" open={openSection === 'buttons'} onToggle={() => toggle('buttons')}>
-        {/* Live Preview — shows current mode button */}
+      {/* Buttons */}
+      <Section icon={MousePointerClick} title="Buttons" open={openSection === 'buttons'} onToggle={() => toggle('buttons')}>
+        {/* Mode tabs for button text colors + preview */}
         {(() => {
-          const isDark = (settings.brand_mode || 'dark') === 'dark';
-          const previewBg = isDark
-            ? (settings.button_dark_bg || settings.brand_dark_primary || '#3ab342')
-            : (settings.button_light_bg || settings.brand_light_primary || '#3ab342');
-          const previewText = isDark
-            ? (settings.button_dark_text || '#ffffff')
-            : (settings.button_light_text || '#ffffff');
-          const previewBorder = isDark ? settings.button_dark_border_color : settings.button_light_border_color;
+          const [btnTab, setBtnTab] = useState<'dark' | 'light'>(
+            (settings.brand_mode as 'dark' | 'light') || 'dark'
+          );
+          const isDark = btnTab === 'dark';
+          const brandPrefix = isDark ? 'brand_dark' : 'brand_light';
+          const btnPrefix = isDark ? 'button_dark' : 'button_light';
+          const primary = settings[`${brandPrefix}_primary` as keyof ThemeSettings] as string;
+          const accent = settings[`${brandPrefix}_accent` as keyof ThemeSettings] as string;
+          const btnTextColor = settings[`${btnPrefix}_text_color` as keyof ThemeSettings] as string;
+          const btnAccentTextColor = settings[`${btnPrefix}_accent_text_color` as keyof ThemeSettings] as string;
+
+          const shadow = {
+            none: 'none',
+            sm: '0 2px 8px -2px rgba(0,0,0,0.15)',
+            md: '0 4px 14px -3px rgba(0,0,0,0.25)',
+            lg: '0 8px 24px -4px rgba(0,0,0,0.35)',
+          }[settings.button_shadow || 'md'];
+          const radius = `${settings.button_border_radius || '12'}px`;
+
           return (
-            <div className="flex justify-center py-3">
-              <div
-                className="px-6 py-3 font-semibold text-sm transition-all"
-                style={{
-                  backgroundColor: previewBg,
-                  color: previewText,
-                  border: previewBorder
-                    ? `${settings.button_border_width || '0'}px solid ${previewBorder}`
-                    : 'none',
-                  borderRadius: `${settings.button_border_radius || '12'}px`,
-                }}
+            <>
+              <ToggleGroup
+                type="single"
+                value={btnTab}
+                onValueChange={(val) => { if (val) setBtnTab(val as 'dark' | 'light'); }}
+                className="w-full bg-zinc-800 p-1 rounded-lg"
               >
-                Button Preview
+                <ToggleGroupItem value="dark" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-600 data-[state=on]:text-zinc-100">
+                  <Moon className="h-3 w-3" /> Dark
+                </ToggleGroupItem>
+                <ToggleGroupItem value="light" className="flex-1 gap-1.5 text-zinc-400 data-[state=on]:bg-zinc-600 data-[state=on]:text-zinc-100">
+                  <Sun className="h-3 w-3" /> Light
+                </ToggleGroupItem>
+              </ToggleGroup>
+
+              {/* Preview */}
+              <div className="flex justify-center gap-3 py-2">
+                <div
+                  className="px-5 py-2 font-semibold text-xs transition-all"
+                  style={{ backgroundColor: primary || '#3ab342', color: btnTextColor || '#ffffff', borderRadius: radius, boxShadow: shadow }}
+                >
+                  Primary
+                </div>
+                <div
+                  className="px-5 py-2 font-semibold text-xs transition-all"
+                  style={{ backgroundColor: accent || '#f97316', color: btnAccentTextColor || (isDark ? '#ffffff' : '#000000'), borderRadius: radius, boxShadow: shadow }}
+                >
+                  Accent
+                </div>
               </div>
-            </div>
+
+              {/* Text colors */}
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="Primary Text">
+                  <ColorPicker value={btnTextColor || '#ffffff'} onChange={(val) => update(`${btnPrefix}_text_color` as keyof ThemeSettings, val)} />
+                </Field>
+                <Field label="Accent Text">
+                  <ColorPicker value={btnAccentTextColor || (isDark ? '#ffffff' : '#000000')} onChange={(val) => update(`${btnPrefix}_accent_text_color` as keyof ThemeSettings, val)} />
+                </Field>
+              </div>
+            </>
           );
         })()}
 
-        {/* Dark Mode */}
-        <div>
-          <div className="flex items-center gap-1.5 mb-2">
-            <Moon className="h-3 w-3 text-zinc-500" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Dark Mode</span>
+        {/* Shape (shared across modes) */}
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-[11px] font-medium text-zinc-400">Radius</Label>
+            <ToggleGroup
+              type="single"
+              value={settings.button_border_radius || '12'}
+              onValueChange={(val) => val && update('button_border_radius', val)}
+              className="w-full bg-zinc-800 p-1 rounded-lg mt-1.5"
+            >
+              <ToggleGroupItem value="0" className="flex-1 text-[10px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">0</ToggleGroupItem>
+              <ToggleGroupItem value="4" className="flex-1 text-[10px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">S</ToggleGroupItem>
+              <ToggleGroupItem value="12" className="flex-1 text-[10px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">M</ToggleGroupItem>
+              <ToggleGroupItem value="9999" className="flex-1 text-[10px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">Full</ToggleGroupItem>
+            </ToggleGroup>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Background">
-              <ColorPicker
-                value={settings.button_dark_bg || settings.brand_dark_primary || '#3ab342'}
-                onChange={(val) => update('button_dark_bg', val)}
-              />
-            </Field>
-            <Field label="Text">
-              <ColorPicker
-                value={settings.button_dark_text || '#ffffff'}
-                onChange={(val) => update('button_dark_text', val)}
-              />
-            </Field>
+          <div>
+            <Label className="text-[11px] font-medium text-zinc-400">Shadow</Label>
+            <ToggleGroup
+              type="single"
+              value={settings.button_shadow || 'md'}
+              onValueChange={(val) => val && update('button_shadow', val)}
+              className="w-full bg-zinc-800 p-1 rounded-lg mt-1.5"
+            >
+              <ToggleGroupItem value="none" className="flex-1 text-[10px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">0</ToggleGroupItem>
+              <ToggleGroupItem value="sm" className="flex-1 text-[10px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">S</ToggleGroupItem>
+              <ToggleGroupItem value="md" className="flex-1 text-[10px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">M</ToggleGroupItem>
+              <ToggleGroupItem value="lg" className="flex-1 text-[10px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">L</ToggleGroupItem>
+            </ToggleGroup>
           </div>
-          <ContrastBadge bg={settings.button_dark_bg || settings.brand_dark_primary || '#3ab342'} text={settings.button_dark_text || '#ffffff'} />
-          <div className="mt-3">
-            <Field label="Border Color">
-              <ColorPicker
-                value={settings.button_dark_border_color || ''}
-                onChange={(val) => update('button_dark_border_color', val)}
-              />
-              {settings.button_dark_border_color && (
-                <button
-                  type="button"
-                  onClick={() => update('button_dark_border_color', '')}
-                  className="text-[10px] text-zinc-500 hover:text-zinc-300 underline underline-offset-2 mt-1"
-                >
-                  Remove border
-                </button>
-              )}
-            </Field>
-          </div>
-        </div>
-
-        {/* Light Mode */}
-        <div className="pt-2">
-          <div className="flex items-center gap-1.5 mb-2">
-            <Sun className="h-3 w-3 text-zinc-500" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Light Mode</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Background">
-              <ColorPicker
-                value={settings.button_light_bg || settings.brand_light_primary || '#3ab342'}
-                onChange={(val) => update('button_light_bg', val)}
-              />
-            </Field>
-            <Field label="Text">
-              <ColorPicker
-                value={settings.button_light_text || '#ffffff'}
-                onChange={(val) => update('button_light_text', val)}
-              />
-            </Field>
-          </div>
-          <ContrastBadge bg={settings.button_light_bg || settings.brand_light_primary || '#3ab342'} text={settings.button_light_text || '#ffffff'} />
-          <div className="mt-3">
-            <Field label="Border Color">
-              <ColorPicker
-                value={settings.button_light_border_color || ''}
-                onChange={(val) => update('button_light_border_color', val)}
-              />
-              {settings.button_light_border_color && (
-                <button
-                  type="button"
-                  onClick={() => update('button_light_border_color', '')}
-                  className="text-[10px] text-zinc-500 hover:text-zinc-300 underline underline-offset-2 mt-1"
-                >
-                  Remove border
-                </button>
-              )}
-            </Field>
-          </div>
-        </div>
-
-        {/* Shared: border width + radius */}
-        <div className="pt-2 grid grid-cols-2 gap-3">
-          {(settings.button_dark_border_color || settings.button_light_border_color) && (
-            <Field label="Border Width (px)">
-              <Input
-                type="number"
-                min="0"
-                max="10"
-                value={settings.button_border_width || '0'}
-                onChange={(e) => update('button_border_width', e.target.value)}
-                className={inputCls}
-              />
-            </Field>
-          )}
-        </div>
-
-        <div>
-          <Label className="text-[11px] font-medium text-zinc-400">Border Radius</Label>
-          <ToggleGroup
-            type="single"
-            value={settings.button_border_radius || '12'}
-            onValueChange={(val) => val && update('button_border_radius', val)}
-            className="w-full bg-zinc-800 p-1 rounded-lg mt-1.5"
-          >
-            <ToggleGroupItem value="0" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
-              None
-            </ToggleGroupItem>
-            <ToggleGroupItem value="4" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
-              Small
-            </ToggleGroupItem>
-            <ToggleGroupItem value="12" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
-              Medium
-            </ToggleGroupItem>
-            <ToggleGroupItem value="9999" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
-              Full
-            </ToggleGroupItem>
-          </ToggleGroup>
         </div>
       </Section>
 

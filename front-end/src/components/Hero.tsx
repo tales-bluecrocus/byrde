@@ -10,12 +10,13 @@ import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useSectionPalette, resolveButtonColor } from '../hooks/useSectionPalette';
 import { useContent, type BadgeIconType } from '../context/ContentContext';
-import { renderHeadlineStyled } from '../utils/renderHeadline';
+import { renderColoredText } from '../utils/renderHeadline';
 import { useSettings } from '../hooks/useSettings';
 import { useFormTracking } from '../hooks/useAnalytics';
 import { trackFormSubmitted, trackFormError, trackPhoneClick, getAttributionForSubmission } from '../lib/analytics';
 import GoogleReviewBadge from './GoogleReviewBadge';
 import { getContrastColor, lighten, generateBrandPalette } from '../utils/colorUtils';
+import { getColorsForMode } from '../hooks/useSectionPalette';
 import * as LucideIcons from 'lucide-react';
 
 // ============================================
@@ -283,16 +284,14 @@ export default function Hero() {
 
   // Memoized theme calculations
   const themeStyles = useMemo(() => {
-    const isOverriding = heroTheme.overrideGlobalColors ?? false;
     // Effective mode: section paletteMode > page mode
     const effectiveMode = heroTheme.paletteMode || globalConfig.brand.mode;
     const isLightMode = effectiveMode === 'light';
-    const fallbacks = isLightMode ? LIGHT_FALLBACKS : DARK_FALLBACKS;
 
-    const accentColor = isOverriding ? (heroTheme.accent || palette.accent[500]) : palette.accent[500];
-    const overlayColor = isOverriding ? (heroTheme.bgPrimary || fallbacks.bgPrimary) : palette.background.primary;
-    const textPrimary = isOverriding ? (heroTheme.textPrimary || fallbacks.textPrimary) : palette.text.primary;
-    const textSecondary = isOverriding ? (heroTheme.textSecondary || fallbacks.textSecondary) : palette.text.secondary;
+    const accentColor = heroTheme.accentSource === 'accent' ? palette.accent[500] : palette.primary[500];
+    const overlayColor = palette.background.primary;
+    const textPrimary = palette.text.primary;
+    const textSecondary = palette.text.secondary;
 
     // Form mode: independent from section mode when formPaletteMode is set
     const formMode = heroTheme.formPaletteMode || effectiveMode;
@@ -302,29 +301,17 @@ export default function Hero() {
     // Generate form-specific palette when form mode differs from section mode
     let formPalette = palette;
     if (formModeOverridden) {
-      const b = globalConfig.brand;
-      const isFormDark = formMode === 'dark';
-      formPalette = generateBrandPalette(
-        isFormDark ? b.darkPrimary : b.lightPrimary,
-        isFormDark ? b.darkAccent : b.lightAccent,
-        formMode,
-        isFormDark ? b.darkBg : b.lightBg,
-        isFormDark ? b.darkText : b.lightText,
-        {
-          textSecondary: isFormDark ? b.darkTextSecondary : b.lightTextSecondary,
-          bgSecondary: isFormDark ? b.darkBgSecondary : b.lightBgSecondary,
-          border: isFormDark ? b.darkBorder : b.lightBorder,
-        },
-      );
+      const colors = getColorsForMode(globalConfig.brand, formMode);
+      formPalette = generateBrandPalette(colors.primary, colors.accent, formMode, colors.text);
     }
 
     // Section-level colors (hero text, benefits, etc.)
-    const borderColor = isOverriding ? (heroTheme.borderColor || fallbacks.borderColor) : palette.border;
+    const borderColor = palette.border;
 
     // Form card colors — form-specific overrides take highest priority, then form mode, then section
     const cardBgColor = heroTheme.formBg
       || (formModeOverridden ? formFallbacks.bgSecondary : undefined)
-      || (isOverriding ? (heroTheme.bgSecondary || fallbacks.bgSecondary) : palette.background.secondary);
+      || palette.background.secondary;
     const formBorderColor = heroTheme.formBorder
       || (formModeOverridden ? formFallbacks.borderColor : undefined)
       || borderColor;
@@ -344,22 +331,20 @@ export default function Hero() {
       ? lighten(heroTheme.formBg, 3)
       : (formModeOverridden
         ? formFallbacks.bgTertiary
-        : (isOverriding
-          ? (heroTheme.bgTertiary || fallbacks.bgTertiary)
-          : (formConfig.inputBg || palette.background.tertiary)));
+        : (formConfig.inputBg || palette.background.tertiary));
     const inputBorder = heroTheme.formBorder
       || (formModeOverridden ? formFallbacks.borderColor : undefined)
-      || (isOverriding ? borderColor : (formConfig.inputBorder || palette.border));
+      || (formConfig.inputBorder || palette.border);
     const inputText = heroTheme.formText
       || (formModeOverridden ? formFallbacks.textPrimary : undefined)
-      || (isOverriding ? textPrimary : (formConfig.inputText || palette.text.primary));
+      || (formConfig.inputText || palette.text.primary);
     const inputFocusBorder = heroTheme.formAccent
       || (formModeOverridden ? formPalette.primary[500] : undefined)
       || (formConfig.inputFocusBorder || palette.primary[500]);
     const labelColor = heroTheme.formTextSecondary
       || (formModeOverridden ? formFallbacks.textSecondary : undefined)
-      || (isOverriding ? textSecondary : (formConfig.labelColor || palette.text.secondary));
-    const defaultButtonColor = resolveButtonColor(heroTheme.buttonStyle, globalConfig.brand, palette.primary[500]);
+      || (formConfig.labelColor || palette.text.secondary);
+    const defaultButtonColor = resolveButtonColor(heroTheme.buttonStyle, globalConfig.brand, palette.primary[500], effectiveMode as 'dark' | 'light');
     const buttonBg = heroTheme.formAccent || formConfig.buttonBg || defaultButtonColor;
     const buttonHoverBg = lighten(buttonBg, 15);
 
@@ -368,7 +353,6 @@ export default function Hero() {
     const bgImageOverlayColor = heroTheme.bgImageOverlayColor || overlayColor;
 
     return {
-      isOverriding,
       isLightMode,
       isFormLightMode: formMode === 'light',
       hasBgImage,
@@ -514,7 +498,7 @@ export default function Hero() {
         style={{
           opacity: themeStyles.hasBgImage
             ? (1 - themeStyles.bgImageOpacity)
-            : (heroTheme.bgPrimary ? 0.88 : (themeStyles.isLightMode ? 0.92 : 0.85)),
+            : (themeStyles.isLightMode ? 0.92 : 0.85),
           background: themeStyles.hasBgImage
             ? themeStyles.bgImageOverlayColor
             : `linear-gradient(to right, ${themeStyles.overlayColor} 0%, ${themeStyles.overlayColor} 50%, transparent 100%)`
@@ -522,7 +506,7 @@ export default function Hero() {
       />
 
       {/* Accent Gradient */}
-      <div className="absolute top-0 right-0 w-1/2 h-full" style={{ background: `linear-gradient(to left, ${themeStyles.accentColor}10, transparent)` }} />
+      <div className="absolute inset-0" style={{ background: `linear-gradient(to left, ${themeStyles.accentColor}10, transparent 60%)` }} />
 
       {/* Decorative Shapes */}
       <div className="absolute top-40 left-10 w-72 h-72 rounded-full blur-3xl" style={{ backgroundColor: `${themeStyles.accentColor}1a` }} />
@@ -545,12 +529,12 @@ export default function Hero() {
 
             {/* Heading */}
             <h1 className="font-[var(--font-display)] text-4xl sm:text-5xl lg:text-6xl font-bold section-text-primary leading-[1.1] mb-6">
-              {renderHeadlineStyled(content.headline, { color: themeStyles.accentColor })}
+              {renderColoredText(content.headline)}
             </h1>
 
             {/* Subheadline */}
             <p className="text-lg mb-6" style={{ color: themeStyles.textSecondary }}>
-              {content.subheadline}
+              {renderColoredText(content.subheadline)}
             </p>
 
             {/* Mobile: Infinite scrolling marquee (benefits + trust badges) */}
@@ -649,9 +633,7 @@ export default function Hero() {
                   borderColor: themeStyles.formBorderColor,
                   '--section-text-primary': themeStyles.formTextPrimary,
                   '--section-text-secondary': themeStyles.formTextSecondary,
-                  boxShadow: heroTheme.bgPrimary
-                    ? '0 25px 50px -12px rgba(0, 0, 0, 0.35)'
-                    : (themeStyles.isFormLightMode ? '0 25px 50px -12px rgba(0, 0, 0, 0.15)' : '0 25px 50px -12px rgba(0, 0, 0, 0.5)')
+                  boxShadow: themeStyles.isFormLightMode ? '0 25px 50px -12px rgba(0, 0, 0, 0.15)' : '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
                 } as React.CSSProperties}
               >
                 {/* Form Header */}
@@ -817,7 +799,7 @@ export default function Hero() {
                     </button>
 
                     {/* Privacy Note */}
-                    <p className="text-center text-xs text-gray-500">
+                    <p className="text-center text-xs opacity-60" style={{ color: themeStyles.formTextSecondary }}>
                       By submitting, you agree to our{' '}
                       <a href={settings.privacy_policy_url} className="hover:underline" style={{ color: themeStyles.formAccentColor }}>
                         Privacy Policy

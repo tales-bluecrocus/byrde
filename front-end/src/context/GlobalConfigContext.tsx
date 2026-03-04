@@ -12,22 +12,14 @@ export interface TrustBadge {
   sublabel?: string;
 }
 
-// Brand color configuration (per-mode primary, accent, bg, text + optional overrides)
+// Brand color configuration (per-mode primary + accent + text)
 export interface BrandColors {
   darkPrimary: string;
   darkAccent: string;
-  darkBg: string;
   darkText: string;
-  darkTextSecondary?: string;   // Override auto-derived text.secondary
-  darkBgSecondary?: string;     // Override auto-derived background.secondary
-  darkBorder?: string;          // Override auto-derived border
   lightPrimary: string;
   lightAccent: string;
-  lightBg: string;
   lightText: string;
-  lightTextSecondary?: string;
-  lightBgSecondary?: string;
-  lightBorder?: string;
   mode: ColorMode;
   // Per-page override: null = inherit site default, 'dark'/'light' = explicit override
   modeOverride?: 'dark' | 'light' | null;
@@ -107,11 +99,9 @@ const DEFAULT_GLOBAL_CONFIG: GlobalConfig = {
   brand: {
     darkPrimary: '#3ab342',
     darkAccent: '#f97316',
-    darkBg: '#171717',
     darkText: '#efefef',
     lightPrimary: '#3ab342',
     lightAccent: '#f97316',
-    lightBg: '#ffffff',
     lightText: '#2a2a2a',
     mode: 'dark',
     modeOverride: null,
@@ -184,18 +174,10 @@ function loadConfig(): GlobalConfig {
     base.brand = {
       darkPrimary: s.brand_dark_primary || base.brand.darkPrimary,
       darkAccent: s.brand_dark_accent || base.brand.darkAccent,
-      darkBg: s.brand_dark_bg || base.brand.darkBg,
       darkText: s.brand_dark_text || base.brand.darkText,
-      darkTextSecondary: s.brand_dark_text_secondary || undefined,
-      darkBgSecondary: s.brand_dark_bg_secondary || undefined,
-      darkBorder: s.brand_dark_border || undefined,
       lightPrimary: s.brand_light_primary || base.brand.lightPrimary,
       lightAccent: s.brand_light_accent || base.brand.lightAccent,
-      lightBg: s.brand_light_bg || base.brand.lightBg,
       lightText: s.brand_light_text || base.brand.lightText,
-      lightTextSecondary: s.brand_light_text_secondary || undefined,
-      lightBgSecondary: s.brand_light_bg_secondary || undefined,
-      lightBorder: s.brand_light_border || undefined,
       mode: effectiveMode,
       modeOverride,
     };
@@ -212,7 +194,7 @@ const GlobalConfigContext = createContext<GlobalConfigContextType | undefined>(u
 export function GlobalConfigProvider({ children }: { children: ReactNode }) {
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(loadConfig);
 
-  // Generate the brand palette directly from brand colors
+  // Generate the brand palette from the active mode's color pair
   const palette = useMemo(() => {
     const b = globalConfig.brand;
     const isDark = b.mode === 'dark';
@@ -220,13 +202,7 @@ export function GlobalConfigProvider({ children }: { children: ReactNode }) {
       isDark ? b.darkPrimary : b.lightPrimary,
       isDark ? b.darkAccent : b.lightAccent,
       b.mode,
-      isDark ? b.darkBg : b.lightBg,
       isDark ? b.darkText : b.lightText,
-      {
-        textSecondary: isDark ? b.darkTextSecondary : b.lightTextSecondary,
-        bgSecondary: isDark ? b.darkBgSecondary : b.lightBgSecondary,
-        border: isDark ? b.darkBorder : b.lightBorder,
-      },
     );
   }, [globalConfig.brand]);
 

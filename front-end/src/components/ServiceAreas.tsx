@@ -1,6 +1,6 @@
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent } from '../context/ContentContext';
-import { renderHeadline, renderHeadlineStyled } from '../utils/renderHeadline';
+import { renderColoredText } from '../utils/renderHeadline';
 
 const MapPinIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,25 +36,14 @@ export default function ServiceAreas() {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <span
-            className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4"
-            style={theme.saBadgeColor ? { color: theme.saBadgeColor } : undefined}
-          >
+          <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">
             {content.badgeText}
           </span>
-          <h2
-            className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6"
-            style={theme.saHeadlineColor ? { color: theme.saHeadlineColor } : undefined}
-          >
-            {theme.saHeadlineAccent
-              ? renderHeadlineStyled(content.headline, { color: theme.saHeadlineAccent })
-              : renderHeadline(content.headline, 'section-text-accent')}
+          <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6">
+            {renderColoredText(content.headline)}
           </h2>
-          <p
-            className="section-text-secondary text-lg max-w-2xl mx-auto"
-            style={theme.saSubheadlineColor ? { color: theme.saSubheadlineColor } : undefined}
-          >
-            {content.subheadline}
+          <p className="section-text-secondary text-lg max-w-2xl mx-auto">
+            {renderColoredText(content.subheadline)}
           </p>
         </div>
 
@@ -72,24 +61,27 @@ export default function ServiceAreas() {
 
               {/* Center Icon */}
               <div className="relative z-10 flex items-center justify-center py-20">
-                <div className="w-32 h-32 bg-gradient-to-br from-primary-500 to-primary-400 rounded-full flex items-center justify-center shadow-2xl shadow-primary-500/30 animate-pulse">
-                  <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div
+                  className="w-32 h-32 rounded-full flex items-center justify-center shadow-2xl animate-pulse"
+                  style={{ backgroundColor: 'var(--section-button-bg)', color: 'var(--section-button-text)' }}
+                >
+                  <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
 
               {/* Floating Location Pins */}
-              <div className="absolute top-8 left-8 w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white shadow-lg animate-bounce" style={{ animationDelay: '0.1s' }}>
+              <div className="absolute top-8 left-8 w-10 h-10 rounded-full flex items-center justify-center shadow-lg animate-bounce" style={{ animationDelay: '0.1s', backgroundColor: 'var(--section-button-bg)', color: 'var(--section-button-text)' }}>
                 <MapPinIcon />
               </div>
               <div className="absolute top-16 right-12 w-10 h-10 section-bg-secondary rounded-full flex items-center justify-center section-text-primary shadow-lg animate-bounce" style={{ animationDelay: '0.3s' }}>
                 <MapPinIcon />
               </div>
-              <div className="absolute bottom-16 left-16 w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-lg animate-bounce" style={{ animationDelay: '0.5s' }}>
+              <div className="absolute bottom-16 left-16 w-10 h-10 rounded-full flex items-center justify-center shadow-lg animate-bounce" style={{ animationDelay: '0.5s', backgroundColor: 'var(--section-button-bg)', color: 'var(--section-button-text)' }}>
                 <MapPinIcon />
               </div>
-              <div className="absolute bottom-8 right-8 w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white shadow-lg animate-bounce" style={{ animationDelay: '0.7s' }}>
+              <div className="absolute bottom-8 right-8 w-10 h-10 rounded-full flex items-center justify-center shadow-lg animate-bounce" style={{ animationDelay: '0.7s', backgroundColor: 'var(--section-button-bg)', color: 'var(--section-button-text)' }}>
                 <MapPinIcon />
               </div>
             </div>
@@ -106,18 +98,17 @@ export default function ServiceAreas() {
                   key={area.id}
                   className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full font-medium ${
                     area.highlighted
-                      ? 'bg-gradient-to-r from-primary-500 to-primary-400 text-white shadow-lg shadow-primary-500/20'
-                      : `${theme.saTagBg ? '' : 'section-bg-secondary'} ${theme.saTagText ? '' : 'section-text-secondary'} ${theme.saTagBorder ? '' : 'section-border'} border shadow-sm`
+                      ? 'shadow-lg'
+                      : 'section-bg-secondary section-text-secondary section-border border shadow-sm'
                   }`}
-                  style={!area.highlighted ? {
-                    ...(theme.saTagBg ? { backgroundColor: theme.saTagBg } : {}),
-                    ...(theme.saTagText ? { color: theme.saTagText } : {}),
-                    ...(theme.saTagBorder ? { borderColor: theme.saTagBorder } : {}),
+                  style={area.highlighted ? {
+                    backgroundColor: 'var(--section-button-bg)',
+                    color: 'var(--section-button-text)',
                   } : undefined}
                 >
                   <MapPinIcon />
                   <span>{area.name}</span>
-                  <span className={`text-xs ${area.highlighted ? 'text-white/80' : `${theme.saTagText ? '' : 'section-text-secondary'} opacity-70`}`}>
+                  <span className={`text-xs ${area.highlighted ? 'opacity-80' : 'section-text-secondary opacity-70'}`}>
                     {area.state}
                   </span>
                 </span>

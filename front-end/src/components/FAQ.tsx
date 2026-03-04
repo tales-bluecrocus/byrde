@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent } from '../context/ContentContext';
-import { renderHeadline, renderHeadlineStyled } from '../utils/renderHeadline';
+import { renderColoredText } from '../utils/renderHeadline';
 
-const ChevronIcon = ({ isOpen, color }: { isOpen: boolean; color?: string }) => (
+const ChevronIcon = ({ isOpen }: { isOpen: boolean }) => (
   <svg
-    className={`w-5 h-5 ${color ? '' : 'text-primary-500'} transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+    className={`w-5 h-5 text-primary-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
-    style={color ? { color } : undefined}
   >
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
   </svg>
@@ -37,25 +36,14 @@ export default function FAQ() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           {/* Left Content */}
           <div className="lg:sticky lg:top-32">
-            <span
-              className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4"
-              style={theme.faqBadgeColor ? { color: theme.faqBadgeColor } : undefined}
-            >
+            <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">
               {content.badgeText}
             </span>
-            <h2
-              className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6"
-              style={theme.faqHeadlineColor ? { color: theme.faqHeadlineColor } : undefined}
-            >
-              {theme.faqHeadlineAccent
-                ? renderHeadlineStyled(content.headline, { color: theme.faqHeadlineAccent })
-                : renderHeadline(content.headline, 'section-text-accent')}
+            <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6">
+              {renderColoredText(content.headline)}
             </h2>
-            <p
-              className="section-text-secondary text-lg mb-8"
-              style={theme.faqSubheadlineColor ? { color: theme.faqSubheadlineColor } : undefined}
-            >
-              {content.subheadline}
+            <p className="section-text-secondary text-lg mb-8">
+              {renderColoredText(content.subheadline)}
             </p>
 
             {/* Contact Card */}
@@ -85,28 +73,21 @@ export default function FAQ() {
             {content.faqs.map((faq, index) => (
               <div
                 key={faq.id}
-                className={`${theme.faqItemBg ? '' : 'section-bg-secondary'} rounded-xl border transition-all duration-300 ${
+                className={`section-bg-secondary rounded-xl border transition-all duration-300 ${
                   openIndex === index
-                    ? `${theme.faqItemBorder ? '' : 'border-primary-500/30'} shadow-lg shadow-primary-500/5`
-                    : `${theme.faqItemBorder ? '' : 'section-border'} shadow-sm hover:border-opacity-70`
+                    ? 'border-primary-500/30 shadow-lg shadow-primary-500/5'
+                    : 'section-border shadow-sm hover:border-opacity-70'
                 }`}
-                style={{
-                  ...(theme.faqItemBg ? { backgroundColor: theme.faqItemBg } : {}),
-                  ...(theme.faqItemBorder ? { borderColor: theme.faqItemBorder } : {}),
-                }}
               >
                 <button
                   onClick={() => toggleFAQ(index)}
                   className="w-full flex items-center justify-between p-6 text-left cursor-pointer"
                   aria-expanded={openIndex === index}
                 >
-                  <span
-                    className="font-semibold section-text-primary pr-4"
-                    style={theme.faqQuestionColor ? { color: theme.faqQuestionColor } : undefined}
-                  >
+                  <span className="font-semibold section-text-primary pr-4">
                     {faq.question}
                   </span>
-                  <ChevronIcon isOpen={openIndex === index} color={theme.faqIconColor} />
+                  <ChevronIcon isOpen={openIndex === index} />
                 </button>
 
                 <div
@@ -117,7 +98,6 @@ export default function FAQ() {
                   <div className="px-6 pb-6 pt-0">
                     <p
                       className="section-text-secondary leading-relaxed [&_a]:text-primary-500 [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-80"
-                      style={theme.faqAnswerColor ? { color: theme.faqAnswerColor } : undefined}
                       dangerouslySetInnerHTML={{ __html: faq.answer }}
                     />
                   </div>

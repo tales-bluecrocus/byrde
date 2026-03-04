@@ -5,7 +5,8 @@ import { useGlobalConfig } from "../context/GlobalConfigContext";
 import { useSectionTheme } from "../context/SectionThemeContext";
 import { useSettings } from "../hooks/useSettings";
 import GoogleReviewBadge from "./GoogleReviewBadge";
-import { getContrastColor, withAlpha } from "../utils/colorUtils";
+import { getContrastColor, withAlpha, generateBrandPalette } from "../utils/colorUtils";
+import { getColorsForMode } from "../hooks/useSectionPalette";
 import { trackPhoneClick, trackEmailClick } from "../lib/analytics";
 
 const PhoneIcon = () => (
@@ -98,17 +99,78 @@ const TOPBAR_ICON_MAP: Record<string, React.ComponentType<{ className?: string }
 
 function Topbar() {
 	const { topbarConfig, headerConfig } = useHeaderConfig();
-	const { palette } = useGlobalConfig();
+	const { palette, globalConfig } = useGlobalConfig();
 	const { sectionThemes } = useSectionTheme();
 	const settings = useSettings();
-	const topheaderTheme = sectionThemes['topheader'] || {};
 
 	if (!headerConfig.showTopbar) return null;
 
-	// Check if using override colors or global primary
-	const isOverriding = topheaderTheme.overrideGlobalColors ?? false;
-	const bgColor = isOverriding ? (topheaderTheme.bgPrimary || palette.primary[500]) : palette.primary[500];
-	const textColor = isOverriding ? (topheaderTheme.textPrimary || getContrastColor(bgColor)) : getContrastColor(palette.primary[500]);
+	const topTheme = sectionThemes['topheader'] || {};
+
+	// Generate custom palette when topheader has its own mode override
+	const sectionMode = topTheme.paletteMode;
+	const effectivePalette = (() => {
+		if (!sectionMode || sectionMode === globalConfig.brand.mode) return palette;
+		const colors = getColorsForMode(globalConfig.brand, sectionMode);
+		return generateBrandPalette(colors.primary, colors.accent, sectionMode, colors.text);
+	})();
+
+	const bgColor = topTheme.bgColor || effectivePalette.background.secondary;
+	const textColor = effectivePalette.text.primary;
+	const accentColor = topTheme.accentSource === 'accent'
+		? effectivePalette.accent[500]
+		: effectivePalette.primary[500];
+
+	// Padding
+	const TOPBAR_PADDING: Record<string, string> = {
+		sm: '0.25rem',
+		md: '0.5rem',
+		lg: '0.75rem',
+		xl: '1rem',
+	};
+	const topPadding = TOPBAR_PADDING[topTheme.padding || 'md'] || '0.5rem';
+
+	// Gradient overlay
+	const hasGradient = !!topTheme.gradientEnabled;
+	const topGradientStyle = hasGradient ? (() => {
+		const type = topTheme.gradientType || 'linear';
+		const color1 = topTheme.gradientColor1 || bgColor;
+		const color2 = topTheme.gradientColor2 || 'transparent';
+		const loc1 = topTheme.gradientLocation1 ?? 0;
+		const loc2 = topTheme.gradientLocation2 ?? 100;
+		const angle = topTheme.gradientAngle ?? 180;
+		const position = topTheme.gradientPosition || 'center';
+		const gradient = type === 'radial'
+			? `radial-gradient(circle at ${position}, ${color1} ${loc1}%, ${color2} ${loc2}%)`
+			: `linear-gradient(${angle}deg, ${color1} ${loc1}%, ${color2} ${loc2}%)`;
+		return {
+			position: 'absolute' as const,
+			inset: 0,
+			background: gradient,
+			pointerEvents: 'none' as const,
+			zIndex: 0,
+		};
+	})() : null;
+
+	// Background image
+	const hasBgImage = !!topTheme.bgImage;
+	const bgImageStyle = hasBgImage ? {
+		position: 'absolute' as const,
+		inset: 0,
+		backgroundImage: `url(${topTheme.bgImage})`,
+		backgroundPosition: topTheme.bgImagePosition || 'center',
+		backgroundSize: topTheme.bgImageSize || 'cover',
+		backgroundRepeat: 'no-repeat' as const,
+		opacity: topTheme.bgImageOpacity ?? 1,
+		zIndex: 0,
+	} : null;
+
+	const bgOverlayStyle = hasBgImage && topTheme.bgImageOverlayColor ? {
+		position: 'absolute' as const,
+		inset: 0,
+		backgroundColor: topTheme.bgImageOverlayColor,
+		zIndex: 0,
+	} : null;
 
 	// Get the icon component
 	const IconComponent = TOPBAR_ICON_MAP[topbarConfig.icon];
@@ -136,7 +198,7 @@ function Topbar() {
 
 	// Render the message with icon
 	const renderMessage = () => {
-		const icon = IconComponent ? <IconComponent className="w-4 h-4 flex-shrink-0" /> : null;
+		const icon = IconComponent ? <span style={{ color: accentColor }}><IconComponent className="w-4 h-4 flex-shrink-0" /></span> : null;
 		const text = <span>{topbarConfig.message}</span>;
 
 		if (!icon) return text;
@@ -155,13 +217,21 @@ function Topbar() {
 	return (
 		<div
 			id="topheader-section"
-			className="py-2 text-sm"
+			className="relative overflow-hidden text-sm"
 			style={{
 				backgroundColor: bgColor,
-				color: textColor
+				color: textColor,
+				paddingTop: topPadding,
+				paddingBottom: topPadding,
 			}}
 		>
-			<div className="max-w-7xl mx-auto px-6 lg:px-8">
+			{/* Background image layers */}
+			{hasBgImage && <div style={bgImageStyle!} aria-hidden="true" />}
+			{bgOverlayStyle && <div style={bgOverlayStyle} aria-hidden="true" />}
+			{/* Gradient overlay */}
+			{hasGradient && <div style={topGradientStyle!} aria-hidden="true" />}
+
+			<div className="max-w-7xl mx-auto px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
 				<div className={`flex items-center ${getJustifyClass()}`}>
 					{/* Message - hidden on mobile if we have contact info */}
 					<span className={hasContactInfo ? "hidden sm:inline-flex" : "inline-flex"}>
@@ -177,7 +247,7 @@ function Topbar() {
 									className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
 									onClick={() => trackPhoneClick('topbar')}
 								>
-									<TopbarPhoneIcon className="w-4 h-4" />
+									<span style={{ color: accentColor }}><TopbarPhoneIcon className="w-4 h-4" /></span>
 									<span className="text-xs sm:text-sm">{settings.phone}</span>
 								</a>
 							)}
@@ -188,7 +258,7 @@ function Topbar() {
 									aria-label={`Email ${settings.email}`}
 									onClick={() => trackEmailClick('topbar')}
 								>
-									<EmailIcon />
+									<span style={{ color: accentColor }}><EmailIcon /></span>
 									<span className="hidden sm:inline text-xs sm:text-sm">{settings.email}</span>
 								</a>
 							)}
@@ -213,10 +283,10 @@ export default function Header() {
 	const logo = settings.logo;
 	const logoAlt = settings.logo_alt;
 
-	// Use header palette colors if overriding, otherwise fall back to global
-	const isOverriding = headerTheme.overrideGlobalColors ?? false;
-	const bgColor = isOverriding ? (headerTheme.bgPrimary || palette.background.primary) : palette.background.primary;
-	const textPrimary = isOverriding ? (headerTheme.textPrimary || palette.text.primary) : palette.text.primary;
+	// Use custom bgColor if set, otherwise global palette
+	const customBg = headerTheme.bgColor;
+	const bgColor = customBg || palette.background.primary;
+	const textPrimary = palette.text.primary;
 	// Measure header height via ResizeObserver (avoids forced reflow from offsetHeight)
 	useEffect(() => {
 		const el = headerRef.current;
@@ -255,6 +325,12 @@ export default function Header() {
 			default: return '0.75rem';
 		}
 	};
+
+	// Button color: primary (default) or accent based on buttonStyle
+	const buttonBg = headerTheme.buttonStyle === 2 ? palette.accent[500] : palette.primary[500];
+	const buttonText = headerTheme.buttonStyle === 2
+		? getContrastColor(palette.accent[500])
+		: getContrastColor(palette.primary[500]);
 
 	// Header padding from section theme (same system as other sections)
 	const HEADER_PADDING: Record<string, string> = {
@@ -309,19 +385,23 @@ export default function Header() {
 				<header
 					id="header-section"
 					className={`relative overflow-hidden ${
-						shouldBeFixed
+						shouldBeFixed && !customBg
 							? "backdrop-blur-md shadow-lg shadow-black/20"
-							: ""
+							: shouldBeFixed
+								? "shadow-lg shadow-black/20"
+								: ""
 					}`}
 					style={{
-						backgroundColor: shouldBeFixed ? withAlpha(bgColor, 0.95) : (isOverriding ? bgColor : 'transparent'),
+						backgroundColor: shouldBeFixed
+							? (customBg || withAlpha(bgColor, 0.95))
+							: (customBg || 'transparent'),
 						color: textPrimary,
 						paddingTop: headerPadding,
 						paddingBottom: headerPadding,
 					}}
 				>
 					{/* Gradient overlay */}
-					{hasGradient && !shouldBeFixed && <div style={headerGradientStyle!} aria-hidden="true" />}
+					{hasGradient && <div style={headerGradientStyle!} aria-hidden="true" />}
 					<div className="max-w-7xl mx-auto px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
 						<div className="flex items-center justify-between">
 							{/* Logo */}
@@ -361,7 +441,12 @@ export default function Header() {
 								{headerConfig.showPhone && (
 									<a
 										href={`tel:${settings.phone_raw}`}
-										className="hidden sm:inline-flex btn-themed group relative items-center gap-2 px-6 py-3 rounded-full font-semibold text-base shadow-lg shadow-black/25"
+										className="hidden sm:inline-flex btn-section group relative items-center gap-2 px-6 py-3 font-semibold text-base"
+										style={{
+											backgroundColor: buttonBg,
+											color: buttonText,
+											borderRadius: `var(--color-button-radius, 12px)`,
+										}}
 										onClick={() => trackPhoneClick('header_cta')}
 									>
 										<PhoneIcon />

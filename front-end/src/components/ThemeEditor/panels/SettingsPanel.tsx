@@ -1,5 +1,5 @@
 /**
- * Settings Panel - Section visibility, background settings, and header/topbar config
+ * Settings Panel - Section visibility, background settings, padding, gradient overlay
  */
 
 import { useState, useCallback } from 'react';
@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {
   Select,
   SelectContent,
@@ -18,8 +19,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ColorPicker } from '@/components/ui/color-picker';
-import { useSectionTheme, type SectionId, SECTION_LABELS } from '../../../context/SectionThemeContext';
+import { useSectionTheme, type SectionId, type SectionTheme, SECTION_LABELS } from '../../../context/SectionThemeContext';
 import { useHeaderConfig, type BadgeTheme } from '../../../context/HeaderConfigContext';
+import { useGlobalConfig } from '../../../context/GlobalConfigContext';
 import { useToast } from '../../Toast';
 import { Eye, EyeOff, Image, Upload, Trash2, Settings2 } from 'lucide-react';
 
@@ -44,6 +46,7 @@ const BG_SIZE_OPTIONS = [
 export function SettingsPanel({ sectionId }: SettingsPanelProps) {
   const { sectionThemes, updateSectionTheme, isSectionVisible, setSectionVisibility } = useSectionTheme();
   const { headerConfig, updateHeaderConfig, updateHeaderStyle } = useHeaderConfig();
+  const { palette } = useGlobalConfig();
   const { toast } = useToast();
   const [imageUrl, setImageUrl] = useState('');
 
@@ -108,6 +111,246 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
       handleToggleVisibility(v);
     }
   };
+
+  // ── Padding ──
+  const paddingValue = theme.padding || 'md';
+  const paddingToggle = (
+    <div>
+      <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+        Padding
+      </Label>
+      <ToggleGroup
+        type="single"
+        value={paddingValue}
+        onValueChange={(val) => {
+          if (!val) return;
+          updateSectionTheme(sectionId, { padding: val as SectionTheme['padding'] });
+        }}
+        className="w-full bg-zinc-800 p-1 rounded-lg mt-2"
+      >
+        <ToggleGroupItem value="sm" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          Small
+        </ToggleGroupItem>
+        <ToggleGroupItem value="md" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          Medium
+        </ToggleGroupItem>
+        <ToggleGroupItem value="lg" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          Large
+        </ToggleGroupItem>
+        <ToggleGroupItem value="xl" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+          XL
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </div>
+  );
+
+  // ── Background Color ──
+  const bgColorEnabled = !!theme.bgColor;
+  const bgColorControl = (
+    <div>
+      <div className="flex items-center justify-between">
+        <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+          Background Color
+        </Label>
+        <Switch
+          checked={bgColorEnabled}
+          onCheckedChange={(enabled) => {
+            if (enabled) {
+              updateSectionTheme(sectionId, { bgColor: palette.background.primary });
+            } else {
+              updateSectionTheme(sectionId, { bgColor: undefined });
+            }
+          }}
+        />
+      </div>
+      {bgColorEnabled && (
+        <div className="mt-2">
+          <ColorPicker
+            value={theme.bgColor || palette.background.primary}
+            onChange={(val) => updateSectionTheme(sectionId, { bgColor: val })}
+          />
+          <p className="text-[10px] mt-1.5 text-zinc-500">
+            Overrides the mode background
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  // ── Gradient Overlay ──
+  const gradientEnabled = theme.gradientEnabled ?? false;
+  const gradientType = theme.gradientType || 'linear';
+  const gradientAngle = theme.gradientAngle ?? 180;
+  const gradientLocation1 = theme.gradientLocation1 ?? 0;
+  const gradientLocation2 = theme.gradientLocation2 ?? 100;
+  const gradientPosition = theme.gradientPosition || 'center';
+  const effectiveBg = palette.background.primary;
+  const gradientColor1 = theme.gradientColor1 || effectiveBg;
+  const gradientColor2 = theme.gradientColor2 || 'transparent';
+
+  const previewGradient = gradientType === 'radial'
+    ? `radial-gradient(circle at ${gradientPosition}, ${gradientColor1} ${gradientLocation1}%, ${gradientColor2} ${gradientLocation2}%)`
+    : `linear-gradient(${gradientAngle}deg, ${gradientColor1} ${gradientLocation1}%, ${gradientColor2} ${gradientLocation2}%)`;
+
+  const handleGradientToggle = (enabled: boolean) => {
+    if (enabled) {
+      updateSectionTheme(sectionId, {
+        gradientEnabled: true,
+        gradientColor1: effectiveBg,
+        gradientColor2: theme.gradientColor2 || 'transparent',
+        gradientType: theme.gradientType || 'linear',
+        gradientAngle: theme.gradientAngle ?? 180,
+        gradientPosition: theme.gradientPosition || 'center',
+      });
+    } else {
+      updateSectionTheme(sectionId, { gradientEnabled: false });
+    }
+  };
+
+  const gradientOverlay = (
+    <div>
+      <div className="flex items-center justify-between">
+        <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+          Gradient Overlay
+        </Label>
+        <Switch
+          checked={gradientEnabled}
+          onCheckedChange={handleGradientToggle}
+        />
+      </div>
+
+      {gradientEnabled && (
+        <div className="mt-3 space-y-4">
+          {/* Live preview */}
+          <div
+            className="h-10 rounded-lg border border-zinc-700"
+            style={{ background: previewGradient }}
+          />
+
+          {/* Type toggle */}
+          <div>
+            <Label className="text-[11px] text-zinc-500">Type</Label>
+            <ToggleGroup
+              type="single"
+              value={gradientType}
+              onValueChange={(val) => {
+                if (!val) return;
+                updateSectionTheme(sectionId, { gradientType: val as 'linear' | 'radial' });
+              }}
+              className="w-full bg-zinc-800 p-1 rounded-lg mt-1"
+            >
+              <ToggleGroupItem value="linear" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+                Linear
+              </ToggleGroupItem>
+              <ToggleGroupItem value="radial" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+                Radial
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+
+          {/* Color 1 */}
+          <div>
+            <Label className="text-[11px] text-zinc-500">Color</Label>
+            <div className="mt-1">
+              <ColorPicker
+                value={gradientColor1}
+                onChange={(val) => updateSectionTheme(sectionId, { gradientColor1: val })}
+              />
+            </div>
+            <div className="mt-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-[11px] text-zinc-500">Location</Label>
+                <span className="text-[11px] text-zinc-500">{gradientLocation1}%</span>
+              </div>
+              <Slider
+                min={0}
+                max={100}
+                step={1}
+                value={[gradientLocation1]}
+                onValueChange={([val]) => updateSectionTheme(sectionId, { gradientLocation1: val })}
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          {/* Color 2 */}
+          <div>
+            <Label className="text-[11px] text-zinc-500">Second Color</Label>
+            <div className="mt-1">
+              <ColorPicker
+                value={gradientColor2}
+                onChange={(val) => updateSectionTheme(sectionId, { gradientColor2: val })}
+              />
+            </div>
+            <div className="mt-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-[11px] text-zinc-500">Location</Label>
+                <span className="text-[11px] text-zinc-500">{gradientLocation2}%</span>
+              </div>
+              <Slider
+                min={0}
+                max={100}
+                step={1}
+                value={[gradientLocation2]}
+                onValueChange={([val]) => updateSectionTheme(sectionId, { gradientLocation2: val })}
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          {/* Angle slider (linear only) */}
+          {gradientType === 'linear' && (
+            <div>
+              <div className="flex items-center justify-between">
+                <Label className="text-[11px] text-zinc-500">Angle</Label>
+                <span className="text-[11px] text-zinc-500">{gradientAngle}°</span>
+              </div>
+              <Slider
+                min={0}
+                max={360}
+                step={1}
+                value={[gradientAngle]}
+                onValueChange={([val]) => updateSectionTheme(sectionId, { gradientAngle: val })}
+                className="mt-2"
+              />
+            </div>
+          )}
+
+          {/* Position (radial only) */}
+          {gradientType === 'radial' && (
+            <div>
+              <Label className="text-[11px] text-zinc-500">Position</Label>
+              <ToggleGroup
+                type="single"
+                value={gradientPosition}
+                onValueChange={(val) => {
+                  if (!val) return;
+                  updateSectionTheme(sectionId, { gradientPosition: val });
+                }}
+                className="w-full bg-zinc-800 p-1 rounded-lg mt-1 flex-wrap"
+              >
+                <ToggleGroupItem value="center" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+                  Center
+                </ToggleGroupItem>
+                <ToggleGroupItem value="top" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+                  Top
+                </ToggleGroupItem>
+                <ToggleGroupItem value="bottom" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+                  Bottom
+                </ToggleGroupItem>
+                <ToggleGroupItem value="left" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+                  Left
+                </ToggleGroupItem>
+                <ToggleGroupItem value="right" className="flex-1 text-[11px] text-zinc-400 data-[state=on]:bg-zinc-700 data-[state=on]:text-zinc-100">
+                  Right
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="space-y-5 text-zinc-200">
@@ -200,17 +443,18 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
 
       <Separator className="bg-zinc-800/60" />
 
+      {/* Padding + Background section */}
+      {paddingToggle}
+      {bgColorControl}
+
       {/* Background Image */}
       <div>
         <Label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
           Background Image
         </Label>
-        <p className="text-xs mb-3 text-zinc-400">
-          Add an optional background image to this section
-        </p>
 
         {hasBgImage ? (
-          <div className="space-y-4">
+          <div className="space-y-4 mt-2">
             {/* Image Preview */}
             <Card className="overflow-hidden border-zinc-800">
               <div
@@ -304,7 +548,7 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
             </div>
           </div>
         ) : (
-          <Card className="bg-zinc-800/50 border-zinc-800">
+          <Card className="bg-zinc-800/50 border-zinc-800 mt-2">
             <CardContent className="p-4 space-y-4">
               <div className="flex flex-col items-center py-4">
                 <div className="h-10 w-10 rounded-md flex items-center justify-center mb-3 bg-zinc-800">
@@ -337,6 +581,8 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
         )}
       </div>
 
+      {gradientOverlay}
+
       <Separator className="bg-zinc-800/60" />
 
       {/* Section Info */}
@@ -358,8 +604,8 @@ export function SettingsPanel({ sectionId }: SettingsPanelProps) {
               <span className="text-zinc-300">{sectionLabel}</span>
             </div>
             <div className="flex justify-between">
-              <span>Has Custom Colors:</span>
-              <span className="text-zinc-300">{theme.overrideGlobalColors ? 'Yes' : 'No'}</span>
+              <span>Custom Mode:</span>
+              <span className="text-zinc-300">{theme.paletteMode ? theme.paletteMode : 'Default'}</span>
             </div>
             <div className="flex justify-between">
               <span>Has Background Image:</span>

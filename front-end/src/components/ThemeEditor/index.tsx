@@ -211,29 +211,20 @@ function flatToNestedSettings(flat: ThemeSettings) {
     brand_colors: {
       dark_primary: flat.brand_dark_primary,
       dark_accent: flat.brand_dark_accent,
-      dark_bg: flat.brand_dark_bg,
       dark_text: flat.brand_dark_text,
-      dark_text_secondary: flat.brand_dark_text_secondary,
-      dark_bg_secondary: flat.brand_dark_bg_secondary,
-      dark_border: flat.brand_dark_border,
       light_primary: flat.brand_light_primary,
       light_accent: flat.brand_light_accent,
-      light_bg: flat.brand_light_bg,
       light_text: flat.brand_light_text,
-      light_text_secondary: flat.brand_light_text_secondary,
-      light_bg_secondary: flat.brand_light_bg_secondary,
-      light_border: flat.brand_light_border,
       mode: flat.brand_mode,
     },
     button_style: {
-      dark_bg: flat.button_dark_bg,
-      dark_text: flat.button_dark_text,
-      dark_border_color: flat.button_dark_border_color,
-      light_bg: flat.button_light_bg,
-      light_text: flat.button_light_text,
-      light_border_color: flat.button_light_border_color,
       border_width: flat.button_border_width,
       border_radius: flat.button_border_radius,
+      dark_text_color: flat.button_dark_text_color,
+      dark_accent_text_color: flat.button_dark_accent_text_color,
+      light_text_color: flat.button_light_text_color,
+      light_accent_text_color: flat.button_light_accent_text_color,
+      shadow: flat.button_shadow,
     },
   };
 }
@@ -250,18 +241,10 @@ function BrandColorSync() {
     const updates: Partial<import('../../context/GlobalConfigContext').BrandColors> = {
       darkPrimary: settings.brand_dark_primary,
       darkAccent: settings.brand_dark_accent,
-      darkBg: settings.brand_dark_bg,
       darkText: settings.brand_dark_text,
-      darkTextSecondary: settings.brand_dark_text_secondary || undefined,
-      darkBgSecondary: settings.brand_dark_bg_secondary || undefined,
-      darkBorder: settings.brand_dark_border || undefined,
       lightPrimary: settings.brand_light_primary,
       lightAccent: settings.brand_light_accent,
-      lightBg: settings.brand_light_bg,
       lightText: settings.brand_light_text,
-      lightTextSecondary: settings.brand_light_text_secondary || undefined,
-      lightBgSecondary: settings.brand_light_bg_secondary || undefined,
-      lightBorder: settings.brand_light_border || undefined,
     };
     // When no per-page override, sync mode from site default
     if (!globalConfig.brand.modeOverride) {
@@ -271,18 +254,10 @@ function BrandColorSync() {
   }, [
     settings.brand_dark_primary,
     settings.brand_dark_accent,
-    settings.brand_dark_bg,
     settings.brand_dark_text,
-    settings.brand_dark_text_secondary,
-    settings.brand_dark_bg_secondary,
-    settings.brand_dark_border,
     settings.brand_light_primary,
     settings.brand_light_accent,
-    settings.brand_light_bg,
     settings.brand_light_text,
-    settings.brand_light_text_secondary,
-    settings.brand_light_bg_secondary,
-    settings.brand_light_border,
     settings.brand_mode,
     globalConfig.brand.modeOverride,
     updateBrand,
@@ -309,28 +284,18 @@ export function ThemeEditor() {
     updateSettings({
       brand_dark_primary: DEFAULT_SETTINGS.brand_dark_primary,
       brand_dark_accent: DEFAULT_SETTINGS.brand_dark_accent,
-      brand_dark_bg: DEFAULT_SETTINGS.brand_dark_bg,
       brand_dark_text: DEFAULT_SETTINGS.brand_dark_text,
-      brand_dark_text_secondary: DEFAULT_SETTINGS.brand_dark_text_secondary,
-      brand_dark_bg_secondary: DEFAULT_SETTINGS.brand_dark_bg_secondary,
-      brand_dark_border: DEFAULT_SETTINGS.brand_dark_border,
       brand_light_primary: DEFAULT_SETTINGS.brand_light_primary,
       brand_light_accent: DEFAULT_SETTINGS.brand_light_accent,
-      brand_light_bg: DEFAULT_SETTINGS.brand_light_bg,
       brand_light_text: DEFAULT_SETTINGS.brand_light_text,
-      brand_light_text_secondary: DEFAULT_SETTINGS.brand_light_text_secondary,
-      brand_light_bg_secondary: DEFAULT_SETTINGS.brand_light_bg_secondary,
-      brand_light_border: DEFAULT_SETTINGS.brand_light_border,
       brand_mode: DEFAULT_SETTINGS.brand_mode,
-      // Button style
-      button_dark_bg: DEFAULT_SETTINGS.button_dark_bg,
-      button_dark_text: DEFAULT_SETTINGS.button_dark_text,
-      button_dark_border_color: DEFAULT_SETTINGS.button_dark_border_color,
-      button_light_bg: DEFAULT_SETTINGS.button_light_bg,
-      button_light_text: DEFAULT_SETTINGS.button_light_text,
-      button_light_border_color: DEFAULT_SETTINGS.button_light_border_color,
       button_border_width: DEFAULT_SETTINGS.button_border_width,
       button_border_radius: DEFAULT_SETTINGS.button_border_radius,
+      button_dark_text_color: DEFAULT_SETTINGS.button_dark_text_color,
+      button_dark_accent_text_color: DEFAULT_SETTINGS.button_dark_accent_text_color,
+      button_light_text_color: DEFAULT_SETTINGS.button_light_text_color,
+      button_light_accent_text_color: DEFAULT_SETTINGS.button_light_accent_text_color,
+      button_shadow: DEFAULT_SETTINGS.button_shadow,
     });
   }, [updateSettings]);
 
@@ -518,7 +483,7 @@ export function ThemeEditor() {
                     key={id}
                     id={id}
                     isVisible={isSectionVisible(id)}
-                    hasOverride={!!theme?.overrideGlobalColors}
+                    hasOverride={!!theme?.paletteMode}
                     isSelected={selectedSection === id && panelOpen}
                     onSelect={() => handleSelectSection(id)}
                   />
@@ -542,7 +507,7 @@ export function ThemeEditor() {
                         key={id}
                         id={id}
                         isVisible={isSectionVisible(id)}
-                        hasOverride={!!theme?.overrideGlobalColors}
+                        hasOverride={!!theme?.paletteMode}
                         isSelected={selectedSection === id && panelOpen}
                         onSelect={() => handleSelectSection(id)}
                       />
@@ -561,7 +526,7 @@ export function ThemeEditor() {
                     key={id}
                     id={id}
                     isVisible={isSectionVisible(id)}
-                    hasOverride={!!theme?.overrideGlobalColors}
+                    hasOverride={!!theme?.paletteMode}
                     isSelected={selectedSection === id && panelOpen}
                     onSelect={() => handleSelectSection(id)}
                   />

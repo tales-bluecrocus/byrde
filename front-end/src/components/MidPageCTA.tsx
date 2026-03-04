@@ -3,7 +3,7 @@ import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useSectionPalette } from '../hooks/useSectionPalette';
 import { useContent, type FeatureItem } from '../context/ContentContext';
-import { renderHeadlineStyled } from '../utils/renderHeadline';
+import { renderColoredText } from '../utils/renderHeadline';
 import { withAlpha } from '../utils/colorUtils';
 import { trackPhoneClick } from '../lib/analytics';
 import * as LucideIcons from 'lucide-react';
@@ -29,24 +29,10 @@ export default function MidPageCTA() {
   const { getContent } = useContent();
   const content = getContent('mid-cta');
   const ctaTheme = sectionThemes['mid-cta'] || {};
-
-  // Use CTA palette colors if overriding, otherwise fall back to section palette
-  const isOverriding = ctaTheme.overrideGlobalColors ?? false;
   const hasBgImage = !!ctaTheme.bgImage;
 
-  // Section colors - section palette already reflects paletteMode
-  const bgPrimary = isOverriding
-    ? (ctaTheme.bgPrimary || palette.background.primary)
-    : palette.background.primary;
-  const accentColor = isOverriding
-    ? (ctaTheme.accent || palette.primary[500])
-    : palette.primary[500];
-  const textPrimary = isOverriding
-    ? (ctaTheme.textPrimary || palette.text.primary)
-    : palette.text.primary;
-  const textSecondary = isOverriding
-    ? (ctaTheme.textSecondary || palette.text.secondary)
-    : palette.text.secondary;
+  // Section accent: follows accentSource toggle (primary or accent brand color)
+  const accentColor = ctaTheme.accentSource === 'accent' ? palette.accent[500] : palette.primary[500];
 
   // Determine if section is light or dark
   const effectiveMode = ctaTheme.paletteMode || globalConfig.brand.mode;
@@ -54,21 +40,14 @@ export default function MidPageCTA() {
 
   // Badge colors - inverted for visibility
   const badgeBg = isLightMode ? withAlpha('#000000', 0.08) : withAlpha('#ffffff', 0.1);
-  const badgeText = textPrimary;
 
   // Divider color
   const dividerColor = isLightMode ? withAlpha('#000000', 0.15) : withAlpha('#ffffff', 0.2);
 
-  // When bgImage is set, use transparent background to let ThemedSection's image show
-  const backgroundStyle = hasBgImage
-    ? {}
-    : { backgroundColor: bgPrimary };
-
   return (
     <div
       id="mid-cta-section"
-      className="section-padding relative overflow-hidden"
-      style={backgroundStyle}
+      className={`section-padding relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}
     >
       {/* Subtle gradient overlay for depth */}
       <div
@@ -101,33 +80,24 @@ export default function MidPageCTA() {
       <div className="relative max-w-5xl mx-auto px-6 lg:px-8 text-center">
         {/* Urgency Badge */}
         <div
-          className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold mb-8 shadow-lg"
-          style={{
-            backgroundColor: badgeBg,
-            color: ctaTheme.mcBadgeColor || badgeText,
-          }}
+          className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold mb-8 shadow-lg section-text-primary"
+          style={{ backgroundColor: badgeBg }}
         >
           <span
             className="w-2 h-2 rounded-full animate-pulse"
-            style={{ backgroundColor: ctaTheme.mcHeadlineAccent || accentColor }}
+            style={{ backgroundColor: accentColor }}
           />
           <span>{content.badge}</span>
         </div>
 
         {/* Headline */}
-        <h2
-          className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
-          style={{ color: ctaTheme.mcHeadlineColor || textPrimary, fontFamily: 'var(--font-display)' }}
-        >
-          {renderHeadlineStyled(content.headline, { color: ctaTheme.mcHeadlineAccent || accentColor })}
+        <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight section-text-primary">
+          {renderColoredText(content.headline)}
         </h2>
 
         {/* Subtext */}
-        <p
-          className="text-lg sm:text-xl max-w-2xl mx-auto mb-10"
-          style={{ color: ctaTheme.mcSubheadlineColor || textSecondary }}
-        >
-          {content.subheadline}
+        <p className="section-text-secondary text-lg sm:text-xl max-w-2xl mx-auto mb-10">
+          {renderColoredText(content.subheadline)}
         </p>
 
         {/* CTA Button */}
@@ -156,10 +126,7 @@ export default function MidPageCTA() {
                     style={{ backgroundColor: dividerColor }}
                   />
                 )}
-                <div
-                  className="flex items-center gap-2 font-medium"
-                  style={{ color: textSecondary }}
-                >
+                <div className="flex items-center gap-2 font-medium section-text-secondary">
                   <FeatureIcon feature={feature} />
                   <span>{feature.text}</span>
                 </div>

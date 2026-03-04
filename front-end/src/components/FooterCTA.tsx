@@ -2,7 +2,7 @@ import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useSectionPalette } from '../hooks/useSectionPalette';
 import { useContent } from '../context/ContentContext';
-import { renderHeadlineStyled } from '../utils/renderHeadline';
+import { renderColoredText } from '../utils/renderHeadline';
 import { withAlpha } from '../utils/colorUtils';
 import { trackPhoneClick } from '../lib/analytics';
 
@@ -19,38 +19,18 @@ export default function FooterCTA() {
   const { getContent } = useContent();
   const content = getContent('footer-cta');
   const ctaTheme = sectionThemes['footer-cta'] || {};
-
-  const isOverriding = ctaTheme.overrideGlobalColors ?? false;
   const hasBgImage = !!ctaTheme.bgImage;
 
-  // Section palette already reflects paletteMode
-  const bgPrimary = isOverriding
-    ? (ctaTheme.bgPrimary || palette.background.primary)
-    : palette.background.primary;
-  const accentColor = isOverriding
-    ? (ctaTheme.accent || palette.accent[500])
-    : palette.accent[500];
-  const textPrimary = isOverriding
-    ? (ctaTheme.textPrimary || palette.text.primary)
-    : palette.text.primary;
-  const textSecondary = isOverriding
-    ? (ctaTheme.textSecondary || palette.text.secondary)
-    : palette.text.secondary;
+  // Section accent: follows accentSource toggle
+  const accentColor = ctaTheme.accentSource === 'accent' ? palette.accent[500] : palette.primary[500];
 
   const effectiveMode = ctaTheme.paletteMode || globalConfig.brand.mode;
   const isLightMode = effectiveMode === 'light';
 
   const dividerColor = isLightMode ? withAlpha('#000000', 0.1) : withAlpha('#ffffff', 0.1);
 
-  const backgroundStyle = hasBgImage
-    ? {}
-    : { backgroundColor: bgPrimary };
-
   return (
-    <div
-      className="section-padding relative overflow-hidden"
-      style={backgroundStyle}
-    >
+    <div className={`section-padding relative overflow-hidden ${hasBgImage ? '' : 'section-bg-primary'}`}>
       {/* Subtle radial accent glow */}
       <div
         className="absolute inset-0"
@@ -77,19 +57,13 @@ export default function FooterCTA() {
 
       <div className="relative max-w-4xl mx-auto px-6 lg:px-8 text-center">
         {/* Headline */}
-        <h2
-          className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
-          style={{ color: ctaTheme.fcHeadlineColor || textPrimary }}
-        >
-          {renderHeadlineStyled(content.headline, { color: ctaTheme.fcHeadlineAccent || accentColor })}
+        <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight section-text-primary">
+          {renderColoredText(content.headline)}
         </h2>
 
         {/* Subheadline */}
-        <p
-          className="text-lg sm:text-xl max-w-2xl mx-auto mb-10"
-          style={{ color: ctaTheme.fcSubheadlineColor || textSecondary }}
-        >
-          {content.subheadline}
+        <p className="section-text-secondary text-lg sm:text-xl max-w-2xl mx-auto mb-10">
+          {renderColoredText(content.subheadline)}
         </p>
 
         {/* CTA Button */}
@@ -103,10 +77,7 @@ export default function FooterCTA() {
         </a>
 
         {/* Reassurance text */}
-        <p
-          className="mt-6 text-sm font-medium"
-          style={{ color: textSecondary, opacity: 0.6 }}
-        >
+        <p className="mt-6 text-sm font-medium section-text-secondary opacity-60">
           {content.reassuranceText}
         </p>
       </div>

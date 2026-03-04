@@ -1,58 +1,72 @@
 import type { ReactNode } from 'react';
 
 /**
- * Parse a headline string where <strong>text</strong> becomes accent-colored.
- * Returns an array of React nodes with accent spans applied.
+ * Parse color tags in text: [pr]...[/pr] and [ac]...[/ac].
+ * Also supports legacy [primary]/[accent] and <strong> tags.
  *
- * Example: "Trusted By <strong>Your Neighbors</strong>"
- * → ["Trusted By ", <span className="text-primary-500">Your Neighbors</span>]
+ * Example: "Trusted By [pr]Your Neighbors[/pr]"
+ * Example: "Get [ac]50% Off[/ac] Today"
  */
-export function renderHeadline(text: string, accentClassName = 'text-primary-500'): ReactNode[] {
+export function renderColoredText(text: string): ReactNode[] {
   if (!text) return [];
-  const parts = text.split(/(<strong>.*?<\/strong>)/g);
-  return parts.map((part, i) => {
-    const match = part.match(/^<strong>(.*?)<\/strong>$/);
-    if (match) {
-      return (
-        <span key={i} className={accentClassName}>
-          {match[1]}
-        </span>
-      );
+
+  // Normalize legacy tags
+  const normalized = text
+    .replace(/<strong>/g, '[pr]')
+    .replace(/<\/strong>/g, '[/pr]')
+    .replace(/\[primary\]/g, '[pr]')
+    .replace(/\[\/primary\]/g, '[/pr]')
+    .replace(/\[accent\]/g, '[ac]')
+    .replace(/\[\/accent\]/g, '[/ac]');
+
+  const pattern = /\[(pr|ac)\](.*?)\[\/\1\]/g;
+  const result: ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(normalized)) !== null) {
+    if (match.index > lastIndex) {
+      result.push(normalized.slice(lastIndex, match.index));
     }
-    return part || null;
-  });
+
+    const colorType = match[1];
+    const innerText = match[2];
+    const color = colorType === 'ac'
+      ? 'var(--color-accent-500)'
+      : 'var(--section-text-accent)';
+
+    result.push(
+      <span key={match.index} style={{ color }}>
+        {innerText}
+      </span>
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < normalized.length) {
+    result.push(normalized.slice(lastIndex));
+  }
+
+  return result.length ? result : [text];
 }
 
 /**
- * Same as renderHeadline but applies inline style instead of className.
- * Used for sections that need CSS variable-based coloring.
+ * Legacy aliases — kept for backward compatibility.
  */
-export function renderHeadlineStyled(
+export const renderHeadline = (text: string, _accentClassName?: string): ReactNode[] =>
+  renderColoredText(text);
+
+export const renderHeadlineStyled = (
   text: string,
-  accentStyle: React.CSSProperties = { color: 'rgb(var(--color-primary-500))' },
-): ReactNode[] {
-  if (!text) return [];
-  const parts = text.split(/(<strong>.*?<\/strong>)/g);
-  return parts.map((part, i) => {
-    const match = part.match(/^<strong>(.*?)<\/strong>$/);
-    if (match) {
-      return (
-        <span key={i} style={accentStyle}>
-          {match[1]}
-        </span>
-      );
-    }
-    return part || null;
-  });
-}
+  _accentStyle?: React.CSSProperties,
+): ReactNode[] => renderColoredText(text);
 
 /**
- * Migrate old headline + highlightText format to single headline with <strong>.
- * Used during content loading to handle previously saved data.
+ * Migrate old headline + highlightText format to single headline with [pr].
  */
 export function migrateHeadline(headline: string, highlightText?: string): string {
   if (!highlightText) return headline;
-  // If headline already contains <strong>, it's already migrated
-  if (headline.includes('<strong>')) return headline;
-  return `${headline} <strong>${highlightText}</strong>`;
+  if (headline.includes('[pr]') || headline.includes('[primary]') || headline.includes('<strong>')) return headline;
+  return `${headline} [pr]${highlightText}[/pr]`;
 }

@@ -1,122 +1,42 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
-// Section theme configuration
+// Section theme configuration (simplified: mode + form + layout + bg)
 export interface SectionTheme {
-  // Override global colors with section-specific palette
-  overrideGlobalColors?: boolean; // If true, use palette colors instead of global
-  paletteId?: string;             // ID of the selected palette (only used when override is true)
   paletteMode?: 'dark' | 'light'; // Individual dark/light mode for this section
   formPaletteMode?: 'dark' | 'light'; // Independent form card mode (follows section mode if unset)
-  // Form card-specific color overrides (hero only, independent of section colors)
-  formBg?: string;            // Form card background
-  formText?: string;          // Form text primary (headings, inputs)
-  formTextSecondary?: string; // Form labels, secondary text
-  formBorder?: string;        // Form card border + input borders
-  formAccent?: string;        // Focus ring + button color
-  // Testimonials section-specific color overrides
-  tmBadgeColor?: string;        // Badge text color
-  tmHeadlineColor?: string;     // Headline text color
-  tmHeadlineAccent?: string;    // Headline strong/accent color
-  tmSubheadlineColor?: string;  // Subheadline text color
-  tmReviewLabelColor?: string;  // Review label text color
-  tmCardBg?: string;            // Card background color
-  tmCardText?: string;          // Card quote text color
-  tmCardAuthor?: string;        // Card author name color
-  tmCardBorder?: string;        // Card border color
-  tmDotColor?: string;          // Pagination dot active color
-  // Services section-specific color overrides
-  svcBadgeColor?: string;       // Badge text color
-  svcHeadlineColor?: string;    // Headline text color
-  svcHeadlineAccent?: string;   // Headline strong/accent color
-  svcSubheadlineColor?: string; // Subheadline text color
-  svcCardBg?: string;           // Card background color
-  svcCardBorder?: string;       // Card border color
-  svcCardTitle?: string;        // Card title color
-  svcCardText?: string;         // Card description text color
-  svcIconColor?: string;        // Icon color
-  svcDotColor?: string;         // Pagination dot active color
-  // Featured Testimonial section-specific color overrides
-  ftBadgeColor?: string;        // Badge text color
-  ftQuoteColor?: string;        // Quote text color
-  ftAuthorColor?: string;       // Author name color
-  ftAuthorTitle?: string;       // Author title/subtitle color
-  // Mid-Page CTA section-specific color overrides
-  mcBadgeColor?: string;        // Badge text color
-  mcHeadlineColor?: string;     // Headline text color
-  mcHeadlineAccent?: string;    // Headline strong/accent color
-  mcSubheadlineColor?: string;  // Subheadline text color
-  // Service Areas section-specific color overrides
-  saBadgeColor?: string;        // Badge text color
-  saHeadlineColor?: string;     // Headline text color
-  saHeadlineAccent?: string;    // Headline strong/accent color
-  saSubheadlineColor?: string;  // Subheadline text color
-  saTagBg?: string;             // Area tag background color
-  saTagText?: string;           // Area tag text color
-  saTagBorder?: string;         // Area tag border color
-  // FAQ section-specific color overrides
-  faqBadgeColor?: string;       // Badge text color
-  faqHeadlineColor?: string;    // Headline text color
-  faqHeadlineAccent?: string;   // Headline strong/accent color
-  faqSubheadlineColor?: string; // Subheadline text color
-  faqQuestionColor?: string;    // Question text color
-  faqAnswerColor?: string;      // Answer text color
-  faqItemBg?: string;           // Accordion item background
-  faqItemBorder?: string;       // Accordion item border
-  faqIconColor?: string;        // Chevron icon color
-  // Footer CTA section-specific color overrides
-  fcHeadlineColor?: string;     // Headline text color
-  fcHeadlineAccent?: string;    // Headline strong/accent color
-  fcSubheadlineColor?: string;  // Subheadline text color
-  buttonStyle?: 1 | 2 | 3 | 4;    // 1 = primary, 2 = accent, 3 = dark background, 4 = dark text
-  iconBgEnabled?: boolean;   // Show icon box background (default true)
-  iconBgColor?: string;      // Custom icon box background color (default: section primary)
-
-  // Palette colors (applied when overrideGlobalColors is true)
-  bgPrimary?: string;
-  bgSecondary?: string;
-  bgTertiary?: string;
-  textPrimary?: string;
-  textSecondary?: string;
-  accent?: string;           // Distinct accent color (NOT brand primary)
-  buttonBg?: string;
-  buttonText?: string;
-  borderColor?: string;
-
+  // Form card-specific color overrides (hero only)
+  formBg?: string;
+  formText?: string;
+  formTextSecondary?: string;
+  formBorder?: string;
+  formAccent?: string;
+  // Visual style
+  accentSource?: 'primary' | 'accent'; // Which brand color drives section accents (badges, headlines, icons, buttons)
+  buttonStyle?: 1 | 2 | 3 | 4; // 1 = primary, 2 = accent, 3 = dark background, 4 = light text
+  // Custom background color (overrides mode-derived bg)
+  bgColor?: string;
   // Layout
-  padding?: 'sm' | 'md' | 'lg' | 'xl'; // Section vertical padding (default: md = py-12)
-
+  padding?: 'sm' | 'md' | 'lg' | 'xl';
   // Background image
-  bgImage?: string;          // URL of the background image
-  bgImageOpacity?: number;   // Opacity of the background image (0-1)
-  bgImagePosition?: string;  // CSS background-position value
-  bgImageSize?: string;      // CSS background-size value (cover, contain, etc)
-  bgImageOverlayColor?: string; // Custom overlay color on top of image
-
+  bgImage?: string;
+  bgImageOpacity?: number;
+  bgImagePosition?: string;
+  bgImageSize?: string;
+  bgImageOverlayColor?: string;
   // Gradient overlay
-  gradientEnabled?: boolean;           // Toggle on/off
-  gradientType?: 'linear' | 'radial'; // Gradient type (default: linear)
-  gradientColor1?: string;             // First color (defaults to section bg)
-  gradientColor2?: string;             // Second color (defaults to transparent)
-  gradientLocation1?: number;          // Color 1 stop position 0-100% (default: 0)
-  gradientLocation2?: number;          // Color 2 stop position 0-100% (default: 100)
-  gradientAngle?: number;              // 0-360 degrees for linear (default: 180)
-  gradientPosition?: string;           // Position for radial: center|top|bottom|left|right
+  gradientEnabled?: boolean;
+  gradientType?: 'linear' | 'radial';
+  gradientColor1?: string;
+  gradientColor2?: string;
+  gradientLocation1?: number;
+  gradientLocation2?: number;
+  gradientAngle?: number;
+  gradientPosition?: string;
 }
 
-// Resolved theme with all colors
+// Resolved theme (bg image + gradient only)
 export interface ResolvedSectionTheme {
-  overrideGlobalColors: boolean;
-  paletteId?: string;
-  bgPrimary?: string;
-  bgSecondary?: string;
-  bgTertiary?: string;
-  textPrimary?: string;
-  textSecondary?: string;
-  accent?: string;
-  buttonBg?: string;
-  buttonText?: string;
-  borderColor?: string;
   bgImage?: string;
   bgImageOpacity?: number;
   bgImagePosition?: string;
@@ -176,9 +96,7 @@ interface SectionThemeContextType {
   updateSectionTheme: (sectionId: SectionId, theme: Partial<SectionTheme>) => void;
   resetSectionTheme: (sectionId: SectionId) => void;
   resetAllSectionThemes: () => void;
-  getSectionStyles: (sectionId: SectionId) => React.CSSProperties;
   getResolvedTheme: (sectionId: SectionId) => ResolvedSectionTheme;
-  setOverrideGlobalColors: (sectionId: SectionId, override: boolean) => void;
   setSectionVisibility: (sectionId: SectionId, visible: boolean) => void;
   isSectionVisible: (sectionId: SectionId) => boolean;
   setSectionOrder: (order: SectionId[]) => void;
@@ -295,60 +213,11 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
     setSectionOrder(DEFAULT_SECTION_ORDER);
   }, []);
 
-  // Toggle override of global colors for a section
-  // When override is turned OFF, reset all palette colors to use global defaults
-  const setOverrideGlobalColors = useCallback((sectionId: SectionId, override: boolean) => {
-    setSectionThemes(prev => {
-      let newTheme: SectionTheme;
-
-      if (override) {
-        // Turning ON override - keep existing settings
-        newTheme = {
-          ...prev[sectionId],
-          overrideGlobalColors: true,
-        };
-      } else {
-        // Turning OFF override - reset palette colors to use global defaults
-        newTheme = {
-          overrideGlobalColors: false,
-          // Clear all palette-related colors
-          paletteId: undefined,
-          bgPrimary: undefined,
-          bgSecondary: undefined,
-          bgTertiary: undefined,
-          textPrimary: undefined,
-          textSecondary: undefined,
-          accent: undefined,
-          buttonBg: undefined,
-          buttonText: undefined,
-          borderColor: undefined,
-        };
-      }
-
-      return {
-        ...prev,
-        [sectionId]: newTheme,
-      };
-    });
-  }, []);
-
-  // Get resolved theme with palette + overrides
-  // Note: Palette colors are already stored directly in theme when selected via setSectionPalette
+  // Get resolved theme (bg image + gradient only)
   const getResolvedTheme = useCallback((sectionId: SectionId): ResolvedSectionTheme => {
     const theme = sectionThemes[sectionId] || {};
 
     return {
-      overrideGlobalColors: theme.overrideGlobalColors ?? false,
-      paletteId: theme.paletteId,
-      bgPrimary: theme.bgPrimary,
-      bgSecondary: theme.bgSecondary,
-      bgTertiary: theme.bgTertiary,
-      textPrimary: theme.textPrimary,
-      textSecondary: theme.textSecondary,
-      accent: theme.accent,
-      buttonBg: theme.buttonBg,
-      buttonText: theme.buttonText,
-      borderColor: theme.borderColor,
       bgImage: theme.bgImage,
       bgImageOpacity: theme.bgImageOpacity,
       bgImagePosition: theme.bgImagePosition,
@@ -363,81 +232,6 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
       gradientAngle: theme.gradientAngle,
       gradientPosition: theme.gradientPosition,
     };
-  }, [sectionThemes]);
-
-  const getSectionStyles = useCallback((sectionId: SectionId): React.CSSProperties => {
-    const theme = sectionThemes[sectionId];
-    if (!theme) return {};
-
-    // If section doesn't override global colors, use global styles (no section-specific overrides)
-    if (!theme.overrideGlobalColors) {
-      return {};
-    }
-
-    const styles: Record<string, string> = {};
-
-    // Section-specific variables (for themed-section classes)
-    if (theme.bgPrimary) styles['--section-bg-primary'] = theme.bgPrimary;
-    if (theme.bgSecondary) styles['--section-bg-secondary'] = theme.bgSecondary;
-    if (theme.bgTertiary) styles['--section-bg-tertiary'] = theme.bgTertiary;
-    if (theme.textPrimary) styles['--section-text-primary'] = theme.textPrimary;
-    if (theme.textSecondary) styles['--section-text-secondary'] = theme.textSecondary;
-    if (theme.accent) styles['--section-text-accent'] = theme.accent;
-    if (theme.buttonBg) styles['--section-button-bg'] = theme.buttonBg;
-    if (theme.buttonText) styles['--section-button-text'] = theme.buttonText;
-    if (theme.borderColor) styles['--section-border'] = theme.borderColor;
-
-    // Also override the global CSS variables for this section
-    // This ensures ALL components inside the section use the section's theme
-    // Background colors
-    if (theme.bgPrimary) {
-      styles['--color-dark-950'] = theme.bgPrimary;
-      styles['--section-bg-even'] = theme.bgPrimary;
-    }
-    if (theme.bgSecondary) {
-      styles['--color-dark-900'] = theme.bgSecondary;
-      styles['--section-bg-odd'] = theme.bgSecondary;
-    }
-    if (theme.bgTertiary) {
-      styles['--color-dark-800'] = theme.bgTertiary;
-    }
-
-    // Text colors
-    if (theme.textPrimary) {
-      styles['--color-text-primary'] = theme.textPrimary;
-      styles['--color-white'] = theme.textPrimary;
-    }
-    if (theme.textSecondary) {
-      styles['--color-text-secondary'] = theme.textSecondary;
-      styles['--color-gray-400'] = theme.textSecondary;
-    }
-
-    // Button colors
-    if (theme.buttonBg) {
-      styles['--color-button-bg'] = theme.buttonBg;
-    }
-    if (theme.buttonText) {
-      styles['--color-button-text'] = theme.buttonText;
-    }
-
-    // Border color + muted backgrounds
-    if (theme.borderColor) {
-      styles['--color-border'] = theme.borderColor;
-      styles['--color-dark-700'] = theme.borderColor;
-      styles['--color-dark-600'] = theme.borderColor;
-    }
-
-    // Apply accent as primary color for buttons/highlights inside this section
-    if (theme.accent) {
-      styles['--color-primary-500'] = theme.accent;
-    }
-
-    // Set the actual background color inline
-    if (theme.bgPrimary) {
-      styles['backgroundColor'] = theme.bgPrimary;
-    }
-
-    return styles as React.CSSProperties;
   }, [sectionThemes]);
 
   // Set section visibility
@@ -473,9 +267,7 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
         updateSectionTheme,
         resetSectionTheme,
         resetAllSectionThemes,
-        getSectionStyles,
         getResolvedTheme,
-        setOverrideGlobalColors,
         setSectionVisibility,
         isSectionVisible,
         setSectionOrder,

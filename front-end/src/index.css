@@ -246,6 +246,7 @@ body {
   color: var(--color-button-text);
   border: var(--color-button-border-width, 0) solid var(--color-button-border, transparent);
   border-radius: var(--color-button-radius, 12px);
+  box-shadow: var(--color-button-shadow, 0 4px 14px -3px rgba(0,0,0,0.25));
 }
 
 /* Floating phone button pulse */
@@ -397,6 +398,7 @@ body {
   color: var(--section-button-text, var(--color-button-text));
   border: var(--color-button-border-width, 0) solid var(--color-button-border, transparent);
   border-radius: var(--color-button-radius, 12px);
+  box-shadow: var(--color-button-shadow, 0 4px 14px -3px rgba(0,0,0,0.25));
 }
 
 /* Standardized CTA button interaction states */

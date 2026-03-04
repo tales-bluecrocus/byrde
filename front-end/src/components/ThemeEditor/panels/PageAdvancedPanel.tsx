@@ -25,6 +25,7 @@ interface PageExport {
   config: {
     globalConfig: GlobalConfig;
     sectionThemes: Record<SectionId, SectionTheme>;
+    sectionVisibility: Record<SectionId, boolean>;
     sectionOrder: SectionId[];
     header: HeaderConfig;
     topbar: TopbarConfig;
@@ -50,13 +51,14 @@ export function PageAdvancedPanel() {
     config: {
       globalConfig,
       sectionThemes,
+      sectionVisibility,
       sectionOrder,
       header: headerConfig,
       topbar: topbarConfig,
     },
     content: sectionContent,
     exportedAt: new Date().toISOString(),
-  }), [globalConfig, sectionThemes, sectionOrder, headerConfig, topbarConfig, sectionContent]);
+  }), [globalConfig, sectionThemes, sectionVisibility, sectionOrder, headerConfig, topbarConfig, sectionContent]);
 
   const exportJson = useMemo(() => JSON.stringify(exportData, null, 2), [exportData]);
 
@@ -106,28 +108,20 @@ export function PageAdvancedPanel() {
             updateSettings({
               brand_dark_primary: b.darkPrimary,
               brand_dark_accent: b.darkAccent,
-              brand_dark_bg: b.darkBg,
               brand_dark_text: b.darkText,
-              brand_dark_text_secondary: b.darkTextSecondary || '',
-              brand_dark_bg_secondary: b.darkBgSecondary || '',
-              brand_dark_border: b.darkBorder || '',
               brand_light_primary: b.lightPrimary,
               brand_light_accent: b.lightAccent,
-              brand_light_bg: b.lightBg,
               brand_light_text: b.lightText,
-              brand_light_text_secondary: b.lightTextSecondary || '',
-              brand_light_bg_secondary: b.lightBgSecondary || '',
-              brand_light_border: b.lightBorder || '',
               brand_mode: b.mode,
             });
           }
         }
         if (data.config.header) replaceHeaderConfig(data.config.header);
         if (data.config.topbar) replaceTopbarConfig(data.config.topbar);
-        if (data.config.sectionThemes || data.config.sectionOrder) {
+        if (data.config.sectionThemes || data.config.sectionOrder || data.config.sectionVisibility) {
           importSectionData(
             data.config.sectionThemes || sectionThemes,
-            sectionVisibility,
+            data.config.sectionVisibility || sectionVisibility,
             data.config.sectionOrder || sectionOrder,
           );
         }

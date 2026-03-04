@@ -43,10 +43,7 @@ export default function FeaturedTestimonial() {
 
       <div className="relative max-w-4xl mx-auto px-8 text-center">
         {/* Section Label */}
-        <div
-          className="inline-flex items-center gap-2 section-bg-secondary backdrop-blur-sm section-text-accent px-4 py-2 rounded-full text-sm font-medium mb-8 section-border border"
-          style={theme.ftBadgeColor ? { color: theme.ftBadgeColor } : undefined}
-        >
+        <div className="inline-flex items-center gap-2 section-bg-secondary backdrop-blur-sm section-text-accent px-4 py-2 rounded-full text-sm font-medium mb-8 section-border border">
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -65,10 +62,7 @@ export default function FeaturedTestimonial() {
 
         {/* Quote */}
         <blockquote className="mb-10">
-          <p
-            className="font-[var(--font-display)] text-xl sm:text-2xl lg:text-3xl section-text-primary leading-relaxed font-medium"
-            style={theme.ftQuoteColor ? { color: theme.ftQuoteColor } : undefined}
-          >
+          <p className="font-[var(--font-display)] text-xl sm:text-2xl lg:text-3xl section-text-primary leading-relaxed font-medium">
             {content.quote}
           </p>
         </blockquote>
@@ -84,14 +78,8 @@ export default function FeaturedTestimonial() {
           </div>
 
           <div className="text-center">
-            <h3
-              className="section-text-primary font-semibold text-lg"
-              style={theme.ftAuthorColor ? { color: theme.ftAuthorColor } : undefined}
-            >{content.authorName}</h3>
-            <p
-              className="section-text-secondary text-sm"
-              style={theme.ftAuthorTitle ? { color: theme.ftAuthorTitle } : undefined}
-            >{content.authorTitle}</p>
+            <h3 className="section-text-primary font-semibold text-lg">{content.authorName}</h3>
+            <p className="section-text-secondary text-sm">{content.authorTitle}</p>
           </div>
 
           {/* Google Badge */}

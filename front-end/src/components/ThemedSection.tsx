@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import type { ReactNode, CSSProperties } from 'react';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
-import { useSettingsContext } from '../context/SettingsContext';
 import type { SectionId } from '../context/SectionThemeContext';
-import { generateBrandPalette, withAlpha } from '../utils/colorUtils';
+import { generateBrandPalette, withAlpha, lighten, darken } from '../utils/colorUtils';
+import { getColorsForMode } from '../hooks/useSectionPalette';
 import type { BrandPalette } from '../utils/colorUtils';
 
 interface ThemedSectionProps {
@@ -16,32 +16,46 @@ interface ThemedSectionProps {
 }
 
 /** Convert a BrandPalette into CSS variable overrides (same vars as PaletteInjector).
- *  When sectionMode is provided, uses the correct button settings for that mode. */
-interface ButtonSettings {
-  bg: string;
-  text: string;
-  borderColor: string;
-}
-
-function paletteToStyles(p: BrandPalette, btnSettings?: ButtonSettings): Record<string, string> {
+ *  When accentSource is 'accent', primary and accent shades swap for section elements.
+ *  buttonStyle: 1=primary, 2=accent (from brand palette, independent of accentSource), 3=dark, 4=light
+ *  sectionMode: effective mode for this section (picks correct per-mode button text vars) */
+function paletteToStyles(p: BrandPalette, accentSource?: 'primary' | 'accent', buttonStyle?: 1 | 2 | 3 | 4, sectionMode?: 'dark' | 'light'): Record<string, string> {
   const styles: Record<string, string> = {};
+  const useAccent = accentSource === 'accent';
 
-  // Primary shade scale
+  // Primary and accent shade scales — swap when accentSource is 'accent'
+  const sectionPrimary = useAccent ? p.accent : p.primary;
+  const sectionAccent = useAccent ? p.primary : p.accent;
+
   const shadeKeys = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
   for (const shade of shadeKeys) {
-    styles[`--color-primary-${shade}`] = p.primary[shade];
-    styles[`--color-accent-${shade}`] = p.accent[shade];
+    styles[`--color-primary-${shade}`] = sectionPrimary[shade];
+    styles[`--color-accent-${shade}`] = sectionAccent[shade];
   }
 
-  // Button colors — use settings for the target mode, fallback to palette primary
-  const btnBg = btnSettings?.bg || p.primary[500];
-  const btnText = btnSettings?.text || '#ffffff';
-  const btnBorder = btnSettings?.borderColor || 'transparent';
+  // Button colors — independent of accentSource; uses BRAND palette directly
+  // Text color references mode-specific CSS vars set by PaletteInjector
+  const m = sectionMode || 'dark';
+  let btnBg: string;
+  let btnText: string | undefined;
+  switch (buttonStyle) {
+    case 2:
+      btnBg = p.accent[500];
+      btnText = `var(--btn-${m}-accent-text, #ffffff)`;
+      break;
+    case 3: btnBg = '#171717'; btnText = '#ffffff'; break;
+    case 4: btnBg = '#efefef'; btnText = '#171717'; break;
+    default:
+      btnBg = p.primary[500];
+      btnText = `var(--btn-${m}-text, #ffffff)`;
+      break;
+  }
   styles['--color-button-bg'] = btnBg;
   styles['--color-button-hover'] = btnBg;
   styles['--color-button-active'] = btnBg;
   styles['--color-button-text'] = btnText;
-  styles['--color-button-border'] = btnBorder;
+  styles['--color-button-accent-text'] = `var(--btn-${m}-accent-text, #ffffff)`;
+  styles['--color-button-border'] = 'transparent';
   styles['--section-button-bg'] = btnBg;
   styles['--section-button-text'] = btnText;
 
@@ -57,7 +71,7 @@ function paletteToStyles(p: BrandPalette, btnSettings?: ButtonSettings): Record<
   styles['--color-dark-800'] = p.background.tertiary;
   styles['--section-bg-even'] = p.background.primary;
   styles['--section-bg-odd'] = p.background.secondary;
-  styles['--section-bg-odd-accent'] = withAlpha(p.accent[500], 0.08);
+  styles['--section-bg-odd-accent'] = withAlpha(sectionAccent[500], 0.08);
 
   // Section-scoped vars
   styles['--section-bg-primary'] = p.background.primary;
@@ -65,7 +79,7 @@ function paletteToStyles(p: BrandPalette, btnSettings?: ButtonSettings): Record<
   styles['--section-bg-tertiary'] = p.background.tertiary;
   styles['--section-text-primary'] = p.text.primary;
   styles['--section-text-secondary'] = p.text.secondary;
-  styles['--section-text-accent'] = p.primary[500];
+  styles['--section-text-accent'] = sectionPrimary[500];
   styles['--section-border'] = p.border;
 
   // Border
@@ -73,8 +87,8 @@ function paletteToStyles(p: BrandPalette, btnSettings?: ButtonSettings): Record<
   styles['--color-dark-700'] = p.border;
 
   // Muted backgrounds (pagination dots, scrollbar, etc.)
-  styles['--color-dark-600'] = p.border;      // Slightly lighter than border
-  styles['--color-dark-500'] = p.text.muted;  // Muted text color as bg
+  styles['--color-dark-600'] = p.border;
+  styles['--color-dark-500'] = p.text.muted;
 
   return styles;
 }
@@ -86,10 +100,8 @@ export default function ThemedSection({
   as: Component = 'section',
   index,
 }: ThemedSectionProps) {
-  const { getSectionStyles, isSectionVisible, sectionThemes } = useSectionTheme();
+  const { isSectionVisible, sectionThemes } = useSectionTheme();
   const { palette, globalConfig } = useGlobalConfig();
-  const { settings } = useSettingsContext();
-  const sectionStyles = getSectionStyles(id);
   const theme = sectionThemes[id] || {};
 
   // Generate per-section palette when paletteMode differs from page mode
@@ -97,20 +109,8 @@ export default function ThemedSection({
     const sectionMode = theme.paletteMode;
     if (!sectionMode || sectionMode === globalConfig.brand.mode) return null;
 
-    const b = globalConfig.brand;
-    const isDark = sectionMode === 'dark';
-    return generateBrandPalette(
-      isDark ? b.darkPrimary : b.lightPrimary,
-      isDark ? b.darkAccent : b.lightAccent,
-      sectionMode,
-      isDark ? b.darkBg : b.lightBg,
-      isDark ? b.darkText : b.lightText,
-      {
-        textSecondary: isDark ? b.darkTextSecondary : b.lightTextSecondary,
-        bgSecondary: isDark ? b.darkBgSecondary : b.lightBgSecondary,
-        border: isDark ? b.darkBorder : b.lightBorder,
-      },
-    );
+    const colors = getColorsForMode(globalConfig.brand, sectionMode);
+    return generateBrandPalette(colors.primary, colors.accent, sectionMode, colors.text);
   }, [theme.paletteMode, globalConfig.brand]);
 
   // Don't render if section is hidden
@@ -125,23 +125,41 @@ export default function ThemedSection({
       : 'section-bg-odd'
     : '';
 
-  // Resolve button settings for this section's effective mode
+  // Build mode-override styles (if section has different mode, accentSource, buttonStyle, or bgColor)
+  const accentSource = theme.accentSource;
+  const buttonStyle = theme.buttonStyle;
+  const customBg = theme.bgColor;
+  const needsStyleOverride = sectionModePalette || accentSource === 'accent' || (buttonStyle && buttonStyle !== 1) || customBg;
+  const effectivePaletteForStyles = sectionModePalette || palette;
   const effectiveMode = theme.paletteMode || globalConfig.brand.mode;
-  const sectionBtnSettings: ButtonSettings = effectiveMode === 'dark'
-    ? { bg: settings.button_dark_bg, text: settings.button_dark_text, borderColor: settings.button_dark_border_color }
-    : { bg: settings.button_light_bg, text: settings.button_light_text, borderColor: settings.button_light_border_color };
-
-  // Build mode-override styles (if section has different mode than page)
-  const modeStyles: CSSProperties = sectionModePalette
+  const modeStyles: CSSProperties = needsStyleOverride
     ? {
-        ...paletteToStyles(sectionModePalette, sectionBtnSettings),
-        backgroundColor: sectionModePalette.background.primary,
-        color: sectionModePalette.text.primary,
+        ...paletteToStyles(effectivePaletteForStyles, accentSource, buttonStyle, effectiveMode),
+        ...(sectionModePalette ? {
+          backgroundColor: sectionModePalette.background.primary,
+          color: sectionModePalette.text.primary,
+        } : {}),
+        // Custom background color override — derive secondary/tertiary from it
+        ...(customBg ? (() => {
+          const bgSecondary = effectiveMode === 'dark' ? lighten(customBg, 4) : darken(customBg, 2);
+          const bgTertiary = effectiveMode === 'dark' ? lighten(customBg, 8) : darken(customBg, 5);
+          return {
+            backgroundColor: customBg,
+            '--section-bg-primary': customBg,
+            '--section-bg-secondary': bgSecondary,
+            '--section-bg-tertiary': bgTertiary,
+            '--color-dark-950': customBg,
+            '--color-dark-900': bgSecondary,
+            '--color-dark-800': bgTertiary,
+            '--section-bg-even': customBg,
+            '--section-bg-odd': bgSecondary,
+          };
+        })() : {}),
       } as CSSProperties
     : {};
 
-  // Merge: sectionStyles (custom overrides) > modeStyles (mode palette) > global
-  const mergedStyles: CSSProperties = { ...modeStyles, ...sectionStyles };
+  // Merge mode palette overrides into styles
+  const mergedStyles: CSSProperties = { ...modeStyles };
 
   // Background image settings
   const hasBgImage = !!theme.bgImage;
@@ -151,7 +169,7 @@ export default function ThemedSection({
 
   // Get the background color for the overlay
   const effectivePalette = sectionModePalette || palette;
-  const overlayColor = theme.bgImageOverlayColor || theme.bgPrimary || effectivePalette.background.primary;
+  const overlayColor = theme.bgImageOverlayColor || effectivePalette.background.primary;
 
   // Per-section padding — exposed as CSS variable for child components
   const PADDING_VALUES: Record<string, string> = {

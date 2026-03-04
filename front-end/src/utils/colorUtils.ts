@@ -287,194 +287,57 @@ export interface BrandPalette {
   border: string;
 }
 
-/** Optional overrides for derived palette colors (textSecondary, bgSecondary, border) */
-export interface PaletteOverrides {
-  textSecondary?: string;
-  bgSecondary?: string;
-  border?: string;
-}
-
 /**
- * Generate the complete brand palette from brand colors + mode.
- * Primary and accent colors become the 500 shade, all others are auto-generated.
- * Background and text colors define the surface/text; mode determines derivation direction.
- * Optional overrides replace the algorithmically derived textSecondary, bgSecondary, border.
+ * Generate the complete brand palette from primary + accent + mode.
+ * Background colors are auto-derived per mode.
+ * Text color can be customized (defaults to #efefef dark, #2a2a2a light).
  */
 export function generateBrandPalette(
   primaryColor: string,
   accentColor: string,
   mode: ColorMode,
-  backgroundColor: string = '#171717',
-  textColor: string = '#efefef',
-  overrides?: PaletteOverrides,
+  textColor?: string,
 ): BrandPalette {
   const primary = generateShades(primaryColor);
   const accent = generateShades(accentColor);
 
   if (mode === 'dark') {
+    const bg = '#171717';
+    const text = textColor || '#efefef';
     return {
       primary,
       accent,
       background: {
-        primary: backgroundColor,
-        secondary: overrides?.bgSecondary || lighten(backgroundColor, 4),
-        tertiary: lighten(backgroundColor, 8),
+        primary: bg,
+        secondary: lighten(bg, 4),
+        tertiary: lighten(bg, 8),
       },
       text: {
-        primary: textColor,
-        secondary: overrides?.textSecondary || darken(textColor, 18),
-        muted: darken(textColor, 38),
+        primary: text,
+        secondary: darken(text, 18),
+        muted: darken(text, 38),
       },
-      border: overrides?.border || lighten(backgroundColor, 16),
+      border: lighten(bg, 16),
     };
   }
 
-  // Light mode: use provided bg/text (defaults to white/dark)
+  // Light mode
+  const bg = '#ffffff';
+  const text = textColor || '#2a2a2a';
   return {
     primary,
     accent,
     background: {
-      primary: backgroundColor,
-      secondary: overrides?.bgSecondary || darken(backgroundColor, 2),
-      tertiary: darken(backgroundColor, 5),
+      primary: bg,
+      secondary: darken(bg, 2),
+      tertiary: darken(bg, 5),
     },
     text: {
-      primary: textColor,
-      secondary: overrides?.textSecondary || lighten(textColor, 25),
-      muted: lighten(textColor, 45),
+      primary: text,
+      secondary: lighten(text, 25),
+      muted: lighten(text, 45),
     },
-    border: overrides?.border || darken(backgroundColor, 12),
+    border: darken(bg, 12),
   };
 }
 
-// ============================================
-// DYNAMIC PALETTE GENERATION (Section overrides)
-// ============================================
-
-export interface GeneratedPalette {
-  id: string;
-  name: string;
-  mode: 'dark' | 'light';
-  colors: {
-    bgPrimary: string;
-    bgSecondary: string;
-    bgTertiary: string;
-    textPrimary: string;
-    textSecondary: string;
-    accent: string;
-    borderColor: string;
-  };
-}
-
-/**
- * Generate 2 dark palettes derived from brand colors.
- * 1. Dark — Neutral dark bg (from background input), primary as accent
- * 2. Brand Dark — Subtle brand tint in bg, accent as accent
- */
-export function generateDarkPalettes(
-  primary: string,
-  accent: string,
-  background: string = '#171717',
-  text: string = '#efefef',
-): GeneratedPalette[] {
-  const bgSecondary = lighten(background, 4);
-  const bgTertiary = lighten(background, 8);
-  const textSecondary = darken(text, 38);
-  const borderColor = lighten(background, 14);
-
-  return [
-    {
-      id: 'dark',
-      name: 'Dark',
-      mode: 'dark',
-      colors: {
-        bgPrimary: background,
-        bgSecondary,
-        bgTertiary,
-        textPrimary: text,
-        textSecondary,
-        accent: primary,
-        borderColor,
-      },
-    },
-    {
-      id: 'brand-dark',
-      name: 'Brand Dark',
-      mode: 'dark',
-      colors: {
-        bgPrimary: mixColors(background, primary, 4),
-        bgSecondary: mixColors(bgSecondary, primary, 6),
-        bgTertiary: mixColors(bgTertiary, primary, 5),
-        textPrimary: text,
-        textSecondary: mixColors(textSecondary, primary, 15),
-        accent: accent,
-        borderColor: mixColors(borderColor, primary, 12),
-      },
-    },
-  ];
-}
-
-/**
- * Generate 2 light palettes derived from brand colors.
- * 1. Light — Clean white bg, primary as accent
- * 2. Brand Light — Subtle brand tint in bg, accent as accent
- */
-export function generateLightPalettes(
-  primary: string,
-  accent: string,
-  background: string = '#ffffff',
-  text: string = '#18181b',
-): GeneratedPalette[] {
-  const bgPrimary = background;
-  const bgSecondary = darken(background, 2);
-  const bgTertiary = darken(background, 4);
-  const textPrimary = text;
-  const textSecondary = lighten(text, 30);
-  const borderColor = darken(background, 10);
-
-  return [
-    {
-      id: 'light',
-      name: 'Light',
-      mode: 'light',
-      colors: {
-        bgPrimary,
-        bgSecondary,
-        bgTertiary,
-        textPrimary,
-        textSecondary,
-        accent: primary,
-        borderColor,
-      },
-    },
-    {
-      id: 'brand-light',
-      name: 'Brand Light',
-      mode: 'light',
-      colors: {
-        bgPrimary: mixColors(bgPrimary, primary, 2),
-        bgSecondary: mixColors(bgSecondary, primary, 4),
-        bgTertiary: mixColors(bgTertiary, primary, 6),
-        textPrimary,
-        textSecondary: mixColors(textSecondary, primary, 10),
-        accent: accent,
-        borderColor: mixColors(borderColor, primary, 10),
-      },
-    },
-  ];
-}
-
-/**
- * Generate all palettes from brand colors (2 dark + 2 light = 4 total)
- */
-export function generateAllPalettes(
-  primary: string,
-  accent: string,
-  background: string = '#171717',
-  text: string = '#efefef',
-): GeneratedPalette[] {
-  return [
-    ...generateDarkPalettes(primary, accent, background, text),
-    ...generateLightPalettes(primary, accent),
-  ];
-}
