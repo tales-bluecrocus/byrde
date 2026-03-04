@@ -276,7 +276,7 @@ body {
 
 @keyframes phone-border-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 var(--color-button-bg, #3ab342);
+    box-shadow: 0 0 0 0 var(--pulse-color, var(--color-button-bg, #3ab342));
   }
   50% {
     box-shadow: 0 0 0 10px transparent;

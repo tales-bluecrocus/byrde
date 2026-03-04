@@ -159,48 +159,72 @@ export default function GoogleReviewBadge({
 	}
 
 	// Compact variant (for header) - uses fixed light/dark theme for brand consistency
+	// Mobile: minimal inline badge (stars + score + G icon, no card)
+	// Desktop: card badge with border
 	const badgeContent = (
-		<div
-			className={`flex flex-col items-center backdrop-blur-sm rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm ${reviewsUrl ? "hover:shadow-md transition-shadow" : ""} ${className}`}
-			style={{
-				backgroundColor: themeStyles.bg,
-				borderWidth: "1px",
-				borderColor: themeStyles.border,
-			}}
-		>
-			{/* Top row: Stars + Score + Google Icon */}
-			<div className="flex items-center gap-1.5 sm:gap-2">
-				<div className="flex items-center gap-0.5">
-					{starTypes.map((type, i) => (
-						<StarIcon key={i} type={type} size="sm" />
-					))}
-				</div>
+		<>
+			{/* Mobile: compact card (single star + rating + G icon) */}
+			<div
+				className={`flex sm:hidden items-center gap-1.5 rounded-xl px-2.5 py-1.5 shadow-sm ${reviewsUrl ? "hover:shadow-md transition-shadow" : ""} ${className}`}
+				style={{
+					backgroundColor: themeStyles.bg,
+					borderWidth: "1px",
+					borderColor: themeStyles.border,
+				}}
+			>
+				<span className="text-yellow-400">
+					<StarIcon type="full" size="sm" />
+				</span>
 				<span
-					className="font-bold text-xs sm:text-sm"
+					className="font-bold text-xs"
 					style={{ color: themeStyles.text }}
 				>
 					{rating}
 				</span>
-				{showGoogleIcon && (
-					<>
-						<div
-							className="w-px h-3 sm:h-4 mx-0.5"
-							style={{ backgroundColor: themeStyles.divider }}
-						/>
-						<GoogleIcon size="sm" />
-					</>
+				{showGoogleIcon && <GoogleIcon size="sm" />}
+			</div>
+
+			{/* Desktop: card badge */}
+			<div
+				className={`hidden sm:flex flex-col items-center backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-sm ${reviewsUrl ? "hover:shadow-md transition-shadow" : ""} ${className}`}
+				style={{
+					backgroundColor: themeStyles.bg,
+					borderWidth: "1px",
+					borderColor: themeStyles.border,
+				}}
+			>
+				<div className="flex items-center gap-2">
+					<div className="flex items-center gap-0.5">
+						{starTypes.map((type, i) => (
+							<StarIcon key={i} type={type} size="sm" />
+						))}
+					</div>
+					<span
+						className="font-bold text-sm"
+						style={{ color: themeStyles.text }}
+					>
+						{rating}
+					</span>
+					{showGoogleIcon && (
+						<>
+							<div
+								className="w-px h-4 mx-0.5"
+								style={{ backgroundColor: themeStyles.divider }}
+							/>
+							<GoogleIcon size="sm" />
+						</>
+					)}
+				</div>
+				{showReviewCount && (
+					<span
+						className="text-xs font-medium whitespace-nowrap mt-0.5 w-full"
+						style={{ color: themeStyles.text, opacity: 0.7 }}
+					>
+						{reviewCount} Google Reviews
+					</span>
 				)}
 			</div>
-			{/* Bottom row: Review count text */}
-			{showReviewCount && (
-				<span
-					className="text-[10px] sm:text-xs font-medium whitespace-nowrap mt-0.5 w-full"
-					style={{ color: themeStyles.text, opacity: 0.7 }}
-				>
-					{reviewCount} Google Reviews
-				</span>
-			)}
-		</div>
+		</>
 	);
 
 	if (reviewsUrl) {

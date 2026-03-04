@@ -1,5 +1,6 @@
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent } from '../context/ContentContext';
+import { renderColoredText } from '../utils/renderHeadline';
 
 const StarIcon = ({ filled = true }: { filled?: boolean }) => (
   <svg
@@ -50,7 +51,7 @@ export default function FeaturedTestimonial() {
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          {content.badgeText}
+          {renderColoredText(content.badgeText)}
         </div>
 
         {/* Stars */}
@@ -63,7 +64,7 @@ export default function FeaturedTestimonial() {
         {/* Quote */}
         <blockquote className="mb-10">
           <p className="font-[var(--font-display)] text-xl sm:text-2xl lg:text-3xl section-text-primary leading-relaxed font-medium">
-            {content.quote}
+            {renderColoredText(content.quote)}
           </p>
         </blockquote>
 
@@ -90,7 +91,7 @@ export default function FeaturedTestimonial() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            <span className="section-text-primary text-sm font-medium">{content.verifiedText}</span>
+            <span className="section-text-primary text-sm font-medium">{renderColoredText(content.verifiedText)}</span>
           </div>
         </div>
 
@@ -103,7 +104,7 @@ export default function FeaturedTestimonial() {
             <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
-            <span className="whitespace-nowrap">{content.ctaText}</span>
+            <span className="whitespace-nowrap">{renderColoredText(content.ctaText)}</span>
           </a>
         </div>
       </div>

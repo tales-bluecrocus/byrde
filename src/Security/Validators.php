@@ -230,10 +230,18 @@ class Validators {
         }
 
         if ( is_string( $data ) ) {
-            if ( $key === 'headline' ) {
-                return wp_specialchars_decode( wp_kses( $data, [ 'strong' => [] ] ), ENT_QUOTES );
-            }
-            return wp_specialchars_decode( sanitize_textarea_field( $data ), ENT_QUOTES );
+            // Allow safe HTML tags in all content fields (rich text support).
+            $allowed = [
+                'strong' => [],
+                'em'     => [],
+                'br'     => [],
+                'a'      => [
+                    'href'   => [],
+                    'target' => [],
+                    'rel'    => [],
+                ],
+            ];
+            return wp_specialchars_decode( wp_kses( $data, $allowed ), ENT_QUOTES );
         }
 
         if ( is_bool( $data ) || is_numeric( $data ) ) {

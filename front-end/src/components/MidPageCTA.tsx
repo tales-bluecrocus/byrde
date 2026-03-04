@@ -87,7 +87,7 @@ export default function MidPageCTA() {
             className="w-2 h-2 rounded-full animate-pulse"
             style={{ backgroundColor: accentColor }}
           />
-          <span>{content.badge}</span>
+          <span>{renderColoredText(content.badge)}</span>
         </div>
 
         {/* Headline */}
@@ -108,7 +108,7 @@ export default function MidPageCTA() {
             onClick={() => trackPhoneClick('mid_cta')}
           >
             <PhoneIcon />
-            {content.ctaText}
+            {renderColoredText(content.ctaText)}
           </a>
         </div>
 
@@ -128,7 +128,7 @@ export default function MidPageCTA() {
                 )}
                 <div className="flex items-center gap-2 font-medium section-text-secondary">
                   <FeatureIcon feature={feature} />
-                  <span>{feature.text}</span>
+                  <span>{renderColoredText(feature.text)}</span>
                 </div>
               </div>
             ))}

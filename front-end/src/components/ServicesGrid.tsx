@@ -66,7 +66,7 @@ function ServiceCard({ service, className = '' }: { service: ServiceItem; classN
 
         {/* Description */}
         <p className="section-text-secondary leading-relaxed">
-          {service.description}
+          {renderColoredText(service.description)}
         </p>
       </div>
 
@@ -188,7 +188,7 @@ export default function ServicesGrid() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">
-            {content.badgeText}
+            {renderColoredText(content.badgeText)}
           </span>
           <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6">
             {renderColoredText(content.headline)}

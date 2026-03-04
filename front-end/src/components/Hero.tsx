@@ -244,7 +244,7 @@ const BenefitItem = memo(({ benefit, index, accentColor, textColor }: BenefitIte
     <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: `${accentColor}33` }}>
       <CheckIcon color={accentColor} />
     </div>
-    <span className="font-medium" style={{ color: textColor }}>{benefit}</span>
+    <span className="font-medium" style={{ color: textColor }}>{renderColoredText(benefit)}</span>
   </li>
 ));
 BenefitItem.displayName = 'BenefitItem';
@@ -515,7 +515,7 @@ export default function Hero() {
                 style={{ backgroundColor: `${themeStyles.accentColor}33`, borderWidth: '1px', borderColor: `${themeStyles.accentColor}4d` }}
               >
                 <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: themeStyles.accentColor }} />
-                {heroBadgeText}
+                {renderColoredText(heroBadgeText)}
               </div>
             )}
 
@@ -633,10 +633,10 @@ export default function Hero() {
                 {/* Form Header */}
                 <div className="text-center mb-8">
                   <h2 className="font-[var(--font-display)] text-2xl font-bold section-text-primary mb-2">
-                    {content.formTitle || 'Fill Out This Form for Your Free Estimate'}
+                    {renderColoredText(content.formTitle || 'Fill Out This Form for Your Free Estimate')}
                   </h2>
                   <p className="section-text-secondary text-sm mb-4">
-                    {content.formSubtitle || "We'll get back to you within 30 minutes"}
+                    {renderColoredText(content.formSubtitle || "We'll get back to you within 30 minutes")}
                   </p>
                   {/* Quick Call CTA for phone-preferring users */}
                   {settings.phone_raw && (
@@ -689,7 +689,7 @@ export default function Hero() {
                         value={formData.name}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        className="w-full px-4 py-3 rounded-xl border transition-all duration-300 outline-none focus:ring-2"
+                        className="w-full px-4 py-3 rounded-xl border transition-all duration-100 outline-none focus:ring-2 focus:ring-offset-1"
                         style={{
                           backgroundColor: errors.name ? 'rgba(239, 68, 68, 0.1)' : themeStyles.inputBg,
                           borderColor: errors.name ? '#ef4444' : themeStyles.inputBorder,
@@ -714,7 +714,7 @@ export default function Hero() {
                           value={formData.phone}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          className="w-full px-4 py-3 rounded-xl border transition-all duration-300 outline-none focus:ring-2"
+                          className="w-full px-4 py-3 rounded-xl border transition-all duration-100 outline-none focus:ring-2 focus:ring-offset-1"
                           style={{
                             backgroundColor: errors.phone ? 'rgba(239, 68, 68, 0.1)' : themeStyles.inputBg,
                             borderColor: errors.phone ? '#ef4444' : themeStyles.inputBorder,
@@ -736,7 +736,7 @@ export default function Hero() {
                           value={formData.email}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          className="w-full px-4 py-3 rounded-xl border transition-all duration-300 outline-none focus:ring-2"
+                          className="w-full px-4 py-3 rounded-xl border transition-all duration-100 outline-none focus:ring-2 focus:ring-offset-1"
                           style={{
                             backgroundColor: errors.email ? 'rgba(239, 68, 68, 0.1)' : themeStyles.inputBg,
                             borderColor: errors.email ? '#ef4444' : themeStyles.inputBorder,

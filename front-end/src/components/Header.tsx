@@ -8,6 +8,7 @@ import GoogleReviewBadge from "./GoogleReviewBadge";
 import { getContrastColor, withAlpha, generateBrandPalette } from "../utils/colorUtils";
 import { getColorsForMode } from "../hooks/useSectionPalette";
 import { trackPhoneClick, trackEmailClick } from "../lib/analytics";
+import { renderColoredText } from "../utils/renderHeadline";
 
 const PhoneIcon = () => (
 	<svg
@@ -25,9 +26,9 @@ const PhoneIcon = () => (
 	</svg>
 );
 
-const EmailIcon = () => (
+const EmailIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
 	<svg
-		className="w-4 h-4"
+		className={className}
 		fill="none"
 		stroke="currentColor"
 		viewBox="0 0 24 24"
@@ -199,7 +200,10 @@ function Topbar() {
 	// Render the message with icon
 	const renderMessage = () => {
 		const icon = IconComponent ? <span style={{ color: accentColor }}><IconComponent className="w-4 h-4 flex-shrink-0" /></span> : null;
-		const text = <span>{topbarConfig.message}</span>;
+		const hasMobileText = topbarConfig.messageMobile?.trim();
+		const desktopText = <span className={hasMobileText ? 'hidden sm:inline' : ''}>{renderColoredText(topbarConfig.message)}</span>;
+		const mobileText = hasMobileText ? <span className="sm:hidden">{renderColoredText(topbarConfig.messageMobile!)}</span> : null;
+		const text = <>{mobileText}{desktopText}</>;
 
 		if (!icon) return text;
 
@@ -232,23 +236,23 @@ function Topbar() {
 			{hasGradient && <div style={topGradientStyle!} aria-hidden="true" />}
 
 			<div className="max-w-7xl mx-auto px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
-				<div className={`flex items-center ${getJustifyClass()}`}>
-					{/* Message - hidden on mobile if we have contact info */}
-					<span className={hasContactInfo ? "hidden sm:inline-flex" : "inline-flex"}>
+				<div className={`flex items-center gap-3 sm:gap-4 ${getJustifyClass()}`}>
+					{/* Message */}
+					<span className={`inline-flex min-w-0 ${hasContactInfo ? 'truncate text-xs sm:text-sm' : ''}`}>
 						{renderMessage()}
 					</span>
 
 					{/* Contact Info */}
 					{hasContactInfo && (
-						<div className="flex items-center gap-4 sm:gap-6 mx-auto sm:mx-0">
+						<div className="flex items-center gap-2 sm:gap-6 shrink-0">
 							{topbarConfig.showPhone && (
 								<a
 									href={`tel:${settings.phone_raw}`}
 									className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
 									onClick={() => trackPhoneClick('topbar')}
 								>
-									<span style={{ color: accentColor }}><TopbarPhoneIcon className="w-4 h-4" /></span>
-									<span className="text-xs sm:text-sm">{settings.phone}</span>
+									<span style={{ color: accentColor }}><TopbarPhoneIcon className="w-5 h-5 sm:w-4 sm:h-4" /></span>
+									<span className="hidden sm:inline text-sm">{settings.phone}</span>
 								</a>
 							)}
 							{topbarConfig.showEmail && (
@@ -258,8 +262,8 @@ function Topbar() {
 									aria-label={`Email ${settings.email}`}
 									onClick={() => trackEmailClick('topbar')}
 								>
-									<span className="shrink-0" style={{ color: accentColor }}><EmailIcon /></span>
-									<span className="text-xs sm:text-sm truncate">{settings.email}</span>
+									<span className="shrink-0" style={{ color: accentColor }}><EmailIcon className="w-5 h-5 sm:w-4 sm:h-4" /></span>
+									<span className="hidden sm:inline text-sm truncate">{settings.email}</span>
 								</a>
 							)}
 						</div>
@@ -403,7 +407,7 @@ export default function Header() {
 					{/* Gradient overlay */}
 					{hasGradient && <div style={headerGradientStyle!} aria-hidden="true" />}
 					<div className="max-w-7xl mx-auto px-6 lg:px-8 relative" style={{ zIndex: 1 }}>
-						<div className="flex items-center justify-between">
+						<div className="flex items-center justify-between gap-4">
 							{/* Logo */}
 							{logo && (
 								<a href={window.location.pathname} className="flex items-center group" aria-label="Home">
@@ -420,7 +424,7 @@ export default function Header() {
 											width={64}
 											height={64}
 											fetchPriority="high"
-											className="w-auto h-14 sm:h-16"
+											className="w-auto max-h-14 sm:max-h-16"
 										/>
 									</div>
 								</a>
@@ -468,7 +472,8 @@ export default function Header() {
 					style={{
 						backgroundColor: buttonBg,
 						color: buttonText,
-					}}
+						'--pulse-color': buttonBg,
+					} as React.CSSProperties}
 					aria-label={`Call ${settings.phone}`}
 				>
 					<PhoneIcon />

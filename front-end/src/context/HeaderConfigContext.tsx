@@ -38,6 +38,7 @@ export interface HeaderConfig {
 // Note: Email and phone values come from WordPress via useSettings()
 export interface TopbarConfig {
   message: string;
+  messageMobile?: string;
   icon: TopbarIcon;
   textAlign: TextAlign;
   iconPosition: IconPosition;

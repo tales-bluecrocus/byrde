@@ -73,12 +73,12 @@ export default function FooterCTA() {
           onClick={() => trackPhoneClick('footer_cta')}
         >
           <PhoneIcon />
-          {content.ctaText}
+          {renderColoredText(content.ctaText)}
         </a>
 
         {/* Reassurance text */}
         <p className="mt-6 text-sm font-medium section-text-secondary opacity-60">
-          {content.reassuranceText}
+          {renderColoredText(content.reassuranceText)}
         </p>
       </div>
     </div>

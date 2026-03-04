@@ -394,10 +394,10 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
               </div>
               <BadgeIconPicker value={content.badge1Icon} onChange={(v) => onChange({ badge1Icon: v })} label="Icon" />
               <div className="grid grid-cols-2 gap-2">
-                <FormField label="Label">
+                <FormField label="Label" hint={RICH_TEXT_HINT}>
                   <Input value={content.badge1Label} onChange={(e) => onChange({ badge1Label: e.target.value })} placeholder="Fully Insured" />
                 </FormField>
-                <FormField label="Sublabel">
+                <FormField label="Sublabel" hint={RICH_TEXT_HINT}>
                   <Input value={content.badge1Sublabel} onChange={(e) => onChange({ badge1Sublabel: e.target.value })} placeholder="Peace of Mind" />
                 </FormField>
               </div>
@@ -411,10 +411,10 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
               </div>
               <BadgeIconPicker value={content.badge2Icon} onChange={(v) => onChange({ badge2Icon: v })} label="Icon" />
               <div className="grid grid-cols-2 gap-2">
-                <FormField label="Label">
+                <FormField label="Label" hint={RICH_TEXT_HINT}>
                   <Input value={content.badge2Label} onChange={(e) => onChange({ badge2Label: e.target.value })} placeholder="Same-Day" />
                 </FormField>
-                <FormField label="Sublabel">
+                <FormField label="Sublabel" hint={RICH_TEXT_HINT}>
                   <Input value={content.badge2Sublabel} onChange={(e) => onChange({ badge2Sublabel: e.target.value })} placeholder="Service Available" />
                 </FormField>
               </div>
@@ -426,13 +426,13 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
       <div>
         <SectionTitle>Contact Form</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Form Title">
+          <FormField label="Form Title" hint={RICH_TEXT_HINT}>
             <Input value={content.formTitle} onChange={(e) => onChange({ formTitle: e.target.value })} placeholder="Fill Out This Form for Your Free Estimate" />
           </FormField>
-          <FormField label="Form Subtitle">
+          <FormField label="Form Subtitle" hint={RICH_TEXT_HINT}>
             <Input value={content.formSubtitle} onChange={(e) => onChange({ formSubtitle: e.target.value })} placeholder="We'll get back to you within 30 minutes" />
           </FormField>
-          <FormField label="Submit Button Text">
+          <FormField label="Submit Button Text" hint={RICH_TEXT_HINT}>
             <Input value={content.formSubmitText} onChange={(e) => onChange({ formSubmitText: e.target.value })} placeholder="Get My Free Quote" />
           </FormField>
           <FormField label="Default Service (hidden field)">
@@ -444,7 +444,7 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
       <div>
         <SectionTitle>Hero Badge</SectionTitle>
         <div className="space-y-3 mt-3">
-          <FormField label="Badge Text">
+          <FormField label="Badge Text" hint={RICH_TEXT_HINT}>
             <Input value={content.heroBadgeText} onChange={(e) => onChange({ heroBadgeText: e.target.value })} placeholder="Fully Insured. Peace of Mind." />
           </FormField>
         </div>
@@ -460,10 +460,10 @@ function FeaturedTestimonialEditor({ content, onChange }: { content: FeaturedTes
       <div>
         <SectionTitle>Labels</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Badge Text">
+          <FormField label="Badge Text" hint={RICH_TEXT_HINT}>
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Featured Review" />
           </FormField>
-          <FormField label="Verified Text">
+          <FormField label="Verified Text" hint={RICH_TEXT_HINT}>
             <Input value={content.verifiedText} onChange={(e) => onChange({ verifiedText: e.target.value })} placeholder="Verified Google Review" />
           </FormField>
         </div>
@@ -472,14 +472,14 @@ function FeaturedTestimonialEditor({ content, onChange }: { content: FeaturedTes
       <div>
         <SectionTitle>Testimonial</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Quote">
+          <FormField label="Quote" hint={RICH_TEXT_HINT}>
             <Textarea value={content.quote} onChange={(e) => onChange({ quote: e.target.value })} placeholder="Customer quote..." rows={4} />
           </FormField>
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Author Name">
+            <FormField label="Author Name" hint={RICH_TEXT_HINT}>
               <Input value={content.authorName} onChange={(e) => onChange({ authorName: e.target.value })} placeholder="John Doe" />
             </FormField>
-            <FormField label="Author Title">
+            <FormField label="Author Title" hint={RICH_TEXT_HINT}>
               <Input value={content.authorTitle} onChange={(e) => onChange({ authorTitle: e.target.value })} placeholder="Verified Customer" />
             </FormField>
           </div>
@@ -492,7 +492,7 @@ function FeaturedTestimonialEditor({ content, onChange }: { content: FeaturedTes
       <div>
         <SectionTitle>Call to Action</SectionTitle>
         <div className="grid grid-cols-2 gap-4 mt-3">
-          <FormField label="Button Text">
+          <FormField label="Button Text" hint={RICH_TEXT_HINT}>
             <Input value={content.ctaText} onChange={(e) => onChange({ ctaText: e.target.value })} placeholder="Call For Service" />
           </FormField>
           <FormField label="Button Link">
@@ -525,7 +525,7 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Badge Text (small uppercase)">
+          <FormField label="Badge Text (small uppercase)" hint={RICH_TEXT_HINT}>
             <Input value={content.badgeText || ''} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Full-Service Service & More" />
           </FormField>
           <FormField label="Headline" hint={RICH_TEXT_HINT}>
@@ -594,7 +594,7 @@ function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; on
       <div>
         <SectionTitle>Content</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Badge">
+          <FormField label="Badge" hint={RICH_TEXT_HINT}>
             <Input value={content.badge} onChange={(e) => onChange({ badge: e.target.value })} placeholder="Ready to Clear the Clutter?" />
           </FormField>
           <FormField label="Headline" hint={RICH_TEXT_HINT}>
@@ -633,7 +633,7 @@ function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; on
       <div>
         <SectionTitle>Call to Action</SectionTitle>
         <div className="grid grid-cols-2 gap-4 mt-3">
-          <FormField label="Button Text">
+          <FormField label="Button Text" hint={RICH_TEXT_HINT}>
             <Input value={content.ctaText} onChange={(e) => onChange({ ctaText: e.target.value })} placeholder="Call Now" />
           </FormField>
           <FormField label="Button Link">
@@ -734,7 +734,7 @@ function ServiceAreasContentEditor({ content, onChange }: { content: ServiceArea
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Badge Text (small uppercase)">
+          <FormField label="Badge Text (small uppercase)" hint={RICH_TEXT_HINT}>
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Areas We Serve" />
           </FormField>
           <FormField label="Headline" hint={RICH_TEXT_HINT}>
@@ -743,10 +743,10 @@ function ServiceAreasContentEditor({ content, onChange }: { content: ServiceArea
           <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
             <Textarea value={content.subheadline} rows={2} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Professional services across the region." />
           </FormField>
-          <FormField label="Locations Heading">
+          <FormField label="Locations Heading" hint={RICH_TEXT_HINT}>
             <Input value={content.locationsHeading} onChange={(e) => onChange({ locationsHeading: e.target.value })} placeholder="Service Locations" />
           </FormField>
-          <FormField label="Missing Area Text">
+          <FormField label="Missing Area Text" hint={RICH_TEXT_HINT}>
             <Input value={content.missingAreaText} onChange={(e) => onChange({ missingAreaText: e.target.value })} placeholder="Don't see your area? Contact us..." />
           </FormField>
         </div>
@@ -777,7 +777,7 @@ function ServiceAreasContentEditor({ content, onChange }: { content: ServiceArea
       <div>
         <SectionTitle>Call to Action</SectionTitle>
         <div className="grid grid-cols-2 gap-4 mt-3">
-          <FormField label="Button Text">
+          <FormField label="Button Text" hint={RICH_TEXT_HINT}>
             <Input value={content.ctaText} onChange={(e) => onChange({ ctaText: e.target.value })} placeholder="Get Service" />
           </FormField>
           <FormField label="Button Link">
@@ -810,7 +810,7 @@ function TestimonialsContentEditor({ content, onChange }: { content: Testimonial
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Badge Text (small uppercase)">
+          <FormField label="Badge Text (small uppercase)" hint={RICH_TEXT_HINT}>
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Testimonials" />
           </FormField>
           <FormField label="Headline" hint={RICH_TEXT_HINT}>
@@ -819,7 +819,7 @@ function TestimonialsContentEditor({ content, onChange }: { content: Testimonial
           <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
             <Textarea value={content.subheadline} rows={2} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="See why homeowners love us" />
           </FormField>
-          <FormField label="Review Label">
+          <FormField label="Review Label" hint={RICH_TEXT_HINT}>
             <Input value={content.reviewLabel} onChange={(e) => onChange({ reviewLabel: e.target.value })} placeholder="Google Review" />
           </FormField>
         </div>
@@ -857,7 +857,7 @@ function TestimonialsContentEditor({ content, onChange }: { content: Testimonial
       <div>
         <SectionTitle>Call to Action</SectionTitle>
         <div className="grid grid-cols-2 gap-4 mt-3">
-          <FormField label="Button Text">
+          <FormField label="Button Text" hint={RICH_TEXT_HINT}>
             <Input value={content.ctaText} onChange={(e) => onChange({ ctaText: e.target.value })} placeholder="Call To Get Started" />
           </FormField>
           <FormField label="Button Link">
@@ -890,7 +890,7 @@ function FaqContentEditor({ content, onChange }: { content: FaqContent; onChange
       <div>
         <SectionTitle>Section Header</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Badge Text (small uppercase)">
+          <FormField label="Badge Text (small uppercase)" hint={RICH_TEXT_HINT}>
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Frequently Asked Questions" />
           </FormField>
           <FormField label="Headline" hint={RICH_TEXT_HINT}>
@@ -927,14 +927,14 @@ function FaqContentEditor({ content, onChange }: { content: FaqContent; onChange
       <div>
         <SectionTitle>Contact Card</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Title">
+          <FormField label="Title" hint={RICH_TEXT_HINT}>
             <Input value={content.contactTitle} onChange={(e) => onChange({ contactTitle: e.target.value })} placeholder="Still have questions?" />
           </FormField>
-          <FormField label="Description">
+          <FormField label="Description" hint={RICH_TEXT_HINT}>
             <Textarea value={content.contactDescription} onChange={(e) => onChange({ contactDescription: e.target.value })} placeholder="Our team is ready to help..." rows={2} />
           </FormField>
           <div className="grid grid-cols-2 gap-4">
-            <FormField label="Button Text">
+            <FormField label="Button Text" hint={RICH_TEXT_HINT}>
               <Input value={content.contactCtaText} onChange={(e) => onChange({ contactCtaText: e.target.value })} placeholder="(208) 998-0054" />
             </FormField>
             <FormField label="Button Link">
@@ -960,7 +960,7 @@ function FooterCtaContentEditor({ content, onChange }: { content: FooterCtaConte
           <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Get your free quote today..." rows={2} />
           </FormField>
-          <FormField label="Reassurance Text">
+          <FormField label="Reassurance Text" hint={RICH_TEXT_HINT}>
             <Input value={content.reassuranceText} onChange={(e) => onChange({ reassuranceText: e.target.value })} placeholder="No obligation · Free estimates · Fast response" />
           </FormField>
         </div>
@@ -969,7 +969,7 @@ function FooterCtaContentEditor({ content, onChange }: { content: FooterCtaConte
       <div>
         <SectionTitle>Call to Action</SectionTitle>
         <div className="grid grid-cols-2 gap-4 mt-3">
-          <FormField label="Button Text">
+          <FormField label="Button Text" hint={RICH_TEXT_HINT}>
             <Input value={content.ctaText} onChange={(e) => onChange({ ctaText: e.target.value })} placeholder="Call For Free Quote" />
           </FormField>
           <FormField label="Button Link">
@@ -990,11 +990,19 @@ function TopbarContentEditor() {
       <div>
         <SectionTitle>Message</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Text">
+          <FormField label="Text" hint={RICH_TEXT_HINT}>
             <Input
               value={topbarConfig.message}
               onChange={(e) => updateTopbarConfig({ message: e.target.value })}
               placeholder="Serving Your Local Area"
+              className="bg-zinc-800 border-zinc-600 text-zinc-100 placeholder:text-zinc-500"
+            />
+          </FormField>
+          <FormField label="Mobile Text (optional)" hint="Shorter text for mobile screens. Leave empty to use the same text.">
+            <Input
+              value={topbarConfig.messageMobile || ''}
+              onChange={(e) => updateTopbarConfig({ messageMobile: e.target.value })}
+              placeholder="Same as desktop"
               className="bg-zinc-800 border-zinc-600 text-zinc-100 placeholder:text-zinc-500"
             />
           </FormField>

@@ -42,7 +42,7 @@ function TestimonialCard({ testimonial, reviewLabel, className = '' }: { testimo
       {/* Quote */}
       <blockquote className="mb-6">
         <p className="section-text-secondary leading-relaxed text-sm">
-          &ldquo;{testimonial.quote}&rdquo;
+          &ldquo;{renderColoredText(testimonial.quote)}&rdquo;
         </p>
       </blockquote>
 
@@ -161,7 +161,7 @@ export default function TestimonialsGrid() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block section-text-accent font-semibold text-sm uppercase tracking-wider mb-4">
-            {content.badgeText}
+            {renderColoredText(content.badgeText)}
           </span>
           <h2 className="font-[var(--font-display)] text-3xl sm:text-4xl lg:text-5xl font-bold section-text-primary mb-6">
             {renderColoredText(content.headline)}
@@ -195,7 +195,7 @@ export default function TestimonialsGrid() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
-            {content.ctaText}
+            {renderColoredText(content.ctaText)}
           </a>
         </div>
       </div>
