@@ -97,5 +97,6 @@ Tag push triggers GitHub Actions → builds frontend → creates release ZIP →
 - **No `json_encode`** on save — WordPress serializes post_meta arrays automatically.
 - **Nonce required** — All authenticated requests need `X-WP-Nonce` header.
 - **Multisite aware** — Use `Helpers::plugin_uri()` instead of `plugins_url()` directly.
-- **Fixed filenames** — Vite outputs `main.js` and `style.css` (no hashes). Version-based cache busting via `byrde.php` Version field.
+- **Hashed filenames** — Vite outputs content-hashed filenames (e.g. `index-DfB4kLG_.js`). PHP reads `.vite/manifest.json` to resolve URLs. No `?ver=` needed — CDN-safe cache busting.
+- **Two entry points** — `index.html` (production, lightweight) and `editor.html` (includes ThemeEditor). `AssetManager::get_entry()` picks the right one based on `?byrde_preview=1`.
 - **Version source** — Plugin version lives in `byrde.php` header, read by `get_plugin_data()`.

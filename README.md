@@ -31,11 +31,11 @@ A WordPress plugin for building headless PPC landing pages. WordPress handles th
 
 ```bash
 git clone git@github.com:tales-bluecrocus/byrde.git
-cd byrde/front-end
+cd byrde
+composer install --no-dev
+cd front-end
 npm install
 npm run build
-cd ..
-composer install --no-dev
 ```
 
 Then symlink or copy the `byrde/` folder into `wp-content/plugins/`.
@@ -71,8 +71,9 @@ The editor lets you:
 | Layer | Technology |
 |-------|-----------|
 | CMS | WordPress 6.x |
+| Backend | PHP 8.0+ with PSR-4 autoloading (Composer) |
 | Frontend | React 18 + TypeScript |
-| Build | Vite |
+| Build | Vite (multi-entry, content-hashed filenames) |
 | Styling | Tailwind CSS |
 | UI Components | shadcn/ui (Radix primitives) |
 | State Management | React Context API |
@@ -83,30 +84,30 @@ The editor lets you:
 
 ```
 byrde/
-├── byrde.php                     # Plugin entry point
-├── functions.php                 # Plugin bootstrap (requires all modules)
+├── byrde.php                     # Plugin entry point (constants, autoload, boot)
+├── src/                          # PHP classes (PSR-4, namespace Byrde\)
+│   ├── Plugin.php                # Bootstrap: instantiates all modules
+│   ├── Core/                     # Constants, Helpers, Logo
+│   ├── Assets/                   # AssetManager (enqueue, preload, critical CSS)
+│   ├── Settings/                 # Theme settings CRUD, cache management
+│   ├── Security/                 # Cleanup, Validators, RateLimiter, CookieConsent
+│   ├── Content/                  # CPT, TemplateLoader, SEO, Shortcodes, LegalPages
+│   ├── API/                      # REST endpoints, ContactForm
+│   ├── Admin/                    # SettingsPage, PageEditor, Onboarding
+│   └── Migration/                # Theme and color schema migrations
 ├── front-end/                    # React application
+│   ├── index.html                # Production entry (lightweight, no editor)
+│   ├── editor.html               # Editor entry (includes ThemeEditor)
 │   ├── src/
+│   │   ├── main.tsx              # Production bootstrap
+│   │   ├── editor-main.tsx       # Editor bootstrap (imports ThemeEditor)
+│   │   ├── App.tsx               # Shared app (accepts optional Editor prop)
 │   │   ├── components/           # React components (one per section)
 │   │   ├── context/              # React Contexts (global state)
 │   │   ├── hooks/                # Custom hooks
-│   │   ├── utils/                # Utilities
-│   │   └── assets/images/        # Static assets (logo fallback)
-│   └── dist/                     # Production build (generated)
-├── inc/                          # PHP modules
-│   ├── cpt-landing.php           # byrde_landing CPT registration
-│   ├── template-loader.php       # Template override + asset isolation
-│   ├── migration.php             # Theme-to-plugin data migration
-│   ├── cleanup.php               # XML-RPC/pingback security
-│   ├── constants.php             # Plugin constants
-│   ├── contact-form-handler.php  # Contact form REST endpoint
-│   ├── page-theme-editor.php     # Visual editor (iframe + REST API)
-│   ├── rate-limiter.php          # Rate limiting for REST endpoints
-│   ├── required-plugins.php      # Required plugin checks (TGM)
-│   ├── rest-content-api.php      # REST API for section content
-│   ├── seo.php                   # Meta tags, JSON-LD, Open Graph
-│   ├── update-checker.php        # GitHub-based auto-updater
-│   └── validators.php            # Input validation & sanitization
+│   │   └── lib/                  # Utilities (analytics, phone, etc.)
+│   └── dist/                     # Production build (generated, hashed filenames)
+│       └── .vite/manifest.json   # Asset manifest for PHP resolution
 ├── templates/
 │   ├── template-landing.php      # Standalone HTML for landing pages
 │   └── template-legal.php        # Server-rendered legal pages
@@ -163,14 +164,20 @@ composer -V
 ```bash
 cd front-end
 npm install
-npm run dev    # Vite dev server with HMR
+npm run dev    # Vite dev server with HMR (open /editor.html for editor)
 ```
 
 ### Production Build
 
 ```bash
 cd front-end
-npm run build  # Outputs to front-end/dist/
+npm run build  # Outputs to front-end/dist/ (two entries: production + editor)
+```
+
+### PHP Autoload
+
+```bash
+composer dump-autoload  # Regenerate PSR-4 autoload after adding classes
 ```
 
 ### Tests
@@ -217,7 +224,7 @@ This will:
 
 ## How Auto-Updates Work
 
-The plugin includes `inc/update-checker.php` which uses the [Plugin Update Checker](https://github.com/YahniS98/plugin-update-checker) library to poll GitHub Releases. When a new release is published:
+The plugin uses the [Plugin Update Checker](https://github.com/YahniS98/plugin-update-checker) library (via Composer) to poll GitHub Releases. When a new release is published:
 
 1. WordPress checks for updates periodically (or manually via **Plugins → Installed Plugins**)
 2. If a newer version exists on GitHub, WordPress shows an update notification

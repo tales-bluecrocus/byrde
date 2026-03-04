@@ -86,16 +86,42 @@ class AssetManager {
     }
 
     /**
-     * Get CSS files associated with a manifest entry.
+     * Get CSS files associated with a manifest entry (including imported chunks).
      *
      * @param string $entry Source entry.
      * @return string[] Array of full CSS URLs.
      */
     private function css_urls( string $entry ): array {
         $manifest = $this->get_manifest();
-        $css      = $manifest[ $entry ]['css'] ?? [];
         $base     = Helpers::plugin_uri() . '/front-end/dist/';
-        return array_map( fn( $file ) => $base . $file, $css );
+        $css      = [];
+
+        // Collect CSS from the entry itself.
+        foreach ( $manifest[ $entry ]['css'] ?? [] as $file ) {
+            $css[] = $base . $file;
+        }
+
+        // Collect CSS from imported chunks (e.g. shared App chunk).
+        foreach ( $manifest[ $entry ]['imports'] ?? [] as $import_key ) {
+            foreach ( $manifest[ $import_key ]['css'] ?? [] as $file ) {
+                $css[] = $base . $file;
+            }
+        }
+
+        return array_unique( $css );
+    }
+
+    /**
+     * Get the Vite entry key for the current request.
+     *
+     * Editor preview loads editor.html (includes ThemeEditor).
+     * Production loads index.html (lightweight, no editor code).
+     */
+    private function get_entry(): string {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $is_preview = ! empty( $_GET[ Constants::QUERY_PREVIEW ] );
+
+        return $is_preview ? 'editor.html' : 'index.html';
     }
 
     /**
@@ -107,9 +133,10 @@ class AssetManager {
             return;
         }
 
-        $js_url  = $this->asset_url( 'index.html' );
-        $js_path = $this->asset_path( 'index.html' );
-        $css_urls = $this->css_urls( 'index.html' );
+        $entry    = $this->get_entry();
+        $js_url   = $this->asset_url( $entry );
+        $js_path  = $this->asset_path( $entry );
+        $css_urls = $this->css_urls( $entry );
 
         // Enqueue CSS (extracted by Vite from the JS entry).
         if ( ! empty( $css_urls ) ) {
@@ -163,8 +190,9 @@ class AssetManager {
             return;
         }
 
-        $css_urls = $this->css_urls( 'index.html' );
-        $js_url   = $this->asset_url( 'index.html' );
+        $entry    = $this->get_entry();
+        $css_urls = $this->css_urls( $entry );
+        $js_url   = $this->asset_url( $entry );
 
         // Preload CSS -- browser discovers stylesheet before parsing full HTML.
         if ( ! empty( $css_urls ) ) {
@@ -180,6 +208,17 @@ class AssetManager {
                 '<link rel="modulepreload" href="%s">' . "\n",
                 esc_url( $js_url )
             );
+        }
+
+        // Modulepreload imported chunks (vendor/shared) — browser fetches in parallel.
+        $manifest = $this->get_manifest();
+        foreach ( $manifest[ $entry ]['imports'] ?? [] as $import_key ) {
+            if ( isset( $manifest[ $import_key ]['file'] ) ) {
+                printf(
+                    '<link rel="modulepreload" href="%s">' . "\n",
+                    esc_url( Helpers::plugin_uri() . '/front-end/dist/' . $manifest[ $import_key ]['file'] )
+                );
+            }
         }
 
         // Preconnect to Google Fonts.

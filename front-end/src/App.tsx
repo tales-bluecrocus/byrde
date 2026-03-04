@@ -1,6 +1,4 @@
 import { useState, useEffect, useCallback, type ComponentType } from 'react';
-// TEMPORARY: direct import (no code splitting) to test cross-chunk context issue
-import ThemeEditor from './components/ThemeEditor';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import FeaturedTestimonial from './components/FeaturedTestimonial';
@@ -36,15 +34,9 @@ const SECTION_COMPONENTS: Record<string, ComponentType> = {
   'footer-cta': FooterCTA,
 };
 
-const isDev = import.meta.env.DEV;
-
-// Check if we should show the sidebar (editor mode)
-function shouldShowSidebar(): boolean {
-  if (isDev) return true;
-  if (typeof window !== 'undefined' && window.byrdeAdmin !== undefined) {
-    return true;
-  }
-  return false;
+interface AppProps {
+  /** Pass the ThemeEditor component from editor entry point. Omit for production. */
+  Editor?: ComponentType;
 }
 
 const PhoneIcon = () => (
@@ -149,7 +141,7 @@ function ProductionLayout() {
 }
 
 // Layout with sidebar (editor mode)
-function EditorLayout() {
+function EditorLayout({ Editor }: { Editor: ComponentType }) {
   const { isOpen, totalWidth } = useSidebar();
 
   // Prevent all link navigation in editor mode to avoid editor-within-editor
@@ -183,14 +175,12 @@ function EditorLayout() {
       </div>
       <FloatingPhoneButton />
       <ScrollToTopButton />
-      <ThemeEditor />
+      <Editor />
     </>
   );
 }
 
-export default function App() {
-  const showSidebar = shouldShowSidebar();
-
+export default function App({ Editor }: AppProps) {
   return (
     <ToastProvider>
       <SettingsProvider>
@@ -199,9 +189,13 @@ export default function App() {
           <HeaderConfigProvider>
             <SectionThemeProvider>
               <ContentProvider>
-                <SidebarProvider>
-                  {showSidebar ? <EditorLayout /> : <ProductionLayout />}
-                </SidebarProvider>
+                {Editor ? (
+                  <SidebarProvider>
+                    <EditorLayout Editor={Editor} />
+                  </SidebarProvider>
+                ) : (
+                  <ProductionLayout />
+                )}
               </ContentProvider>
             </SectionThemeProvider>
           </HeaderConfigProvider>

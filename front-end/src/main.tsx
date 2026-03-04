@@ -15,7 +15,7 @@ if (onboardingRoot) {
     )
   })
 } else {
-  // Landing page — synchronous mount (same as original)
+  // Landing page — production layout (no editor)
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <App />

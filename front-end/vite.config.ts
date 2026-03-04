@@ -5,7 +5,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: './',  // Relative paths so lazy chunks resolve correctly in WordPress
+  base: './',  // Relative paths so assets resolve correctly in WordPress
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -15,6 +15,10 @@ export default defineConfig({
   build: {
     manifest: true, // Generate .vite/manifest.json for PHP asset resolution
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        editor: path.resolve(__dirname, 'editor.html'),
+      },
       output: {
         // Content hashes in ALL filenames — CDN-safe cache busting (no ?ver= needed)
         entryFileNames: 'assets/[name]-[hash].js',
