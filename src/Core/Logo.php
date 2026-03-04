@@ -149,6 +149,7 @@ class Logo {
             </header>
 
             <?php // ─── Hero skeleton ─── ?>
+            <main>
             <div style="position:relative;overflow:hidden;padding:4rem 1rem 4rem;<?php echo $hero_has_bg ? '' : 'background:' . esc_attr( $hero_bg ) . ';'; ?>">
                 <?php // Background image + overlay (if set) ?>
                 <?php if ( $hero_has_bg ) : ?>
@@ -196,6 +197,7 @@ class Logo {
                     </div>
                 </div>
             </div>
+            </main>
         </div>
         <?php
     }

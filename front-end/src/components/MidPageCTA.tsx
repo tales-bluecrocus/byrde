@@ -6,7 +6,7 @@ import { useContent, type FeatureItem } from '../context/ContentContext';
 import { renderColoredText } from '../utils/renderHeadline';
 import { withAlpha } from '../utils/colorUtils';
 import { trackPhoneClick } from '../lib/analytics';
-import * as LucideIcons from 'lucide-react';
+import LucideIcon from './LucideIcon';
 
 const PhoneIcon = () => (
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -14,11 +14,9 @@ const PhoneIcon = () => (
   </svg>
 );
 
-// Render Lucide icon by name
+// Render Lucide icon by name (kebab-case)
 const FeatureIcon = memo(({ feature }: { feature: FeatureItem }) => {
-  const Component = (LucideIcons as Record<string, unknown>)[feature.icon] as React.ComponentType<{ className?: string }> | undefined;
-  if (Component) return <Component className="w-5 h-5" />;
-  return <LucideIcons.CheckCircle className="w-5 h-5" />;
+  return <LucideIcon name={feature.icon || 'check-circle'} className="w-5 h-5" />;
 });
 FeatureIcon.displayName = 'FeatureIcon';
 

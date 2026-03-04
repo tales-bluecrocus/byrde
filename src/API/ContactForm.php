@@ -15,28 +15,9 @@ use Byrde\Settings\Manager;
 class ContactForm {
 
     /**
-     * Allowed services (must match Hero.tsx SERVICE_OPTIONS).
+     * Max length for the service slug.
      */
-    private const ALLOWED_SERVICES = [
-        'junk-removal',
-        'demolition',
-        'estate-cleanout',
-        'move-out',
-        'bobcat',
-        'dumpster',
-    ];
-
-    /**
-     * Service labels for email display.
-     */
-    private const SERVICE_LABELS = [
-        'junk-removal'    => 'Junk Removal',
-        'demolition'      => 'Demolition Services',
-        'estate-cleanout' => 'Estate & Hoarder Cleanouts',
-        'move-out'        => 'Apartment & Move-Out Cleanouts',
-        'bobcat'          => 'Bobcat & Excavation Work',
-        'dumpster'        => 'Dumpster Rentals',
-    ];
+    private const SERVICE_MAX_LENGTH = 100;
 
     public function __construct(
         private Manager $settings,
@@ -272,7 +253,7 @@ class ContactForm {
 
         // --- IP-based rate limiting ---
         $ip = $this->get_client_ip();
-        if ( ! $this->contact_rate_limit( $ip, 3, 300 ) ) {
+        if ( ! $this->contact_rate_limit( $ip, 10, 300 ) ) {
             return new \WP_Error(
                 'rate_limit',
                 'Too many submissions. Please try again in a few minutes.',
@@ -305,7 +286,7 @@ class ContactForm {
 
         if ( empty( $service ) ) {
             $errors['service'] = 'Service is required.';
-        } elseif ( ! in_array( $service, self::ALLOWED_SERVICES, true ) ) {
+        } elseif ( strlen( $service ) > self::SERVICE_MAX_LENGTH ) {
             $errors['service'] = 'Invalid service selected.';
         }
 
@@ -433,8 +414,8 @@ class ContactForm {
             return false;
         }
 
-        // Service label.
-        $service_label = self::SERVICE_LABELS[ $service ] ?? $service;
+        // Service label: convert slug to readable form (e.g. "junk-removal" → "Junk Removal").
+        $service_label = ucwords( str_replace( [ '-', '_' ], ' ', $service ) );
 
         // Build HTML email.
         $html_body = $this->build_lead_email_html( $name, $email, $phone, $service_label, $message );

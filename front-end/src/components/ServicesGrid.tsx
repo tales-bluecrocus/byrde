@@ -2,23 +2,23 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent, type ServiceItem } from '../context/ContentContext';
 import { renderColoredText } from '../utils/renderHeadline';
-import * as LucideIcons from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
+import LucideIcon from './LucideIcon';
 
-// Map of legacy icon names → Lucide component names
-const LEGACY_ICON_MAP: Record<string, keyof typeof LucideIcons> = {
-  trash: 'Trash2',
-  demolition: 'Hammer',
-  home: 'Home',
-  building: 'Building',
-  truck: 'Truck',
-  box: 'Box',
-  package: 'Package',
-  wrench: 'Wrench',
-  hammer: 'Hammer',
-  recycle: 'RefreshCw',
-  leaf: 'Leaf',
+// Map of legacy icon names → Lucide kebab-case names
+const LEGACY_ICON_MAP: Record<string, string> = {
+  trash: 'trash-2',
+  demolition: 'hammer',
+  home: 'home',
+  building: 'building',
+  truck: 'truck',
+  box: 'box',
+  package: 'package',
+  wrench: 'wrench',
+  hammer: 'hammer',
+  recycle: 'refresh-cw',
+  leaf: 'leaf',
 };
 
 // Render icon based on type
@@ -30,15 +30,7 @@ const ServiceIcon = memo(({ service }: { service: ServiceItem }) => {
 
   // Lucide icon (default)
   const iconName = LEGACY_ICON_MAP[service.icon] || service.icon;
-  // Try exact match first, then PascalCase
-  const Component = (LucideIcons as Record<string, unknown>)[iconName] as React.ComponentType<{ className?: string; strokeWidth?: number }> | undefined;
-
-  if (Component) {
-    return <Component className="w-8 h-8" strokeWidth={1.5} />;
-  }
-
-  // Fallback
-  return <LucideIcons.Wrench className="w-8 h-8" strokeWidth={1.5} />;
+  return <LucideIcon name={iconName} className="w-8 h-8" strokeWidth={1.5} />;
 });
 ServiceIcon.displayName = 'ServiceIcon';
 
@@ -119,7 +111,7 @@ function ServicesSlider({ services }: { services: ServiceItem[] }) {
           className="w-10 h-10 rounded-full section-bg-secondary section-border border flex items-center justify-center section-text-secondary hover:text-primary-400 hover:border-primary-500/50 transition-colors"
           aria-label="Previous"
         >
-          <LucideIcons.ChevronLeft className="w-5 h-5" />
+          <LucideIcon name="chevron-left" className="w-5 h-5" />
         </button>
 
         <div className="flex gap-2">
@@ -142,7 +134,7 @@ function ServicesSlider({ services }: { services: ServiceItem[] }) {
           className="w-10 h-10 rounded-full section-bg-secondary section-border border flex items-center justify-center section-text-secondary hover:text-primary-400 hover:border-primary-500/50 transition-colors"
           aria-label="Next"
         >
-          <LucideIcons.ChevronRight className="w-5 h-5" />
+          <LucideIcon name="chevron-right" className="w-5 h-5" />
         </button>
       </div>
     </div>

@@ -20,12 +20,6 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
-        // Split React into a cacheable vendor chunk.
-        manualChunks(id) {
-          if (id.includes('node_modules') && (id.includes('react-dom') || id.includes('/react/'))) {
-            return 'vendor';
-          }
-        },
       },
     },
   },
