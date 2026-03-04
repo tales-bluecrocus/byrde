@@ -19,6 +19,9 @@ class AssetManager {
     /** @var array<string, array{file: string, css?: string[]}> Vite manifest cache. */
     private ?array $manifest = null;
 
+    /** @var bool Whether current request is editor preview. */
+    private ?bool $is_preview = null;
+
     public function __construct(
         private Manager $settings,
         private Cache   $cache,
@@ -37,7 +40,35 @@ class AssetManager {
     }
 
     /**
-     * Read and cache the Vite manifest.
+     * Check if current request is editor preview.
+     */
+    private function is_preview(): bool {
+        if ( null === $this->is_preview ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $this->is_preview = ! empty( $_GET[ Constants::QUERY_PREVIEW ] );
+        }
+        return $this->is_preview;
+    }
+
+    /**
+     * Get the dist subdirectory for the current build.
+     *
+     * Production: dist/          (built by vite.config.ts)
+     * Editor:     dist/editor/   (built by vite.config.editor.ts)
+     */
+    private function dist_subdir(): string {
+        return $this->is_preview() ? 'front-end/dist/editor/' : 'front-end/dist/';
+    }
+
+    /**
+     * Get the Vite manifest entry key for the current build.
+     */
+    private function get_entry(): string {
+        return $this->is_preview() ? 'editor.html' : 'index.html';
+    }
+
+    /**
+     * Read and cache the Vite manifest for the current build.
      *
      * @return array<string, array{file: string, css?: string[]}>
      */
@@ -46,7 +77,7 @@ class AssetManager {
             return $this->manifest;
         }
 
-        $manifest_path = BYRDE_PLUGIN_DIR . 'front-end/dist/.vite/manifest.json';
+        $manifest_path = BYRDE_PLUGIN_DIR . $this->dist_subdir() . '.vite/manifest.json';
         if ( ! file_exists( $manifest_path ) ) {
             $this->manifest = [];
             return $this->manifest;
@@ -68,7 +99,7 @@ class AssetManager {
         if ( ! isset( $manifest[ $entry ]['file'] ) ) {
             return null;
         }
-        return Helpers::plugin_uri() . '/front-end/dist/' . $manifest[ $entry ]['file'];
+        return Helpers::plugin_uri() . '/' . $this->dist_subdir() . $manifest[ $entry ]['file'];
     }
 
     /**
@@ -82,7 +113,7 @@ class AssetManager {
         if ( ! isset( $manifest[ $entry ]['file'] ) ) {
             return null;
         }
-        return BYRDE_PLUGIN_DIR . 'front-end/dist/' . $manifest[ $entry ]['file'];
+        return BYRDE_PLUGIN_DIR . $this->dist_subdir() . $manifest[ $entry ]['file'];
     }
 
     /**
@@ -93,7 +124,7 @@ class AssetManager {
      */
     private function css_urls( string $entry ): array {
         $manifest = $this->get_manifest();
-        $base     = Helpers::plugin_uri() . '/front-end/dist/';
+        $base     = Helpers::plugin_uri() . '/' . $this->dist_subdir();
         $css      = [];
 
         // Collect CSS from the entry itself.
@@ -101,7 +132,7 @@ class AssetManager {
             $css[] = $base . $file;
         }
 
-        // Collect CSS from imported chunks (e.g. shared App chunk).
+        // Collect CSS from imported chunks (e.g. vendor chunk).
         foreach ( $manifest[ $entry ]['imports'] ?? [] as $import_key ) {
             foreach ( $manifest[ $import_key ]['css'] ?? [] as $file ) {
                 $css[] = $base . $file;
@@ -109,19 +140,6 @@ class AssetManager {
         }
 
         return array_unique( $css );
-    }
-
-    /**
-     * Get the Vite entry key for the current request.
-     *
-     * Editor preview loads editor.html (includes ThemeEditor).
-     * Production loads index.html (lightweight, no editor code).
-     */
-    private function get_entry(): string {
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $is_preview = ! empty( $_GET[ Constants::QUERY_PREVIEW ] );
-
-        return $is_preview ? 'editor.html' : 'index.html';
     }
 
     /**
@@ -210,13 +228,14 @@ class AssetManager {
             );
         }
 
-        // Modulepreload imported chunks (vendor/shared) — browser fetches in parallel.
+        // Modulepreload imported chunks (vendor) — browser fetches in parallel.
         $manifest = $this->get_manifest();
+        $base     = Helpers::plugin_uri() . '/' . $this->dist_subdir();
         foreach ( $manifest[ $entry ]['imports'] ?? [] as $import_key ) {
             if ( isset( $manifest[ $import_key ]['file'] ) ) {
                 printf(
                     '<link rel="modulepreload" href="%s">' . "\n",
-                    esc_url( Helpers::plugin_uri() . '/front-end/dist/' . $manifest[ $import_key ]['file'] )
+                    esc_url( $base . $manifest[ $import_key ]['file'] )
                 );
             }
         }

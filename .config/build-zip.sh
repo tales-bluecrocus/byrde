@@ -55,6 +55,7 @@ rsync -a "$PLUGIN_DIR/" "$BUILD_DIR/byrde/" \
   --exclude='front-end/.agents/' \
   --exclude='front-end/.claude/' \
   --exclude='front-end/vite.config.ts' \
+  --exclude='front-end/vite.config.editor.ts' \
   --exclude='front-end/tsconfig*.json' \
   --exclude='front-end/postcss.config.*' \
   --exclude='front-end/tailwind.config.*' \
