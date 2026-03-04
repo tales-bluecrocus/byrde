@@ -406,7 +406,7 @@ export default function Header() {
 						<div className="flex items-center justify-between">
 							{/* Logo */}
 							{logo && (
-								<a href="#" className="flex items-center group">
+								<a href={window.location.pathname} className="flex items-center group">
 									<div
 										className={`p-2 sm:p-3 ${globalConfig.logo.shape === 'circle' ? 'overflow-hidden' : ''}`}
 										style={{

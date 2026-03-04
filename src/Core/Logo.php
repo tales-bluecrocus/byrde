@@ -61,8 +61,8 @@ class Logo {
 
         ?>
         <div data-skeleton style="background:var(--color-dark-950,#09090b);min-height:100vh">
-            <?php // Header skeleton ?>
-            <header style="padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between">
+            <?php // Header skeleton — invisible but preserves layout space ?>
+            <header style="padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;visibility:hidden">
                 <?php if ( ! empty( $logo['url'] ) ) : ?>
                     <img src="<?php echo esc_url( $logo['url'] ); ?>"
                          alt="<?php echo esc_attr( $logo['alt'] ); ?>"
@@ -71,18 +71,14 @@ class Logo {
                          fetchpriority="high">
                 <?php endif; ?>
                 <?php if ( $phone ) : ?>
-                    <a href="tel:<?php echo esc_attr( $settings['phone_raw'] ?? '' ); ?>"
-                       style="display:none;padding:0.75rem 1.5rem;border-radius:12px;background:var(--color-dark-accent,#3ab342);color:#fff;text-decoration:none;font-weight:600;font-size:0.875rem"
-                       class="byrde-sk-phone">
-                        <?php echo esc_html( $phone ); ?>
-                    </a>
+                    <span style="padding:0.75rem 1.5rem;font-size:0.875rem">&nbsp;</span>
                 <?php endif; ?>
             </header>
 
-            <?php // Hero skeleton ?>
-            <div style="padding:3rem 1.5rem;max-width:80rem;margin:0 auto">
+            <?php // Hero skeleton — invisible but preserves layout space ?>
+            <div style="padding:3rem 1.5rem;max-width:80rem;margin:0 auto;visibility:hidden">
                 <?php if ( $headline ) : ?>
-                    <h1 style="font-family:Outfit,system-ui,sans-serif;font-size:clamp(2.25rem,5vw,3.75rem);font-weight:800;line-height:1.1;color:var(--color-dark-text,#fafafa);margin:0 0 1rem">
+                    <h1 style="font-family:Outfit,system-ui,sans-serif;font-size:clamp(2.25rem,5vw,3.75rem);font-weight:800;line-height:1.1;margin:0 0 1rem">
                         <?php echo wp_kses_post( $headline ); ?>
                     </h1>
                 <?php endif; ?>

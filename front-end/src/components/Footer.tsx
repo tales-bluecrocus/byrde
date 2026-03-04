@@ -45,7 +45,7 @@ export default function Footer() {
           <div className="max-w-sm">
             {/* Logo - uses same settings as header */}
             {footerConfig.showLogo && logo && (
-              <a href="#" className="flex items-center gap-3 mb-6">
+              <a href={window.location.pathname} className="flex items-center gap-3 mb-6">
                 <div
                   className={`p-2 ${logoConfig.shape === 'circle' ? 'overflow-hidden' : ''}`}
                   style={{
@@ -127,7 +127,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="section-border border-t">
+      <div className="section-border">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="section-text-secondary text-sm text-center md:text-left">

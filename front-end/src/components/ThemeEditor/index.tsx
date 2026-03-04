@@ -29,6 +29,7 @@ import { SettingsPanel } from './panels/SettingsPanel';
 import { AdvancedPanel } from './panels/AdvancedPanel';
 import { PageAdvancedPanel } from './panels/PageAdvancedPanel';
 import { SiteSettingsPanel } from './panels/SiteSettingsPanel';
+import { SocialPanel } from './panels/SocialPanel';
 import { useSettingsContext } from '../../context/SettingsContext';
 import type { ThemeSettings } from '../../hooks/useSettings';
 import { DEFAULT_SETTINGS } from '../../hooks/useSettings';
@@ -47,6 +48,7 @@ import {
   PanelLeftOpen,
   Code,
   Building,
+  Share2,
 } from 'lucide-react';
 import {
   DndContext,
@@ -410,7 +412,7 @@ export function ThemeEditor() {
   const isPageDesign = selectedSection === 'page-design';
   const isSiteSettings = selectedSection === 'site-settings';
   const panelLabel = isPageDesign
-    ? 'Page Design'
+    ? 'Page Settings'
     : isSiteSettings
       ? 'Site Settings'
       : (selectedSection ? SECTION_LABELS[selectedSection] : '');
@@ -467,8 +469,8 @@ export function ThemeEditor() {
                   <Palette className="h-3.5 w-3.5 text-zinc-400" />
                 </div>
                 <div className="flex-1 min-w-0 text-left">
-                  <span className="text-xs font-medium block">Page Design</span>
-                  <span className="text-[9px] text-zinc-500 block">Colors, palettes, SEO, logo</span>
+                  <span className="text-xs font-medium block">Page Settings</span>
+                  <span className="text-[9px] text-zinc-500 block">Theme mode, social sharing</span>
                 </div>
                 <ChevronRight className="h-3 w-3 text-zinc-600 shrink-0" />
               </button>
@@ -609,10 +611,14 @@ export function ThemeEditor() {
             <>
               <Tabs defaultValue="design" className="flex-1 flex flex-col min-h-0">
                 <div className="px-3 pt-2">
-                  <TabsList className="w-full grid grid-cols-2 bg-zinc-800/60 h-8">
+                  <TabsList className="w-full grid grid-cols-3 bg-zinc-800/60 h-8">
                     <TabsTrigger value="design" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
                       <Palette className="h-3 w-3" />
                       Design
+                    </TabsTrigger>
+                    <TabsTrigger value="social" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
+                      <Share2 className="h-3 w-3" />
+                      Social
                     </TabsTrigger>
                     <TabsTrigger value="advanced" className="gap-1 text-[11px] text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-200 data-[state=active]:shadow-none h-7">
                       <Code className="h-3 w-3" />
@@ -623,6 +629,9 @@ export function ThemeEditor() {
                 <ScrollArea className="flex-1">
                   <TabsContent value="design" className="m-0 p-4">
                     <GlobalPanel />
+                  </TabsContent>
+                  <TabsContent value="social" className="m-0 p-4">
+                    <SocialPanel />
                   </TabsContent>
                   <TabsContent value="advanced" className="m-0 p-4">
                     <PageAdvancedPanel />

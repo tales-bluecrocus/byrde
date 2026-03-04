@@ -1,15 +1,17 @@
-import { useState, useEffect, useCallback, type ComponentType } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense, type ComponentType } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import FeaturedTestimonial from './components/FeaturedTestimonial';
-import ServicesGrid from './components/ServicesGrid';
-import MidPageCTA from './components/MidPageCTA';
-import ServiceAreas from './components/ServiceAreas';
-import TestimonialsGrid from './components/TestimonialsGrid';
-import FAQ from './components/FAQ';
-import FooterCTA from './components/FooterCTA';
-import Footer from './components/Footer';
 import ThemedSection from './components/ThemedSection';
+
+// Below-fold sections — lazy-loaded to reduce initial bundle size.
+const FeaturedTestimonial = lazy(() => import('./components/FeaturedTestimonial'));
+const ServicesGrid = lazy(() => import('./components/ServicesGrid'));
+const MidPageCTA = lazy(() => import('./components/MidPageCTA'));
+const ServiceAreas = lazy(() => import('./components/ServiceAreas'));
+const TestimonialsGrid = lazy(() => import('./components/TestimonialsGrid'));
+const FAQ = lazy(() => import('./components/FAQ'));
+const FooterCTA = lazy(() => import('./components/FooterCTA'));
+const Footer = lazy(() => import('./components/Footer'));
 import PaletteInjector from './components/PaletteInjector';
 import { ToastProvider } from './components/Toast';
 import { SectionThemeProvider, useSectionTheme, type SectionId } from './context/SectionThemeContext';
@@ -106,7 +108,9 @@ function StaticHomePage() {
         if (!Component) return null;
         return (
           <ThemedSection key={id} id={id as SectionId} index={index}>
-            <Component />
+            <Suspense fallback={null}>
+              <Component />
+            </Suspense>
           </ThemedSection>
         );
       })}
@@ -130,9 +134,11 @@ function ProductionLayout() {
       >
         <Header />
         <StaticHomePage />
-        <ThemedSection id="footer" as="footer" index={99}>
-          <Footer />
-        </ThemedSection>
+        <Suspense fallback={null}>
+          <ThemedSection id="footer" as="footer" index={99}>
+            <Footer />
+          </ThemedSection>
+        </Suspense>
       </div>
       <FloatingPhoneButton />
       <ScrollToTopButton />
@@ -169,9 +175,11 @@ function EditorLayout({ Editor }: { Editor: ComponentType }) {
       >
         <Header />
         <StaticHomePage />
-        <ThemedSection id="footer" as="footer" index={99}>
-          <Footer />
-        </ThemedSection>
+        <Suspense fallback={null}>
+          <ThemedSection id="footer" as="footer" index={99}>
+            <Footer />
+          </ThemedSection>
+        </Suspense>
       </div>
       <FloatingPhoneButton />
       <ScrollToTopButton />

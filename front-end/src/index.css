@@ -38,6 +38,26 @@
   background-color: #52525b !important; /* zinc-600 */
 }
 
+/* Editor inputs: consistent dark styling for all inputs/textareas inside the editor panel.
+ * ContentPanel.tsx uses bare <Input> without extra classes, so we force it here.
+ * !important beats WP Admin CSS that may bleed in. */
+.editor-dark input:not([type="color"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.editor-dark textarea {
+  background-color: #27272a !important; /* zinc-800 */
+  border-color: #3f3f46 !important;     /* zinc-700 */
+  color: #f4f4f5 !important;
+}
+.editor-dark input::placeholder,
+.editor-dark textarea::placeholder {
+  color: #71717a !important; /* zinc-500 */
+}
+.editor-dark input:focus-visible,
+.editor-dark textarea:focus-visible {
+  border-color: #52525b !important; /* zinc-600 */
+  outline: none !important;
+  box-shadow: 0 0 0 1px #52525b !important;
+}
+
 /* ADMIN SIDEBAR - Fixed colors (never change with theme) */
 .sidebar-theme {
   /* Force dark theme for admin sidebar - these values NEVER change */

@@ -43,14 +43,6 @@ const LIGHT_FALLBACKS = {
   borderColor: '#d4d4d4',
 } as const;
 
-// Fallback benefits (used if content.benefits is empty/missing)
-const FALLBACK_BENEFITS = [
-  'Fully Licensed & Insured Pros',
-  'Same-Day Services Available',
-  'Locally Owned & Operated',
-  'Honest & Upfront Pricing',
-] as const;
-
 // ============================================
 // MEMOIZED ICON COMPONENTS
 // ============================================
@@ -470,7 +462,7 @@ export default function Hero() {
   // Mobile marquee items (benefits + badges combined into scrolling pills)
   const marqueeItems = useMemo(() => {
     const items: { key: string; text: string; isRating?: boolean }[] = [];
-    const b = content.benefits?.length ? content.benefits : FALLBACK_BENEFITS;
+    const b = content.benefits?.length ? content.benefits : [];
     b.forEach((text, i) => items.push({ key: `b${i}`, text }));
     if (settings.google_rating) {
       items.push({ key: 'gr', text: `${settings.google_rating} ★ ${settings.google_reviews_count || ''} Reviews`, isRating: true });
@@ -578,17 +570,19 @@ export default function Hero() {
             </div>
 
             {/* Benefits (desktop only) */}
-            <ul className="hidden lg:block space-y-4 mb-8">
-              {(content.benefits?.length ? content.benefits : FALLBACK_BENEFITS).map((benefit, index) => (
-                <BenefitItem
-                  key={benefit}
-                  benefit={benefit}
-                  index={index}
-                  accentColor={themeStyles.accentColor}
-                  textColor={themeStyles.textSecondary}
-                />
-              ))}
-            </ul>
+            {content.benefits?.length ? (
+              <ul className="hidden lg:block space-y-4 mb-8">
+                {content.benefits.map((benefit, index) => (
+                  <BenefitItem
+                    key={benefit}
+                    benefit={benefit}
+                    index={index}
+                    accentColor={themeStyles.accentColor}
+                    textColor={themeStyles.textSecondary}
+                  />
+                ))}
+              </ul>
+            ) : null}
 
             {/* Trust Badges (desktop only) */}
             <div className="hidden lg:flex flex-wrap items-center gap-6 pt-6 border-t" style={{ borderColor: themeStyles.borderColor }}>

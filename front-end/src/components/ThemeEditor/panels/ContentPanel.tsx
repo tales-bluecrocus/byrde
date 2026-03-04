@@ -33,7 +33,6 @@ import {
   type TestimonialsContent,
   type FaqContent,
   type FooterCtaContent,
-  type FooterContent,
 } from '../../../context/ContentContext';
 import { useHeaderConfig, type TopbarIcon, type TextAlign, type IconPosition } from '../../../context/HeaderConfigContext';
 import { type SectionId } from '../../../context/SectionThemeContext';
@@ -900,46 +899,6 @@ function FooterCtaContentEditor({ content, onChange }: { content: FooterCtaConte
   );
 }
 
-// Footer Editor
-function FooterContentEditor({ content, onChange }: { content: FooterContent; onChange: (updates: Partial<FooterContent>) => void }) {
-  return (
-    <div className="space-y-6">
-      <div>
-        <SectionTitle>Footer Content</SectionTitle>
-      </div>
-      <div>
-        <SectionTitle>Legal Links</SectionTitle>
-        <div className="space-y-4 mt-3">
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Privacy Label">
-              <Input value={content.privacyLabel} onChange={(e) => onChange({ privacyLabel: e.target.value })} placeholder="Privacy Policy" />
-            </FormField>
-            <FormField label="Privacy Link">
-              <Input value={content.privacyLink} onChange={(e) => onChange({ privacyLink: e.target.value })} placeholder="/privacy" />
-            </FormField>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Terms Label">
-              <Input value={content.termsLabel} onChange={(e) => onChange({ termsLabel: e.target.value })} placeholder="Terms & Conditions" />
-            </FormField>
-            <FormField label="Terms Link">
-              <Input value={content.termsLink} onChange={(e) => onChange({ termsLink: e.target.value })} placeholder="/terms" />
-            </FormField>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <FormField label="Cookie Label">
-              <Input value={content.cookieLabel} onChange={(e) => onChange({ cookieLabel: e.target.value })} placeholder="Cookie Settings" />
-            </FormField>
-            <FormField label="Cookie Link">
-              <Input value={content.cookieLink} onChange={(e) => onChange({ cookieLink: e.target.value })} placeholder="#cookies" />
-            </FormField>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // Topbar Content Editor
 function TopbarContentEditor() {
   const { topbarConfig, updateTopbarConfig } = useHeaderConfig();
@@ -1087,8 +1046,6 @@ export function ContentPanel({ sectionId }: ContentPanelProps) {
       return <FaqContentEditor content={content as FaqContent} onChange={handleChange} />;
     case 'footer-cta':
       return <FooterCtaContentEditor content={content as FooterCtaContent} onChange={handleChange} />;
-    case 'footer':
-      return <FooterContentEditor content={content as FooterContent} onChange={handleChange} />;
     default:
       return null;
   }
