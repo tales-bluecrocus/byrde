@@ -1,51 +1,92 @@
 import type { ReactNode } from 'react';
 
 /**
- * Parse color tags in text: [pr]...[/pr] and [ac]...[/ac].
- * Also supports legacy [primary]/[accent] and <strong> tags.
+ * Parse rich text with color shortcodes and basic HTML.
  *
- * Example: "Trusted By [pr]Your Neighbors[/pr]"
- * Example: "Get [ac]50% Off[/ac] Today"
+ * Supported:
+ *  - [pr]...[/pr]  → Primary color text
+ *  - [ac]...[/ac]  → Accent color text
+ *  - <strong>...</strong> or <b>...</b> → Bold
+ *  - <a href="...">...</a> → Link
+ *  - <br> / <br/> / <br /> → Line break
+ *  - Legacy: [primary]/[accent], <strong> → [pr] normalization
  */
 export function renderColoredText(text: string): ReactNode[] {
   if (!text) return [];
 
-  // Normalize legacy tags
+  // Normalize legacy shortcode aliases
   const normalized = text
-    .replace(/<strong>/g, '[pr]')
-    .replace(/<\/strong>/g, '[/pr]')
     .replace(/\[primary\]/g, '[pr]')
     .replace(/\[\/primary\]/g, '[/pr]')
     .replace(/\[accent\]/g, '[ac]')
     .replace(/\[\/accent\]/g, '[/ac]');
 
-  const pattern = /\[(pr|ac)\](.*?)\[\/\1\]/g;
-  const result: ReactNode[] = [];
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
+  // Tokenize: split on shortcodes, HTML tags we support
+  const TOKEN_RE =
+    /(\[pr\][\s\S]*?\[\/pr\]|\[ac\][\s\S]*?\[\/ac\]|<br\s*\/?>|<strong>[\s\S]*?<\/strong>|<b>[\s\S]*?<\/b>|<a\s[^>]*>[\s\S]*?<\/a>)/gi;
 
-  while ((match = pattern.exec(normalized)) !== null) {
-    if (match.index > lastIndex) {
-      result.push(normalized.slice(lastIndex, match.index));
+  const parts = normalized.split(TOKEN_RE);
+  const result: ReactNode[] = [];
+  let key = 0;
+
+  for (const part of parts) {
+    if (!part) continue;
+
+    // [pr]...[/pr]
+    const prMatch = part.match(/^\[pr\]([\s\S]*?)\[\/pr\]$/i);
+    if (prMatch) {
+      result.push(
+        <span key={key++} style={{ color: 'var(--section-text-accent)' }}>
+          {renderColoredText(prMatch[1])}
+        </span>
+      );
+      continue;
     }
 
-    const colorType = match[1];
-    const innerText = match[2];
-    const color = colorType === 'ac'
-      ? 'var(--color-accent-500)'
-      : 'var(--section-text-accent)';
+    // [ac]...[/ac]
+    const acMatch = part.match(/^\[ac\]([\s\S]*?)\[\/ac\]$/i);
+    if (acMatch) {
+      result.push(
+        <span key={key++} style={{ color: 'var(--color-accent-500)' }}>
+          {renderColoredText(acMatch[1])}
+        </span>
+      );
+      continue;
+    }
 
-    result.push(
-      <span key={match.index} style={{ color }}>
-        {innerText}
-      </span>
-    );
+    // <br> / <br/> / <br />
+    if (/^<br\s*\/?>$/i.test(part)) {
+      result.push(<br key={key++} />);
+      continue;
+    }
 
-    lastIndex = match.index + match[0].length;
-  }
+    // <strong>...</strong>
+    const strongMatch = part.match(/^<strong>([\s\S]*?)<\/strong>$/i);
+    if (strongMatch) {
+      result.push(<strong key={key++}>{renderColoredText(strongMatch[1])}</strong>);
+      continue;
+    }
 
-  if (lastIndex < normalized.length) {
-    result.push(normalized.slice(lastIndex));
+    // <b>...</b>
+    const bMatch = part.match(/^<b>([\s\S]*?)<\/b>$/i);
+    if (bMatch) {
+      result.push(<strong key={key++}>{renderColoredText(bMatch[1])}</strong>);
+      continue;
+    }
+
+    // <a href="...">...</a>
+    const aMatch = part.match(/^<a\s+href=["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>$/i);
+    if (aMatch) {
+      result.push(
+        <a key={key++} href={aMatch[1]} className="underline hover:opacity-80" target="_blank" rel="noopener noreferrer">
+          {renderColoredText(aMatch[2])}
+        </a>
+      );
+      continue;
+    }
+
+    // Plain text
+    result.push(part);
   }
 
   return result.length ? result : [text];

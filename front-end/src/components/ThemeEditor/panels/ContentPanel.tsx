@@ -36,9 +36,26 @@ import {
 } from '../../../context/ContentContext';
 import { useHeaderConfig, type TopbarIcon, type TextAlign, type IconPosition } from '../../../context/HeaderConfigContext';
 import { type SectionId } from '../../../context/SectionThemeContext';
-import { Plus, Trash2, FileText, Star, Phone, Mail, MapPin, Ban, Shield, Clock, CheckCircle, Truck, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, FileText, Star, Phone, Mail, MapPin, Ban, Shield, Clock, CheckCircle, Truck, Image as ImageIcon, GripVertical } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const TOPBAR_ICON_OPTIONS: { value: TopbarIcon; label: string; icon: typeof MapPin }[] = [
   { value: 'none', label: 'None', icon: Ban },
@@ -317,7 +334,7 @@ function BadgeIconPicker({ value, onChange, label }: { value: BadgeIconType; onC
   );
 }
 
-const HEADLINE_HINT = 'Use [pr]...[/pr] or [ac]...[/ac] for colored text';
+const RICH_TEXT_HINT = '[pr]...[/pr] [ac]...[/ac] <strong> <br> <a href="...">';
 
 // Hero Content Editor
 function HeroContentEditor({ content, onChange }: { content: HeroContent; onChange: (updates: Partial<HeroContent>) => void }) {
@@ -340,10 +357,10 @@ function HeroContentEditor({ content, onChange }: { content: HeroContent; onChan
       <div>
         <SectionTitle>Headlines</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Headline" hint={HEADLINE_HINT}>
+          <FormField label="Headline" hint={RICH_TEXT_HINT}>
             <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Fast & Reliable [pr]Service[/pr]" />
           </FormField>
-          <FormField label="Subheadline">
+          <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" rows={3} />
           </FormField>
         </div>
@@ -511,11 +528,11 @@ function ServicesContentEditor({ content, onChange }: { content: ServicesContent
           <FormField label="Badge Text (small uppercase)">
             <Input value={content.badgeText || ''} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Full-Service Service & More" />
           </FormField>
-          <FormField label="Headline" hint={HEADLINE_HINT}>
+          <FormField label="Headline" hint={RICH_TEXT_HINT}>
             <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Full-Service [pr]Service[/pr]" />
           </FormField>
-          <FormField label="Subheadline">
-            <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" />
+          <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
+            <Textarea value={content.subheadline} rows={2} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" />
           </FormField>
         </div>
       </div>
@@ -580,10 +597,10 @@ function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; on
           <FormField label="Badge">
             <Input value={content.badge} onChange={(e) => onChange({ badge: e.target.value })} placeholder="Ready to Clear the Clutter?" />
           </FormField>
-          <FormField label="Headline" hint={HEADLINE_HINT}>
+          <FormField label="Headline" hint={RICH_TEXT_HINT}>
             <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Get Your [pr]Free Quote[/pr] Today" />
           </FormField>
-          <FormField label="Subheadline">
+          <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Supporting text" rows={2} />
           </FormField>
         </div>
@@ -628,8 +645,66 @@ function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; on
   );
 }
 
+// Sortable area row for drag-and-drop reorder
+function SortableAreaRow({
+  area,
+  index,
+  onAreaChange,
+  onRemove,
+}: {
+  area: AreaItem;
+  index: number;
+  onAreaChange: (index: number, updates: Partial<AreaItem>) => void;
+  onRemove: (index: number) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: area.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex gap-2 items-center">
+      <button
+        className="shrink-0 p-1 cursor-grab active:cursor-grabbing text-zinc-600 hover:text-zinc-400 touch-none"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <Input value={area.name} onChange={(e) => onAreaChange(index, { name: e.target.value })} placeholder="City name" className="flex-1" />
+      <Input value={area.state} onChange={(e) => onAreaChange(index, { state: e.target.value })} placeholder="ST" className="w-16" />
+      <div className="flex items-center gap-1" title="Highlighted">
+        <Switch
+          checked={area.highlighted ?? false}
+          onCheckedChange={(v) => onAreaChange(index, { highlighted: v })}
+          className="data-[state=checked]:bg-primary"
+        />
+      </div>
+      <Button size="icon" variant="ghost" onClick={() => onRemove(index)} className="h-9 w-9 shrink-0 text-destructive hover:text-destructive">
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
+
 // Service Areas Editor
 function ServiceAreasContentEditor({ content, onChange }: { content: ServiceAreasContent; onChange: (updates: Partial<ServiceAreasContent>) => void }) {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
   const handleAreaChange = (index: number, updates: Partial<AreaItem>) => {
     const newAreas = [...content.areas];
     newAreas[index] = { ...newAreas[index], ...updates };
@@ -644,6 +719,16 @@ function ServiceAreasContentEditor({ content, onChange }: { content: ServiceArea
     onChange({ areas: content.areas.filter((_, i) => i !== index) });
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = content.areas.findIndex((a) => a.id === active.id);
+    const newIndex = content.areas.findIndex((a) => a.id === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      onChange({ areas: arrayMove(content.areas, oldIndex, newIndex) });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -652,11 +737,11 @@ function ServiceAreasContentEditor({ content, onChange }: { content: ServiceArea
           <FormField label="Badge Text (small uppercase)">
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Areas We Serve" />
           </FormField>
-          <FormField label="Headline" hint={HEADLINE_HINT}>
+          <FormField label="Headline" hint={RICH_TEXT_HINT}>
             <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Serving [pr]Your Area[/pr]" />
           </FormField>
-          <FormField label="Subheadline">
-            <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Professional services across the region." />
+          <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
+            <Textarea value={content.subheadline} rows={2} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Professional services across the region." />
           </FormField>
           <FormField label="Locations Heading">
             <Input value={content.locationsHeading} onChange={(e) => onChange({ locationsHeading: e.target.value })} placeholder="Service Locations" />
@@ -670,22 +755,19 @@ function ServiceAreasContentEditor({ content, onChange }: { content: ServiceArea
       <div>
         <SectionTitle>Areas</SectionTitle>
         <div className="space-y-2 mt-3">
-          {content.areas.map((area, index) => (
-            <div key={area.id} className="flex gap-2 items-center">
-              <Input value={area.name} onChange={(e) => handleAreaChange(index, { name: e.target.value })} placeholder="City name" className="flex-1" />
-              <Input value={area.state} onChange={(e) => handleAreaChange(index, { state: e.target.value })} placeholder="ST" className="w-16" />
-              <div className="flex items-center gap-1" title="Highlighted">
-                <Switch
-                  checked={area.highlighted ?? false}
-                  onCheckedChange={(v) => handleAreaChange(index, { highlighted: v })}
-                  className="data-[state=checked]:bg-primary"
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={content.areas.map((a) => a.id)} strategy={verticalListSortingStrategy}>
+              {content.areas.map((area, index) => (
+                <SortableAreaRow
+                  key={area.id}
+                  area={area}
+                  index={index}
+                  onAreaChange={handleAreaChange}
+                  onRemove={removeArea}
                 />
-              </div>
-              <Button size="icon" variant="ghost" onClick={() => removeArea(index)} className="h-9 w-9 shrink-0 text-destructive hover:text-destructive">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
+              ))}
+            </SortableContext>
+          </DndContext>
           <Button size="sm" variant="outline" onClick={addArea} className="w-full">
             <Plus className="h-4 w-4 mr-1" /> Add Area
           </Button>
@@ -731,11 +813,11 @@ function TestimonialsContentEditor({ content, onChange }: { content: Testimonial
           <FormField label="Badge Text (small uppercase)">
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Testimonials" />
           </FormField>
-          <FormField label="Headline" hint={HEADLINE_HINT}>
+          <FormField label="Headline" hint={RICH_TEXT_HINT}>
             <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Trusted By [pr]Your Neighbors[/pr]" />
           </FormField>
-          <FormField label="Subheadline">
-            <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="See why homeowners love us" />
+          <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
+            <Textarea value={content.subheadline} rows={2} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="See why homeowners love us" />
           </FormField>
           <FormField label="Review Label">
             <Input value={content.reviewLabel} onChange={(e) => onChange({ reviewLabel: e.target.value })} placeholder="Google Review" />
@@ -811,11 +893,11 @@ function FaqContentEditor({ content, onChange }: { content: FaqContent; onChange
           <FormField label="Badge Text (small uppercase)">
             <Input value={content.badgeText} onChange={(e) => onChange({ badgeText: e.target.value })} placeholder="Frequently Asked Questions" />
           </FormField>
-          <FormField label="Headline" hint={HEADLINE_HINT}>
+          <FormField label="Headline" hint={RICH_TEXT_HINT}>
             <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Clear answers to [pr]common concerns[/pr]" />
           </FormField>
-          <FormField label="Subheadline">
-            <Input value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="So you can book with confidence" />
+          <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
+            <Textarea value={content.subheadline} rows={2} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="So you can book with confidence" />
           </FormField>
         </div>
       </div>
@@ -872,10 +954,10 @@ function FooterCtaContentEditor({ content, onChange }: { content: FooterCtaConte
       <div>
         <SectionTitle>Content</SectionTitle>
         <div className="space-y-4 mt-3">
-          <FormField label="Headline" hint={HEADLINE_HINT}>
+          <FormField label="Headline" hint={RICH_TEXT_HINT}>
             <Input value={content.headline} onChange={(e) => onChange({ headline: e.target.value })} placeholder="Ready to [pr]Clear the Clutter?[/pr]" />
           </FormField>
-          <FormField label="Subheadline">
+          <FormField label="Subheadline" hint={RICH_TEXT_HINT}>
             <Textarea value={content.subheadline} onChange={(e) => onChange({ subheadline: e.target.value })} placeholder="Get your free quote today..." rows={2} />
           </FormField>
           <FormField label="Reassurance Text">

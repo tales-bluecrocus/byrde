@@ -157,9 +157,9 @@ export default function ServicesGrid() {
   const hasBgImage = !!theme.bgImage;
 
   const count = content.services.length;
-  const useSlider = count > 6;
+  const alwaysSlider = count > 6; // slider on all breakpoints
 
-  // Grid layout logic
+  // Grid layout logic (desktop only when not always slider)
   const getGridClass = () => {
     if (count === 4) return 'grid md:grid-cols-2 gap-8';
     if (count === 5) return 'grid md:grid-cols-2 lg:grid-cols-6 gap-8';
@@ -199,18 +199,26 @@ export default function ServicesGrid() {
         </div>
 
         {/* Services: Grid or Slider */}
-        {useSlider ? (
+        {alwaysSlider ? (
+          // Many services — always use slider
           <ServicesSlider services={content.services} />
         ) : (
-          <div className={getGridClass()}>
-            {content.services.map((service, index) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                className={getCardClass(index)}
-              />
-            ))}
-          </div>
+          <>
+            {/* Mobile: always slider */}
+            <div className="sm:hidden">
+              <ServicesSlider services={content.services} />
+            </div>
+            {/* Desktop: grid layout */}
+            <div className={`hidden sm:grid ${getGridClass()}`}>
+              {content.services.map((service, index) => (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  className={getCardClass(index)}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

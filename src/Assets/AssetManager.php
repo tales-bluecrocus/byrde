@@ -284,6 +284,10 @@ class AssetManager {
         html{scroll-behavior:smooth}
         body{font-family:"DM Sans",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;margin:0}
         #root{min-height:100vh}
+        @keyframes sk-shimmer{0%{background-position:200% 0}to{background-position:-200% 0}}
+        [data-skeleton] .sk{animation:sk-shimmer 1.8s ease-in-out infinite}
+        @media(max-width:639px){.sk-hide-mobile{display:none!important}}
+        @media(min-width:1024px){.sk-hero-grid{grid-template-columns:1fr 1fr!important;gap:5rem!important}}
         </style>
         <?php
     }

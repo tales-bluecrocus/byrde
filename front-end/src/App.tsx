@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, lazy, Suspense, type ComponentType } 
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ThemedSection from './components/ThemedSection';
+import LazyMount from './components/LazyMount';
 
 // Below-fold sections — lazy-loaded to reduce initial bundle size.
 const FeaturedTestimonial = lazy(() => import('./components/FeaturedTestimonial'));
@@ -20,9 +21,7 @@ import { GlobalConfigProvider } from './context/GlobalConfigContext';
 import { SidebarProvider, useSidebar } from './context/SidebarContext';
 import { ContentProvider } from './context/ContentContext';
 import { SettingsProvider } from './context/SettingsContext';
-import { useSettings } from './hooks/useSettings';
 import { useScrollDepthTracking, useAdAttributionCapture } from './hooks/useAnalytics';
-import { trackPhoneClick } from './lib/analytics';
 
 // Map section IDs to their components
 const SECTION_COMPONENTS: Record<string, ComponentType> = {
@@ -40,17 +39,6 @@ interface AppProps {
   /** Pass the ThemeEditor component from editor entry point. Omit for production. */
   Editor?: ComponentType;
 }
-
-const PhoneIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-    />
-  </svg>
-);
 
 // Scroll to top button
 function ScrollToTopButton() {
@@ -77,25 +65,8 @@ function ScrollToTopButton() {
   );
 }
 
-// Floating phone button for mobile
-function FloatingPhoneButton() {
-  const settings = useSettings();
-
-  const handleClick = () => {
-    trackPhoneClick('floating_button');
-  };
-
-  return (
-    <a
-      href={`tel:${settings.phone_raw}`}
-      onClick={handleClick}
-      className="sm:hidden fixed bottom-6 right-6 z-60 flex items-center justify-center w-14 h-14 btn-themed rounded-full shadow-xl shadow-black/30 transition-all duration-300 active:scale-95 phone-pulse"
-      aria-label={`Call ${settings.phone}`}
-    >
-      <PhoneIcon />
-    </a>
-  );
-}
+// Floating phone button for mobile — rendered by Header component
+// (needs access to header button color context)
 
 // Dynamic home page layout - renders sections based on sectionOrder
 function StaticHomePage() {
@@ -106,11 +77,21 @@ function StaticHomePage() {
       {sectionOrder.map((id, index) => {
         const Component = SECTION_COMPONENTS[id];
         if (!Component) return null;
+
+        // Hero renders immediately; below-fold sections defer until near viewport
+        const isEager = id === 'hero';
+
         return (
           <ThemedSection key={id} id={id as SectionId} index={index}>
-            <Suspense fallback={null}>
+            {isEager ? (
               <Component />
-            </Suspense>
+            ) : (
+              <LazyMount>
+                <Suspense fallback={null}>
+                  <Component />
+                </Suspense>
+              </LazyMount>
+            )}
           </ThemedSection>
         );
       })}
@@ -140,7 +121,7 @@ function ProductionLayout() {
           </ThemedSection>
         </Suspense>
       </div>
-      <FloatingPhoneButton />
+
       <ScrollToTopButton />
     </>
   );
@@ -181,7 +162,7 @@ function EditorLayout({ Editor }: { Editor: ComponentType }) {
           </ThemedSection>
         </Suspense>
       </div>
-      <FloatingPhoneButton />
+
       <ScrollToTopButton />
       <Editor />
     </>

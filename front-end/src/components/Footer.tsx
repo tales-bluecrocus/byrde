@@ -45,7 +45,7 @@ export default function Footer() {
           <div className="max-w-sm">
             {/* Logo - uses same settings as header */}
             {footerConfig.showLogo && logo && (
-              <a href={window.location.pathname} className="flex items-center gap-3 mb-6">
+              <a href={window.location.pathname} className="flex items-center gap-3 mb-6" aria-label="Home">
                 <div
                   className={`p-2 ${logoConfig.shape === 'circle' ? 'overflow-hidden' : ''}`}
                   style={{

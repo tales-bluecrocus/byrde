@@ -115,7 +115,7 @@ export default function MidPageCTA() {
         {/* Trust Indicators */}
         {content.features.length > 0 && (
           <div
-            className="flex flex-wrap items-center justify-center gap-6 mt-12 pt-10 border-t"
+            className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-8 pt-6 border-t"
             style={{ borderColor: dividerColor }}
           >
             {content.features.map((feature, index) => (

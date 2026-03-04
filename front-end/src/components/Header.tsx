@@ -254,12 +254,12 @@ function Topbar() {
 							{topbarConfig.showEmail && (
 								<a
 									href={`mailto:${settings.email}`}
-									className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+									className="flex items-center gap-1.5 hover:opacity-80 transition-opacity min-w-0"
 									aria-label={`Email ${settings.email}`}
 									onClick={() => trackEmailClick('topbar')}
 								>
-									<span style={{ color: accentColor }}><EmailIcon /></span>
-									<span className="hidden sm:inline text-xs sm:text-sm">{settings.email}</span>
+									<span className="shrink-0" style={{ color: accentColor }}><EmailIcon /></span>
+									<span className="text-xs sm:text-sm truncate">{settings.email}</span>
 								</a>
 							)}
 						</div>
@@ -406,7 +406,7 @@ export default function Header() {
 						<div className="flex items-center justify-between">
 							{/* Logo */}
 							{logo && (
-								<a href={window.location.pathname} className="flex items-center group">
+								<a href={window.location.pathname} className="flex items-center group" aria-label="Home">
 									<div
 										className={`p-2 sm:p-3 ${globalConfig.logo.shape === 'circle' ? 'overflow-hidden' : ''}`}
 										style={{
@@ -458,6 +458,22 @@ export default function Header() {
 					</div>
 				</header>
 			</div>
+
+			{/* Floating phone button — mobile only, uses header button color */}
+			{headerConfig.showPhone && (
+				<a
+					href={`tel:${settings.phone_raw}`}
+					onClick={() => trackPhoneClick('floating_button')}
+					className="sm:hidden fixed bottom-6 right-6 z-60 flex items-center justify-center w-14 h-14 rounded-full shadow-xl shadow-black/30 transition-all duration-300 active:scale-95 phone-pulse"
+					style={{
+						backgroundColor: buttonBg,
+						color: buttonText,
+					}}
+					aria-label={`Call ${settings.phone}`}
+				>
+					<PhoneIcon />
+				</a>
+			)}
 		</>
 	);
 }
