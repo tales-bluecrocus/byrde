@@ -209,6 +209,8 @@ function flatToNestedSettings(flat: ThemeSettings) {
       to_email: flat.contact_form_to_email,
       from_email: flat.contact_form_from_email,
       subject: flat.contact_form_subject,
+      cc_email: flat.contact_form_cc_email,
+      bcc_email: flat.contact_form_bcc_email,
     },
     brand_colors: {
       dark_primary: flat.brand_dark_primary,

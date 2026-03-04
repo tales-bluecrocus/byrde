@@ -265,9 +265,9 @@ const DEFAULT_MID_CTA_CONTENT: MidCtaContent = {
   ctaText: 'Call Now',
   ctaLink: 'tel:0000000000',
   features: [
-    { id: '1', icon: 'ShieldCheck', text: 'Free Estimates' },
-    { id: '2', icon: 'Clock', text: 'Same-Day Service' },
-    { id: '3', icon: 'CheckCircle', text: 'Upfront Pricing' },
+    { id: '1', icon: 'shield-check', text: 'Free Estimates' },
+    { id: '2', icon: 'clock', text: 'Same-Day Service' },
+    { id: '3', icon: 'circle-check', text: 'Upfront Pricing' },
   ],
 };
 
@@ -383,10 +383,10 @@ function migrateContent(raw: Record<string, unknown>): Record<string, unknown> {
   const midCta = content['mid-cta'] as Record<string, unknown> | undefined;
   if (midCta?.features && Array.isArray(midCta.features) && midCta.features.length > 0) {
     if (typeof midCta.features[0] === 'string') {
-      const defaultIcons = ['ShieldCheck', 'Clock', 'CheckCircle'];
+      const defaultIcons = ['shield-check', 'clock', 'circle-check'];
       midCta.features = (midCta.features as string[]).map((text, i) => ({
         id: String(i + 1),
-        icon: defaultIcons[i] || 'CheckCircle',
+        icon: defaultIcons[i] || 'circle-check',
         text,
       }));
     }

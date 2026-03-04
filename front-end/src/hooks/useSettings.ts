@@ -68,6 +68,8 @@ export interface ThemeSettings {
   contact_form_to_email: string;
   contact_form_from_email: string;
   contact_form_subject: string;
+  contact_form_cc_email: string;
+  contact_form_bcc_email: string;
 
   // API
   apiUrl: string;
@@ -140,7 +142,9 @@ export const DEFAULT_SETTINGS: ThemeSettings = {
   postmark_api_token: '',
   contact_form_to_email: '',
   contact_form_from_email: '',
-  contact_form_subject: 'New Lead from Website',
+  contact_form_subject: 'New Lead from Ads',
+  contact_form_cc_email: '',
+  contact_form_bcc_email: '',
 
   // API
   apiUrl: '/wp-json/byrde/v1',

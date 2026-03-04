@@ -4,7 +4,7 @@ import { useContent, type TestimonialItem } from '../context/ContentContext';
 import { renderColoredText } from '../utils/renderHeadline';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import LucideIcon from './LucideIcon';
 
 const StarIcon = ({ filled = true }: { filled?: boolean }) => (
   <svg
@@ -111,7 +111,7 @@ function TestimonialsSlider({ testimonials, reviewLabel }: { testimonials: Testi
           className="w-10 h-10 rounded-full section-bg-secondary section-border border flex items-center justify-center section-text-secondary hover:text-primary-400 hover:border-primary-500/50 transition-colors"
           aria-label="Previous"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <LucideIcon name="chevron-left" className="w-5 h-5" />
         </button>
 
         <div className="flex gap-2">
@@ -134,7 +134,7 @@ function TestimonialsSlider({ testimonials, reviewLabel }: { testimonials: Testi
           className="w-10 h-10 rounded-full section-bg-secondary section-border border flex items-center justify-center section-text-secondary hover:text-primary-400 hover:border-primary-500/50 transition-colors"
           aria-label="Next"
         >
-          <ChevronRight className="w-5 h-5" />
+          <LucideIcon name="chevron-right" className="w-5 h-5" />
         </button>
       </div>
     </div>
@@ -192,9 +192,7 @@ export default function TestimonialsGrid() {
             href={content.ctaLink}
             className="inline-flex items-center gap-3 btn-section px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-black/25"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
+            <LucideIcon name="phone" className="w-5 h-5" />
             {renderColoredText(content.ctaText)}
           </a>
         </div>

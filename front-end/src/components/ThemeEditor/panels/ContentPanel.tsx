@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -36,7 +37,7 @@ import {
 } from '../../../context/ContentContext';
 import { useHeaderConfig, type TopbarIcon, type TextAlign, type IconPosition } from '../../../context/HeaderConfigContext';
 import { type SectionId } from '../../../context/SectionThemeContext';
-import { Plus, Trash2, FileText, Star, Phone, Mail, MapPin, Ban, Shield, Clock, CheckCircle, Truck, Image as ImageIcon, GripVertical } from 'lucide-react';
+import { Plus, Trash2, FileText, Star, Phone, Mail, Ban, Image as ImageIcon, GripVertical, Info } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -57,17 +58,6 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-const TOPBAR_ICON_OPTIONS: { value: TopbarIcon; label: string; icon: typeof MapPin }[] = [
-  { value: 'none', label: 'None', icon: Ban },
-  { value: 'map-pin', label: 'Map Pin', icon: MapPin },
-  { value: 'phone', label: 'Phone', icon: Phone },
-  { value: 'star', label: 'Star', icon: Star },
-  { value: 'truck', label: 'Truck', icon: Truck },
-  { value: 'shield', label: 'Shield', icon: Shield },
-  { value: 'clock', label: 'Clock', icon: Clock },
-  { value: 'check-circle', label: 'Check', icon: CheckCircle },
-];
-
 interface ContentPanelProps {
   sectionId: SectionId;
 }
@@ -83,9 +73,24 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 function FormField({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-medium text-muted-foreground">{label}</Label>
+      <div className="flex items-center gap-1.5">
+        <Label className="text-xs font-medium text-muted-foreground">{label}</Label>
+        {hint && (
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="text-muted-foreground/50 hover:text-muted-foreground transition-colors">
+                  <Info className="w-3.5 h-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="z-[10001] max-w-xs font-mono text-[11px] bg-zinc-100 text-zinc-900 border border-zinc-300 shadow-lg px-3 py-2">
+                <code>{hint}</code>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
       {children}
-      {hint && <p className="text-[10px] text-muted-foreground/70">{hint}</p>}
     </div>
   );
 }
@@ -107,53 +112,66 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
-// Common Lucide icon names for the picker
+// Common Lucide icon names for the picker (kebab-case = CDN format).
+// Browse all icons at: https://lucide.dev/icons
 const COMMON_ICONS: { value: string; label: string }[] = [
-  { value: 'Shield', label: 'Shield' },
-  { value: 'ShieldCheck', label: 'Shield Check' },
-  { value: 'Clock', label: 'Clock' },
-  { value: 'CheckCircle', label: 'Check Circle' },
-  { value: 'Star', label: 'Star' },
-  { value: 'Award', label: 'Award' },
-  { value: 'Trophy', label: 'Trophy' },
-  { value: 'Heart', label: 'Heart' },
-  { value: 'ThumbsUp', label: 'Thumbs Up' },
-  { value: 'Zap', label: 'Zap' },
-  { value: 'Rocket', label: 'Rocket' },
-  { value: 'Phone', label: 'Phone' },
-  { value: 'Mail', label: 'Mail' },
-  { value: 'MapPin', label: 'Map Pin' },
-  { value: 'Home', label: 'Home' },
-  { value: 'Building', label: 'Building' },
-  { value: 'Truck', label: 'Truck' },
-  { value: 'Package', label: 'Package' },
-  { value: 'Box', label: 'Box' },
-  { value: 'Wrench', label: 'Wrench' },
-  { value: 'Hammer', label: 'Hammer' },
-  { value: 'Trash2', label: 'Trash' },
-  { value: 'Users', label: 'Users' },
-  { value: 'Handshake', label: 'Handshake' },
-  { value: 'DollarSign', label: 'Dollar' },
-  { value: 'Leaf', label: 'Leaf' },
-  { value: 'RefreshCw', label: 'Recycle' },
-  { value: 'Target', label: 'Target' },
-  { value: 'Crown', label: 'Crown' },
-  { value: 'Gem', label: 'Gem' },
-  { value: 'Sparkles', label: 'Sparkles' },
-  { value: 'BadgeCheck', label: 'Badge Check' },
-  { value: 'Timer', label: 'Timer' },
-  { value: 'Calendar', label: 'Calendar' },
-  { value: 'Lock', label: 'Lock' },
-  { value: 'CreditCard', label: 'Credit Card' },
-  { value: 'Percent', label: 'Percent' },
-  { value: 'Gift', label: 'Gift' },
-  { value: 'Flag', label: 'Flag' },
-  { value: 'Sun', label: 'Sun' },
+  { value: 'shield', label: 'Shield' },
+  { value: 'shield-check', label: 'Shield Check' },
+  { value: 'clock', label: 'Clock' },
+  { value: 'circle-check', label: 'Check Circle' },
+  { value: 'star', label: 'Star' },
+  { value: 'award', label: 'Award' },
+  { value: 'trophy', label: 'Trophy' },
+  { value: 'heart', label: 'Heart' },
+  { value: 'thumbs-up', label: 'Thumbs Up' },
+  { value: 'zap', label: 'Zap' },
+  { value: 'rocket', label: 'Rocket' },
+  { value: 'phone', label: 'Phone' },
+  { value: 'mail', label: 'Mail' },
+  { value: 'map-pin', label: 'Map Pin' },
+  { value: 'home', label: 'Home' },
+  { value: 'building', label: 'Building' },
+  { value: 'truck', label: 'Truck' },
+  { value: 'package', label: 'Package' },
+  { value: 'box', label: 'Box' },
+  { value: 'wrench', label: 'Wrench' },
+  { value: 'hammer', label: 'Hammer' },
+  { value: 'trash-2', label: 'Trash' },
+  { value: 'users', label: 'Users' },
+  { value: 'handshake', label: 'Handshake' },
+  { value: 'dollar-sign', label: 'Dollar' },
+  { value: 'leaf', label: 'Leaf' },
+  { value: 'refresh-cw', label: 'Recycle' },
+  { value: 'target', label: 'Target' },
+  { value: 'crown', label: 'Crown' },
+  { value: 'gem', label: 'Gem' },
+  { value: 'sparkles', label: 'Sparkles' },
+  { value: 'badge-check', label: 'Badge Check' },
+  { value: 'timer', label: 'Timer' },
+  { value: 'calendar', label: 'Calendar' },
+  { value: 'lock', label: 'Lock' },
+  { value: 'credit-card', label: 'Credit Card' },
+  { value: 'percent', label: 'Percent' },
+  { value: 'gift', label: 'Gift' },
+  { value: 'flag', label: 'Flag' },
+  { value: 'sun', label: 'Sun' },
 ];
 
-// Render a Lucide icon preview by name
+/** Convert kebab-case to PascalCase for lucide-react lookup: "shield-check" → "ShieldCheck" */
+function toPascal(name: string): string {
+  return name.replace(/(^|-)([a-z])/g, (_, _sep, ch) => ch.toUpperCase());
+}
+
+// Lucide renamed some icons — map old names to current lucide-react export names.
+const ICON_RENAMES: Record<string, string> = {
+  'CheckCircle': 'CircleCheck',
+  'circle-check': 'CircleCheck',
+};
+
+// Render a Lucide icon preview by name (accepts kebab-case or PascalCase)
 function LucideIconPreview({ name, className }: { name: string; className?: string }) {
-  const Component = (LucideIcons as Record<string, unknown>)[name] as React.ComponentType<{ className?: string }> | undefined;
+  const pascal = ICON_RENAMES[name] || toPascal(name);
+  const Component = (LucideIcons as Record<string, unknown>)[pascal] as React.ComponentType<{ className?: string }> | undefined;
   if (!Component) return <LucideIcons.HelpCircle className={className || 'h-4 w-4'} />;
   return <Component className={className || 'h-4 w-4'} />;
 }
@@ -207,26 +225,35 @@ function IconPicker({ value, iconType, iconImage, onChangeIcon, onChangeType, on
         </Button>
       </div>
       {type === 'lucide' ? (
-        <Select value={value} onValueChange={onChangeIcon}>
-          <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
-            <SelectValue>
-              <span className="flex items-center gap-2">
-                <LucideIconPreview name={value} />
-                {COMMON_ICONS.find(i => i.value === value)?.label || value}
-              </span>
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001] max-h-60">
-            {COMMON_ICONS.map((icon) => (
-              <SelectItem key={icon.value} value={icon.value} className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">
-                <span className="flex items-center gap-2">
-                  <LucideIconPreview name={icon.value} />
-                  {icon.label}
-                </span>
-              </SelectItem>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-zinc-700 border border-zinc-600 shrink-0">
+              <LucideIconPreview name={value} className="h-5 w-5" />
+            </div>
+            <Input
+              value={value}
+              onChange={(e) => onChangeIcon(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+              placeholder="e.g. shield-check"
+              className="bg-zinc-800 border-zinc-600 text-zinc-100 text-sm"
+            />
+          </div>
+          <p className="text-[10px] text-zinc-500">
+            Browse icons at <a href="https://lucide.dev/icons" target="_blank" rel="noopener noreferrer" className="text-zinc-400 underline hover:text-zinc-300">lucide.dev/icons</a> — use the kebab-case name (e.g. <code className="text-zinc-400">shield-check</code>)
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {COMMON_ICONS.slice(0, 16).map((icon) => (
+              <button
+                key={icon.value}
+                type="button"
+                onClick={() => onChangeIcon(icon.value)}
+                title={icon.label}
+                className={`p-1.5 rounded-md border transition-colors ${value === icon.value ? 'bg-zinc-600 border-zinc-500' : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'}`}
+              >
+                <LucideIconPreview name={icon.value} className="h-4 w-4" />
+              </button>
             ))}
-          </SelectContent>
-        </Select>
+          </div>
+        </div>
       ) : (
         <div className="space-y-2">
           {iconImage && (
@@ -253,83 +280,48 @@ function IconPicker({ value, iconType, iconImage, onChangeIcon, onChangeType, on
   );
 }
 
-// Lucide icon picker (simple, no image option) — for features, badges etc.
-function LucideIconPicker({ value, onChange, label }: { value: string; onChange: (v: string) => void; label?: string }) {
+// Lucide icon picker (simple, no image option) — for features, badges, topbar etc.
+function LucideIconPicker({ value, onChange, label, showNone }: { value: string; onChange: (v: string) => void; label?: string; showNone?: boolean }) {
   return (
     <div className="space-y-2">
       {label && <Label className="text-xs font-medium text-muted-foreground">{label}</Label>}
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
-          <SelectValue>
-            <span className="flex items-center gap-2">
-              <LucideIconPreview name={value} />
-              {COMMON_ICONS.find(i => i.value === value)?.label || value}
-            </span>
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001] max-h-60">
-          {COMMON_ICONS.map((icon) => (
-            <SelectItem key={icon.value} value={icon.value} className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">
-              <span className="flex items-center gap-2">
-                <LucideIconPreview name={icon.value} />
-                {icon.label}
-              </span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-zinc-700 border border-zinc-600 shrink-0">
+          {value && value !== 'none' ? <LucideIconPreview name={value} className="h-5 w-5" /> : <Ban className="h-4 w-4 text-zinc-500" />}
+        </div>
+        <Input
+          value={value === 'none' ? '' : value}
+          onChange={(e) => onChange(e.target.value.toLowerCase().replace(/\s+/g, '-') || (showNone ? 'none' : ''))}
+          placeholder="e.g. shield-check"
+          className="bg-zinc-800 border-zinc-600 text-zinc-100 text-sm"
+        />
+      </div>
+      <p className="text-[10px] text-zinc-500">
+        Browse at <a href="https://lucide.dev/icons" target="_blank" rel="noopener noreferrer" className="text-zinc-400 underline hover:text-zinc-300">lucide.dev/icons</a>
+      </p>
     </div>
   );
 }
 
-// Badge icon type → Lucide name map (for hero trust badges)
-const BADGE_TO_LUCIDE: Record<string, string> = {
-  'shield': 'Shield', 'shield-check': 'ShieldCheck', 'lock': 'Lock', 'key': 'Key',
-  'badge': 'Badge', 'badge-check': 'BadgeCheck', 'check': 'Check', 'check-circle': 'CheckCircle',
-  'circle-check': 'CircleCheck', 'thumbs-up': 'ThumbsUp', 'award': 'Award', 'trophy': 'Trophy',
-  'medal': 'Medal', 'star': 'Star', 'heart': 'Heart', 'sparkles': 'Sparkles', 'zap': 'Zap',
-  'clock': 'Clock', 'timer': 'Timer', 'calendar': 'Calendar', 'hourglass': 'Hourglass',
-  'rocket': 'Rocket', 'phone': 'Phone', 'phone-call': 'PhoneCall', 'mail': 'Mail',
-  'message-circle': 'MessageCircle', 'headphones': 'Headphones', 'map-pin': 'MapPin',
-  'navigation': 'Navigation', 'compass': 'Compass', 'home': 'Home', 'building': 'Building',
-  'truck': 'Truck', 'package': 'Package', 'box': 'Box', 'wrench': 'Wrench', 'hammer': 'Hammer',
-  'tool': 'Drill', 'users': 'Users', 'user-check': 'UserCheck', 'handshake': 'Handshake',
-  'smile': 'Smile', 'dollar-sign': 'DollarSign', 'credit-card': 'CreditCard', 'wallet': 'Wallet',
-  'percent': 'Percent', 'tag': 'Tag', 'leaf': 'Leaf', 'recycle': 'Recycle', 'sun': 'Sun',
-  'droplet': 'Droplet', 'gift': 'Gift', 'target': 'Target', 'flag': 'Flag', 'crown': 'Crown', 'gem': 'Gem',
-};
-
-const LUCIDE_TO_BADGE: Record<string, string> = Object.fromEntries(
-  Object.entries(BADGE_TO_LUCIDE).map(([k, v]) => [v, k])
-);
-
-// Badge icon picker using the BadgeIconType values but rendering Lucide icons
+// Badge icon picker — accepts any kebab-case Lucide icon name
 function BadgeIconPicker({ value, onChange, label }: { value: BadgeIconType; onChange: (v: BadgeIconType) => void; label?: string }) {
-  const lucideName = BADGE_TO_LUCIDE[value] || 'Shield';
-
   return (
     <div className="space-y-2">
       {label && <Label className="text-xs font-medium text-muted-foreground">{label}</Label>}
-      <Select value={lucideName} onValueChange={(v) => onChange((LUCIDE_TO_BADGE[v] || 'shield') as BadgeIconType)}>
-        <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
-          <SelectValue>
-            <span className="flex items-center gap-2">
-              <LucideIconPreview name={lucideName} />
-              {COMMON_ICONS.find(i => i.value === lucideName)?.label || lucideName}
-            </span>
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001] max-h-60">
-          {COMMON_ICONS.map((icon) => (
-            <SelectItem key={icon.value} value={icon.value} className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">
-              <span className="flex items-center gap-2">
-                <LucideIconPreview name={icon.value} />
-                {icon.label}
-              </span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-zinc-700 border border-zinc-600 shrink-0">
+          <LucideIconPreview name={value} className="h-5 w-5" />
+        </div>
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value.toLowerCase().replace(/\s+/g, '-') as BadgeIconType)}
+          placeholder="e.g. shield-check"
+          className="bg-zinc-800 border-zinc-600 text-zinc-100 text-sm"
+        />
+      </div>
+      <p className="text-[10px] text-zinc-500">
+        Browse at <a href="https://lucide.dev/icons" target="_blank" rel="noopener noreferrer" className="text-zinc-400 underline hover:text-zinc-300">lucide.dev/icons</a>
+      </p>
     </div>
   );
 }
@@ -582,7 +574,7 @@ function MidCtaContentEditor({ content, onChange }: { content: MidCtaContent; on
   };
 
   const addFeature = () => {
-    onChange({ features: [...content.features, { id: Date.now().toString(), icon: 'CheckCircle', text: '' }] });
+    onChange({ features: [...content.features, { id: Date.now().toString(), icon: 'circle-check', text: '' }] });
   };
 
   const removeFeature = (index: number) => {
@@ -1013,25 +1005,8 @@ function TopbarContentEditor() {
 
       <div>
         <SectionTitle>Icon</SectionTitle>
-        <div className="grid grid-cols-2 gap-4 mt-3">
-          <FormField label="Icon">
-            <Select value={topbarConfig.icon} onValueChange={(v) => updateTopbarConfig({ icon: v as TopbarIcon })}>
-              <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-800 border-zinc-700 z-[10001]">
-                {TOPBAR_ICON_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value} className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100">
-                    <span className="flex items-center gap-2">
-                      <opt.icon className="h-3.5 w-3.5" />
-                      {opt.label}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormField>
-
+        <div className="space-y-4 mt-3">
+          <LucideIconPicker value={topbarConfig.icon} onChange={(v) => updateTopbarConfig({ icon: v as TopbarIcon })} showNone />
           <FormField label="Position">
             <Select value={topbarConfig.iconPosition} onValueChange={(v) => updateTopbarConfig({ iconPosition: v as IconPosition })}>
               <SelectTrigger className="bg-zinc-800 border-zinc-600 text-zinc-100">

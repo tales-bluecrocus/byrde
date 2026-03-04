@@ -343,11 +343,26 @@ class ContactForm {
         $email_sent = $this->send_postmark_email( $name, $email, $phone, $service, $message );
 
         // Fallback to wp_mail if Postmark fails.
+        $fallback_used = false;
         if ( ! $email_sent ) {
+            $fallback_used = true;
             $this->send_fallback_email( $name, $email, $phone, $service, $message );
         }
 
-        return rest_ensure_response( [ 'success' => true ] );
+        $response = [ 'success' => true ];
+
+        // Include email debug info for admins.
+        if ( current_user_can( 'manage_options' ) ) {
+            $response['_debug'] = [
+                'postmark_sent'   => $email_sent,
+                'fallback_used'   => $fallback_used,
+                'to_email'        => self::normalize_email_list( $this->settings->get( 'contact_form_to_email' ) ),
+                'from_email'      => $this->settings->get( 'contact_form_from_email' ),
+                'has_api_token'   => ! empty( $this->settings->get( 'postmark_api_token' ) ),
+            ];
+        }
+
+        return rest_ensure_response( $response );
     }
 
     // ========================================
@@ -394,6 +409,17 @@ class ContactForm {
         return '0.0.0.0';
     }
 
+    /**
+     * Normalize a comma-separated email list: trim each address and ensure "email, email" format.
+     */
+    private static function normalize_email_list( string $emails ): string {
+        if ( empty( $emails ) ) {
+            return '';
+        }
+
+        return implode( ', ', array_filter( array_map( 'trim', explode( ',', $emails ) ) ) );
+    }
+
     // ========================================
     // 6. POSTMARK EMAIL
     // ========================================
@@ -403,9 +429,11 @@ class ContactForm {
      */
     private function send_postmark_email( string $name, string $email, string $phone, string $service, string $message ): bool {
         $api_token  = $this->settings->get( 'postmark_api_token' );
-        $to_email   = $this->settings->get( 'contact_form_to_email' );
+        $to_email   = self::normalize_email_list( $this->settings->get( 'contact_form_to_email' ) );
         $from_email = $this->settings->get( 'contact_form_from_email' );
-        $subject    = $this->settings->get( 'contact_form_subject' ) ?: 'New Lead from Website';
+        $cc_email   = self::normalize_email_list( $this->settings->get( 'contact_form_cc_email' ) );
+        $bcc_email  = self::normalize_email_list( $this->settings->get( 'contact_form_bcc_email' ) );
+        $subject    = $this->settings->get( 'contact_form_subject' ) ?: 'New Lead from Ads';
 
         if ( empty( $api_token ) || empty( $to_email ) || empty( $from_email ) ) {
             if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
@@ -436,9 +464,11 @@ class ContactForm {
                 'Content-Type'            => 'application/json',
                 'X-Postmark-Server-Token' => $api_token,
             ],
-            'body'    => wp_json_encode( [
+            'body'    => wp_json_encode( array_filter( [
                 'From'     => $from_email,
                 'To'       => $to_email,
+                'Cc'       => $cc_email ?: null,
+                'Bcc'      => $bcc_email ?: null,
                 'Subject'  => $subject . ' - ' . $name,
                 'HtmlBody' => $html_body,
                 'TextBody' => $text_body,
@@ -448,7 +478,7 @@ class ContactForm {
                     'service' => $service,
                     'source'  => 'website_form',
                 ],
-            ] ),
+            ] ) ),
             'timeout' => 15,
         ] );
 
@@ -557,13 +587,16 @@ class ContactForm {
      * Send lead notification via wp_mail as fallback.
      */
     private function send_fallback_email( string $name, string $email, string $phone, string $service, string $message ): void {
-        $to_email = $this->settings->get( 'contact_form_to_email' );
+        $to_email  = self::normalize_email_list( $this->settings->get( 'contact_form_to_email' ) );
+        $cc_email  = self::normalize_email_list( $this->settings->get( 'contact_form_cc_email' ) );
+        $bcc_email = self::normalize_email_list( $this->settings->get( 'contact_form_bcc_email' ) );
 
         if ( empty( $to_email ) ) {
             $to_email = get_option( 'admin_email' );
         }
 
-        $subject = 'New Lead: ' . $name;
+        $subject_prefix = $this->settings->get( 'contact_form_subject' ) ?: 'New Lead from Ads';
+        $subject        = $subject_prefix . ': ' . $name;
 
         $body  = "New lead from website:\n\n";
         $body .= "Name: {$name}\n";
@@ -577,6 +610,13 @@ class ContactForm {
         $headers = [
             'Reply-To: ' . $email,
         ];
+
+        if ( ! empty( $cc_email ) ) {
+            $headers[] = 'Cc: ' . $cc_email;
+        }
+        if ( ! empty( $bcc_email ) ) {
+            $headers[] = 'Bcc: ' . $bcc_email;
+        }
 
         wp_mail( $to_email, $subject, $body, $headers );
     }

@@ -10,8 +10,8 @@ export type TextAlign = 'left' | 'center' | 'right';
 // Icon position options
 export type IconPosition = 'before' | 'after';
 
-// Available icons for topbar
-export type TopbarIcon = 'none' | 'map-pin' | 'phone' | 'star' | 'truck' | 'shield' | 'clock' | 'check-circle';
+// Available icons for topbar (any Lucide kebab-case name, or 'none')
+export type TopbarIcon = string;
 
 // Header padding options
 export type HeaderPadding = 'compact' | 'default' | 'spacious';

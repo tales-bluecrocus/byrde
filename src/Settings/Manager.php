@@ -102,6 +102,21 @@ class Manager {
      * @param string $phone Display phone (e.g., "+1 (479) 877-5803" or "(208) 998-0054").
      * @return string Raw phone for tel: links (e.g., "+14798775803" or "2089980054").
      */
+    /**
+     * Sanitize a comma-separated list of email addresses.
+     */
+    public static function sanitize_email_list( string $emails ): string {
+        if ( empty( $emails ) ) {
+            return '';
+        }
+
+        $list = array_filter( array_map( static function ( string $addr ): string {
+            return sanitize_email( trim( $addr ) );
+        }, explode( ',', $emails ) ) );
+
+        return implode( ', ', $list );
+    }
+
     public static function phone_to_raw( string $phone ): string {
         $phone = trim( $phone );
         if ( '' === $phone ) {
@@ -222,7 +237,9 @@ class Manager {
                 'postmark_api_token' => '',
                 'to_email'           => '',
                 'from_email'         => '',
-                'subject'            => 'New Lead from Website',
+                'cc_email'           => '',
+                'bcc_email'          => '',
+                'subject'            => 'New Lead from Ads',
             ],
         ];
     }
@@ -360,9 +377,11 @@ class Manager {
         if ( isset( $settings['contact_form'] ) ) {
             $sanitized['contact_form'] = [
                 'postmark_api_token' => sanitize_text_field( $settings['contact_form']['postmark_api_token'] ?? '' ),
-                'to_email'           => sanitize_email( $settings['contact_form']['to_email'] ?? '' ),
+                'to_email'           => self::sanitize_email_list( $settings['contact_form']['to_email'] ?? '' ),
                 'from_email'         => sanitize_email( $settings['contact_form']['from_email'] ?? '' ),
-                'subject'            => sanitize_text_field( $settings['contact_form']['subject'] ?? 'New Lead from Website' ),
+                'cc_email'           => self::sanitize_email_list( $settings['contact_form']['cc_email'] ?? '' ),
+                'bcc_email'          => self::sanitize_email_list( $settings['contact_form']['bcc_email'] ?? '' ),
+                'subject'            => sanitize_text_field( $settings['contact_form']['subject'] ?? 'New Lead from Ads' ),
             ];
         }
 
@@ -515,6 +534,8 @@ class Manager {
             'contact_form_to_email',
             'contact_form_from_email',
             'contact_form_subject',
+            'contact_form_cc_email',
+            'contact_form_bcc_email',
         ];
 
         return array_diff_key( $all, array_flip( $private_keys ) );
@@ -541,7 +562,9 @@ class Manager {
             $cache['postmark_api_token']      = $settings['contact_form']['postmark_api_token'] ?? '';
             $cache['contact_form_to_email']   = $settings['contact_form']['to_email'] ?? '';
             $cache['contact_form_from_email'] = $settings['contact_form']['from_email'] ?? '';
-            $cache['contact_form_subject']    = $settings['contact_form']['subject'] ?? 'New Lead from Website';
+            $cache['contact_form_subject']    = $settings['contact_form']['subject'] ?? 'New Lead from Ads';
+            $cache['contact_form_cc_email']   = $settings['contact_form']['cc_email'] ?? '';
+            $cache['contact_form_bcc_email']  = $settings['contact_form']['bcc_email'] ?? '';
         }
 
         $value = $cache[ $key ] ?? null;

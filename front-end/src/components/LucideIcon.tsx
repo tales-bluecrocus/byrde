@@ -10,6 +10,18 @@
 
 import { useState, useEffect, memo } from 'react';
 
+// Lucide renamed some icons — map old PascalCase names to current kebab-case slugs.
+const ICON_ALIASES: Record<string, string> = {
+	'CheckCircle': 'circle-check',
+	'ShieldCheck': 'shield-check',
+};
+
+/** Convert PascalCase or camelCase to kebab-case: "ShieldCheck" → "shield-check" */
+function toKebab(name: string): string {
+	if (ICON_ALIASES[name]) return ICON_ALIASES[name];
+	return name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+}
+
 // In-memory SVG cache (persists for page lifetime)
 const svgCache = new Map<string, string>();
 
@@ -17,26 +29,28 @@ const svgCache = new Map<string, string>();
 const pendingFetches = new Map<string, Promise<string>>();
 
 async function fetchIcon(name: string): Promise<string> {
-	if (svgCache.has(name)) return svgCache.get(name)!;
+	const slug = toKebab(name);
 
-	if (pendingFetches.has(name)) return pendingFetches.get(name)!;
+	if (svgCache.has(slug)) return svgCache.get(slug)!;
 
-	const promise = fetch(`https://unpkg.com/lucide-static@latest/icons/${name}.svg`)
+	if (pendingFetches.has(slug)) return pendingFetches.get(slug)!;
+
+	const promise = fetch(`https://unpkg.com/lucide-static@latest/icons/${slug}.svg`)
 		.then((res) => {
 			if (!res.ok) throw new Error(`Icon "${name}" not found`);
 			return res.text();
 		})
 		.then((svg) => {
-			svgCache.set(name, svg);
-			pendingFetches.delete(name);
+			svgCache.set(slug, svg);
+			pendingFetches.delete(slug);
 			return svg;
 		})
 		.catch(() => {
-			pendingFetches.delete(name);
+			pendingFetches.delete(slug);
 			return '';
 		});
 
-	pendingFetches.set(name, promise);
+	pendingFetches.set(slug, promise);
 	return promise;
 }
 
@@ -48,15 +62,19 @@ interface LucideIconProps {
 }
 
 export default memo(function LucideIcon({ name, className = 'w-6 h-6', color, strokeWidth }: LucideIconProps) {
-	const [svg, setSvg] = useState(() => svgCache.get(name) || '');
+	const slug = toKebab(name);
+	const [svg, setSvg] = useState(() => svgCache.get(slug) || '');
 
 	useEffect(() => {
-		if (!svgCache.has(name)) {
+		if (svgCache.has(slug)) {
+			setSvg(svgCache.get(slug)!);
+		} else {
+			setSvg('');
 			fetchIcon(name).then((s) => {
 				if (s) setSvg(s);
 			});
 		}
-	}, [name]);
+	}, [slug]);
 
 	if (!svg) {
 		// Placeholder while loading

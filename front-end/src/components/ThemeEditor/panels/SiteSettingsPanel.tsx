@@ -509,12 +509,27 @@ export function SiteSettingsPanel() {
             className={inputCls}
           />
         </Field>
-        <Field label="Recipient Email">
+        <Field label="Recipient Email(s)">
           <Input
             value={settings.contact_form_to_email}
             onChange={(e) => update('contact_form_to_email', e.target.value)}
-            placeholder="leads@yourdomain.com"
-            type="email"
+            placeholder="leads@yourdomain.com, owner@yourdomain.com"
+            className={inputCls}
+          />
+        </Field>
+        <Field label="CC">
+          <Input
+            value={settings.contact_form_cc_email}
+            onChange={(e) => update('contact_form_cc_email', e.target.value)}
+            placeholder="manager@yourdomain.com"
+            className={inputCls}
+          />
+        </Field>
+        <Field label="BCC">
+          <Input
+            value={settings.contact_form_bcc_email}
+            onChange={(e) => update('contact_form_bcc_email', e.target.value)}
+            placeholder="archive@yourdomain.com"
             className={inputCls}
           />
         </Field>
@@ -531,7 +546,7 @@ export function SiteSettingsPanel() {
           <Input
             value={settings.contact_form_subject}
             onChange={(e) => update('contact_form_subject', e.target.value)}
-            placeholder="New Lead from Website"
+            placeholder="New Lead from Ads"
             className={inputCls}
           />
         </Field>

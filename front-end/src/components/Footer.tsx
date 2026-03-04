@@ -1,7 +1,7 @@
 import { useSettings } from '../hooks/useSettings';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import LucideIcon from './LucideIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle, faFacebookF, faInstagram, faYoutube, faYelp } from '@fortawesome/free-brands-svg-icons';
 
@@ -98,7 +98,7 @@ export default function Footer() {
               <ul className="space-y-4">
                 {footerConfig.showAddress && settings.address && (
                   <li className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 section-text-accent flex-shrink-0 mt-0.5" />
+                    <LucideIcon name="map-pin" className="w-5 h-5 section-text-accent flex-shrink-0 mt-0.5" />
                     <span className="section-text-secondary text-sm whitespace-pre-line">
                       {settings.address}
                     </span>
@@ -107,7 +107,7 @@ export default function Footer() {
                 {footerConfig.showPhone && (
                   <li>
                     <a href={`tel:${settings.phone_raw}`} className="flex items-center gap-3 section-text-secondary hover:opacity-80 transition-colors">
-                      <Phone className="w-5 h-5 section-text-accent" />
+                      <LucideIcon name="phone" className="w-5 h-5 section-text-accent" />
                       <span className="text-sm">{settings.phone}</span>
                     </a>
                   </li>
@@ -115,7 +115,7 @@ export default function Footer() {
                 {footerConfig.showEmail && (
                   <li>
                     <a href={`mailto:${settings.email}`} className="flex items-center gap-3 section-text-secondary hover:opacity-80 transition-colors">
-                      <Mail className="w-5 h-5 section-text-accent" />
+                      <LucideIcon name="mail" className="w-5 h-5 section-text-accent" />
                       <span className="text-sm">{settings.email}</span>
                     </a>
                   </li>

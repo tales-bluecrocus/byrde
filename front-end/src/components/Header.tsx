@@ -5,98 +5,11 @@ import { useGlobalConfig } from "../context/GlobalConfigContext";
 import { useSectionTheme } from "../context/SectionThemeContext";
 import { useSettings } from "../hooks/useSettings";
 import GoogleReviewBadge from "./GoogleReviewBadge";
+import LucideIcon from "./LucideIcon";
 import { getContrastColor, withAlpha, generateBrandPalette } from "../utils/colorUtils";
 import { getColorsForMode } from "../hooks/useSectionPalette";
 import { trackPhoneClick, trackEmailClick } from "../lib/analytics";
 import { renderColoredText } from "../utils/renderHeadline";
-
-const PhoneIcon = () => (
-	<svg
-		className="w-5 h-5"
-		fill="none"
-		stroke="currentColor"
-		viewBox="0 0 24 24"
-	>
-		<path
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			strokeWidth={2}
-			d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-		/>
-	</svg>
-);
-
-const EmailIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-	<svg
-		className={className}
-		fill="none"
-		stroke="currentColor"
-		viewBox="0 0 24 24"
-	>
-		<path
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			strokeWidth={2}
-			d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-		/>
-	</svg>
-);
-
-// Topbar icon components
-const MapPinIcon = ({ className }: { className?: string }) => (
-	<svg className={className || "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-	</svg>
-);
-
-const StarIcon = ({ className }: { className?: string }) => (
-	<svg className={className || "w-4 h-4"} fill="currentColor" viewBox="0 0 24 24">
-		<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-	</svg>
-);
-
-const TruckIcon = ({ className }: { className?: string }) => (
-	<svg className={className || "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-	</svg>
-);
-
-const ShieldIcon = ({ className }: { className?: string }) => (
-	<svg className={className || "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-	</svg>
-);
-
-const ClockIcon = ({ className }: { className?: string }) => (
-	<svg className={className || "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-	</svg>
-);
-
-const CheckCircleIcon = ({ className }: { className?: string }) => (
-	<svg className={className || "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-	</svg>
-);
-
-const TopbarPhoneIcon = ({ className }: { className?: string }) => (
-	<svg className={className || "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-	</svg>
-);
-
-// Map icon type to component
-const TOPBAR_ICON_MAP: Record<string, React.ComponentType<{ className?: string }> | null> = {
-	'none': null,
-	'map-pin': MapPinIcon,
-	'phone': TopbarPhoneIcon,
-	'star': StarIcon,
-	'truck': TruckIcon,
-	'shield': ShieldIcon,
-	'clock': ClockIcon,
-	'check-circle': CheckCircleIcon,
-};
 
 function Topbar() {
 	const { topbarConfig, headerConfig } = useHeaderConfig();
@@ -173,8 +86,8 @@ function Topbar() {
 		zIndex: 0,
 	} : null;
 
-	// Get the icon component
-	const IconComponent = TOPBAR_ICON_MAP[topbarConfig.icon];
+	// Get the icon name (kebab-case) for LucideIcon
+	const topbarIconName = topbarConfig.icon !== 'none' ? topbarConfig.icon : null;
 
 	// Check if we have contact info to show
 	const hasContactInfo = topbarConfig.showPhone || topbarConfig.showEmail;
@@ -199,7 +112,7 @@ function Topbar() {
 
 	// Render the message with icon
 	const renderMessage = () => {
-		const icon = IconComponent ? <span style={{ color: accentColor }}><IconComponent className="w-4 h-4 flex-shrink-0" /></span> : null;
+		const icon = topbarIconName ? <span style={{ color: accentColor }}><LucideIcon name={topbarIconName} className="w-4 h-4 flex-shrink-0" /></span> : null;
 		const hasMobileText = topbarConfig.messageMobile?.trim();
 		const desktopText = <span className={hasMobileText ? 'hidden sm:inline' : ''}>{renderColoredText(topbarConfig.message)}</span>;
 		const mobileText = hasMobileText ? <span className="sm:hidden">{renderColoredText(topbarConfig.messageMobile!)}</span> : null;
@@ -251,7 +164,7 @@ function Topbar() {
 									className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
 									onClick={() => trackPhoneClick('topbar')}
 								>
-									<span style={{ color: accentColor }}><TopbarPhoneIcon className="w-5 h-5 sm:w-4 sm:h-4" /></span>
+									<span style={{ color: accentColor }}><LucideIcon name="phone" className="w-5 h-5 sm:w-4 sm:h-4" /></span>
 									<span className="hidden sm:inline text-sm">{settings.phone}</span>
 								</a>
 							)}
@@ -262,7 +175,7 @@ function Topbar() {
 									aria-label={`Email ${settings.email}`}
 									onClick={() => trackEmailClick('topbar')}
 								>
-									<span className="shrink-0" style={{ color: accentColor }}><EmailIcon className="w-5 h-5 sm:w-4 sm:h-4" /></span>
+									<span className="shrink-0" style={{ color: accentColor }}><LucideIcon name="mail" className="w-5 h-5 sm:w-4 sm:h-4" /></span>
 									<span className="hidden sm:inline text-sm truncate">{settings.email}</span>
 								</a>
 							)}
@@ -453,7 +366,7 @@ export default function Header() {
 										}}
 										onClick={() => trackPhoneClick('header_cta')}
 									>
-										<PhoneIcon />
+										<LucideIcon name="phone" className="w-5 h-5" />
 										<span>{settings.phone}</span>
 									</a>
 								)}
@@ -476,7 +389,7 @@ export default function Header() {
 					} as React.CSSProperties}
 					aria-label={`Call ${settings.phone}`}
 				>
-					<PhoneIcon />
+					<LucideIcon name="phone" className="w-5 h-5" />
 				</a>
 			)}
 		</>

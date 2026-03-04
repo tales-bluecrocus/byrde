@@ -1,6 +1,7 @@
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent } from '../context/ContentContext';
 import { renderColoredText } from '../utils/renderHeadline';
+import LucideIcon from './LucideIcon';
 
 const StarIcon = ({ filled = true }: { filled?: boolean }) => (
   <svg
@@ -101,9 +102,7 @@ export default function FeaturedTestimonial() {
             href={content.ctaLink}
             className="inline-flex items-center gap-3 btn-section px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-black/25"
           >
-            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
+            <LucideIcon name="phone" className="w-5 h-5 shrink-0" />
             <span className="whitespace-nowrap">{renderColoredText(content.ctaText)}</span>
           </a>
         </div>

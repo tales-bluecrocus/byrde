@@ -1,13 +1,7 @@
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useContent } from '../context/ContentContext';
 import { renderColoredText } from '../utils/renderHeadline';
-
-const MapPinIcon = () => (
-  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-  </svg>
-);
+import LucideIcon from './LucideIcon';
 
 export default function ServiceAreas() {
   const { sectionThemes } = useSectionTheme();
@@ -65,24 +59,22 @@ export default function ServiceAreas() {
                   className="w-32 h-32 rounded-full flex items-center justify-center shadow-2xl animate-pulse"
                   style={{ backgroundColor: 'var(--section-button-bg)', color: 'var(--section-button-text)' }}
                 >
-                  <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <LucideIcon name="globe" className="w-16 h-16" strokeWidth={1.5} />
                 </div>
               </div>
 
               {/* Floating Location Pins */}
               <div className="absolute top-8 left-8 w-10 h-10 rounded-full flex items-center justify-center shadow-lg animate-bounce" style={{ animationDelay: '0.1s', backgroundColor: 'var(--section-button-bg)', color: 'var(--section-button-text)' }}>
-                <MapPinIcon />
+                <LucideIcon name="map-pin" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
               <div className="absolute top-16 right-12 w-10 h-10 section-bg-secondary rounded-full flex items-center justify-center section-text-primary shadow-lg animate-bounce" style={{ animationDelay: '0.3s' }}>
-                <MapPinIcon />
+                <LucideIcon name="map-pin" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
               <div className="absolute bottom-16 left-16 w-10 h-10 rounded-full flex items-center justify-center shadow-lg animate-bounce" style={{ animationDelay: '0.5s', backgroundColor: 'var(--section-button-bg)', color: 'var(--section-button-text)' }}>
-                <MapPinIcon />
+                <LucideIcon name="map-pin" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
               <div className="absolute bottom-8 right-8 w-10 h-10 rounded-full flex items-center justify-center shadow-lg animate-bounce" style={{ animationDelay: '0.7s', backgroundColor: 'var(--section-button-bg)', color: 'var(--section-button-text)' }}>
-                <MapPinIcon />
+                <LucideIcon name="map-pin" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
             </div>
           </div>
@@ -106,7 +98,7 @@ export default function ServiceAreas() {
                     color: 'var(--section-button-text)',
                   } : undefined}
                 >
-                  <MapPinIcon />
+                  <LucideIcon name="map-pin" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>{area.name}</span>
                   <span className={`hidden sm:inline text-xs ${area.highlighted ? 'opacity-80' : 'section-text-secondary opacity-70'}`}>
                     {area.state}
@@ -124,9 +116,7 @@ export default function ServiceAreas() {
                 href={content.ctaLink}
                 className="inline-flex items-center gap-3 btn-section px-8 py-4 rounded-full font-semibold text-lg shadow-lg shadow-black/25"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
+                <LucideIcon name="phone" className="w-5 h-5" />
                 {renderColoredText(content.ctaText)}
               </a>
             </div>

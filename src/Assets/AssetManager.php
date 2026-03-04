@@ -192,6 +192,8 @@ class AssetManager {
                 $settings['contact_form_to_email']   = $this->settings->get( 'contact_form_to_email' );
                 $settings['contact_form_from_email'] = $this->settings->get( 'contact_form_from_email' );
                 $settings['contact_form_subject']    = $this->settings->get( 'contact_form_subject' );
+                $settings['contact_form_cc_email']   = $this->settings->get( 'contact_form_cc_email' );
+                $settings['contact_form_bcc_email']  = $this->settings->get( 'contact_form_bcc_email' );
             }
 
             wp_localize_script( 'byrde-main', 'byrdeSettings', $settings );
