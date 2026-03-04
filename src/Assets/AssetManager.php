@@ -156,7 +156,7 @@ class AssetManager {
         ?>
         <style id="byrde-critical">
         html{scroll-behavior:smooth}
-        body{font-family:"DM Sans",system-ui,sans-serif;background-color:#000;color:#fff;line-height:1.6;-webkit-font-smoothing:antialiased;margin:0}
+        body{font-family:"DM Sans",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;margin:0}
         #root{min-height:100vh}
         </style>
         <?php

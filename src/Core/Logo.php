@@ -43,39 +43,13 @@ class Logo {
     }
 
     /**
-     * Render an HTML shell inside #root so the browser can paint and discover
-     * the LCP image (logo) before React loads. React's createRoot() replaces
-     * this content on mount.
+     * Render minimal content inside #root.
+     *
+     * Intentionally empty — avoids the flash of a partial shell (logo on dark
+     * background) before React mounts. The logo is still preloaded via <link>
+     * in AssetManager::preload() so the browser discovers it early for LCP.
      */
     public function render_shell(): void {
-        // Skip in editor preview -- React handles everything there.
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        if ( ! empty( $_GET[ Constants::QUERY_PREVIEW ] ) ) {
-            return;
-        }
-
-        $logo  = $this->get_data();
-        $phone = $this->settings->get( 'phone' );
-        ?>
-        <div style="min-height:100vh;background:#171717">
-            <header style="padding:1rem 1.5rem">
-                <div style="max-width:80rem;margin:0 auto;display:flex;align-items:center;justify-content:space-between">
-                    <?php if ( ! empty( $logo['url'] ) ) : ?>
-                        <img
-                            src="<?php echo esc_url( $logo['url'] ); ?>"
-                            alt="<?php echo esc_attr( $logo['alt'] ); ?>"
-                            width="64"
-                            height="64"
-                            fetchpriority="high"
-                            style="height:3.5rem;width:auto"
-                        />
-                    <?php endif; ?>
-                    <?php if ( $phone ) : ?>
-                        <a href="tel:<?php echo esc_attr( \Byrde\Settings\Manager::phone_to_raw( $phone ) ); ?>" style="display:none"></a>
-                    <?php endif; ?>
-                </div>
-            </header>
-        </div>
-        <?php
+        // Nothing — React's createRoot() populates #root on mount.
     }
 }
