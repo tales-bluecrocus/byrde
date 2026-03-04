@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback, lazy, Suspense, type ComponentType } from 'react';
+import { useState, useEffect, useCallback, type ComponentType } from 'react';
+// TEMPORARY: direct import (no code splitting) to test cross-chunk context issue
+import ThemeEditor from './components/ThemeEditor';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import FeaturedTestimonial from './components/FeaturedTestimonial';
@@ -33,9 +35,6 @@ const SECTION_COMPONENTS: Record<string, ComponentType> = {
   'faq': FAQ,
   'footer-cta': FooterCTA,
 };
-
-// Lazy-load editor-only code (ThemeEditor + react-colorful, shadcn Sheet/Tabs etc.)
-const ThemeEditor = lazy(() => import('./components/ThemeEditor'));
 
 const isDev = import.meta.env.DEV;
 
@@ -184,17 +183,13 @@ function EditorLayout() {
       </div>
       <FloatingPhoneButton />
       <ScrollToTopButton />
-      <Suspense fallback={null}>
-        <ThemeEditor />
-      </Suspense>
+      <ThemeEditor />
     </>
   );
 }
 
 export default function App() {
   const showSidebar = shouldShowSidebar();
-
-  const content = showSidebar ? <EditorLayout /> : <ProductionLayout />;
 
   return (
     <ToastProvider>
@@ -204,11 +199,9 @@ export default function App() {
           <HeaderConfigProvider>
             <SectionThemeProvider>
               <ContentProvider>
-                {showSidebar ? (
-                  <SidebarProvider>{content}</SidebarProvider>
-                ) : (
-                  content
-                )}
+                <SidebarProvider>
+                  {showSidebar ? <EditorLayout /> : <ProductionLayout />}
+                </SidebarProvider>
               </ContentProvider>
             </SectionThemeProvider>
           </HeaderConfigProvider>

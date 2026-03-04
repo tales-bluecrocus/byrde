@@ -25,19 +25,13 @@ export default defineConfig({
           }
           return 'assets/[name][extname]'
         },
-        manualChunks: {
-          // Editor-only: ThemeEditor + react-colorful + shadcn Sheet/Tabs/ColorPicker
-          'editor': [
-            './src/components/ThemeEditor/index.tsx',
-            './src/components/ThemeEditor/panels/GlobalPanel.tsx',
-            './src/components/ThemeEditor/panels/StylePanel.tsx',
-            './src/components/ThemeEditor/panels/ContentPanel.tsx',
-            './src/components/ThemeEditor/panels/SettingsPanel.tsx',
-          ],
-          // Onboarding wizard — only loaded on setup page
-          'onboarding': [
-            './src/components/Onboarding/OnboardingWizard.tsx',
-          ],
+        // Split React into a cacheable vendor chunk.
+        // Editor and onboarding are auto-split by lazy() dynamic imports.
+        // Don't manually chunk lucide/radix — let tree-shaking keep only what each chunk needs.
+        manualChunks(id) {
+          if (id.includes('node_modules') && (id.includes('react-dom') || id.includes('/react/'))) {
+            return 'vendor';
+          }
         },
       },
     },
