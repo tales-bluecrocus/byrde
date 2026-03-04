@@ -284,6 +284,8 @@ class AssetManager {
         html{scroll-behavior:smooth}
         body{font-family:"DM Sans",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;margin:0}
         #root{min-height:100vh}
+        .byrde-sk-phone{display:none}
+        @media(min-width:640px){.byrde-sk-phone{display:inline-block}}
         </style>
         <?php
     }
