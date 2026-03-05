@@ -167,7 +167,7 @@ export default function HeroForm({ themeStyles }: HeroFormProps) {
 	}, [formData, settings.apiUrl, content.formDefaultService]);
 
 	return (
-		<div className="opacity-0 animate-[slide-up_0.8s_ease-out_0.4s_forwards]">
+		<div>
 			<div className="relative">
 				{/* Floating Card Effect */}
 				<div className="absolute -inset-4 rounded-3xl blur-2xl opacity-60" style={{ background: `linear-gradient(to right, ${themeStyles.formAccentColor}33, ${themeStyles.formAccentColor}1a, ${themeStyles.formAccentColor}33)` }} />

@@ -457,10 +457,12 @@ class PageEditor {
         $byrde_page_id = $request->get_param( 'id' );
         $config        = get_post_meta( $byrde_page_id, Constants::META_THEME_CONFIG, true );
 
+        $config_data = $config ? json_decode( $config, true ) : null;
+
         return new WP_REST_Response( [
             'success'     => true,
             'pageId'      => $byrde_page_id,
-            'themeConfig' => $config ? json_decode( $config, true ) : null,
+            'themeConfig' => $config_data ? self::repair_unicode( $config_data ) : null,
         ], 200 );
     }
 
@@ -496,7 +498,7 @@ class PageEditor {
 
         $sanitized = Validators::sanitize_theme_config( $config );
 
-        $json_config = wp_json_encode( $sanitized );
+        $json_config = wp_json_encode( $sanitized, JSON_UNESCAPED_UNICODE );
         update_post_meta( $byrde_page_id, Constants::META_THEME_CONFIG, $json_config );
 
         $saved_config = get_post_meta( $byrde_page_id, Constants::META_THEME_CONFIG, true );
@@ -556,7 +558,7 @@ class PageEditor {
         $sanitized_theme   = Validators::sanitize_theme_config( $theme_config );
         $sanitized_content = Validators::sanitize_content( $content );
 
-        update_post_meta( $byrde_page_id, Constants::META_THEME_CONFIG, wp_json_encode( $sanitized_theme ) );
+        update_post_meta( $byrde_page_id, Constants::META_THEME_CONFIG, wp_json_encode( $sanitized_theme, JSON_UNESCAPED_UNICODE ) );
         update_post_meta( $byrde_page_id, Constants::META_CONTENT, $sanitized_content );
 
         $saved_theme   = get_post_meta( $byrde_page_id, Constants::META_THEME_CONFIG, true );
@@ -596,9 +598,11 @@ class PageEditor {
         $config_data = json_decode( $theme_config, true );
 
         if ( $config_data ) {
+            // Repair legacy data: wp_unslash corrupted \uXXXX → uXXXX in older saves.
+            $config_data = self::repair_unicode( $config_data );
             ?>
             <script>
-                window.byrdeConfig = <?php echo wp_json_encode( $config_data ); ?>;
+                window.byrdeConfig = <?php echo wp_json_encode( $config_data, JSON_UNESCAPED_UNICODE ); ?>;
             </script>
             <?php
         }
@@ -640,5 +644,32 @@ class PageEditor {
                 'title' => __( 'Edit with BlueCrocus Theme Editor', 'byrde' ),
             ],
         ] );
+    }
+
+    /**
+     * Repair Unicode sequences corrupted by wp_unslash.
+     *
+     * wp_json_encode() encodes • as \u2022. WordPress's wp_unslash()
+     * strips the backslash on meta retrieval, leaving literal "u2022".
+     * This restores the original Unicode characters.
+     *
+     * @param mixed $data Data to repair.
+     * @return mixed Repaired data.
+     */
+    private static function repair_unicode( mixed $data ): mixed {
+        if ( is_array( $data ) ) {
+            return array_map( [ self::class, 'repair_unicode' ], $data );
+        }
+        if ( is_string( $data ) ) {
+            // Match uXXXX only when NOT preceded by a word character (letter/digit/underscore).
+            // This catches corrupted sequences like "text u2022 text" or "$25u2013$50"
+            // but won't match inside normal words like "ubuntu".
+            return preg_replace_callback(
+                '/(?<![a-zA-Z_])u([0-9a-fA-F]{4})(?![0-9a-fA-F])/',
+                static fn( $m ) => mb_chr( (int) hexdec( $m[1] ), 'UTF-8' ),
+                $data
+            );
+        }
+        return $data;
     }
 }

@@ -5,7 +5,7 @@
  * Form is lazy-loaded to reduce initial bundle size.
  */
 
-import { useMemo, memo, lazy, Suspense } from 'react';
+import { useMemo, memo } from 'react';
 import { useGlobalConfig } from '../context/GlobalConfigContext';
 import { useSectionTheme } from '../context/SectionThemeContext';
 import { useSectionPalette, resolveButtonColor } from '../hooks/useSectionPalette';
@@ -17,7 +17,7 @@ import { lighten, generateBrandPalette } from '../utils/colorUtils';
 import { getColorsForMode } from '../hooks/useSectionPalette';
 import LucideIcon from './LucideIcon';
 
-const HeroForm = lazy(() => import('./HeroForm'));
+import HeroForm from './HeroForm';
 
 // ============================================
 // STATIC VALUES (hoisted outside component)
@@ -243,7 +243,7 @@ export default function Hero() {
 			<div className="relative max-w-7xl mx-auto px-4 sm:px-8">
 				<div className="grid lg:grid-cols-2 gap-6 lg:gap-20 lg:items-center">
 					{/* Left Content */}
-					<div className="min-w-0 opacity-0 animate-[slide-right_0.8s_ease-out_0.2s_forwards]">
+					<div className="min-w-0">
 						{/* Hero Badge */}
 						{showHeroBadge && (
 							<div
@@ -324,10 +324,8 @@ export default function Hero() {
 						</div>
 					</div>
 
-					{/* Right - Contact Form (lazy-loaded) */}
-					<Suspense fallback={null}>
-						<HeroForm themeStyles={themeStyles} />
-					</Suspense>
+					{/* Right - Contact Form */}
+					<HeroForm themeStyles={themeStyles} />
 				</div>
 			</div>
 		</div>

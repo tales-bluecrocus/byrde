@@ -162,7 +162,7 @@ class ColorMigration {
             }
 
             if ( $changed ) {
-                update_post_meta( $post_id, Constants::META_THEME_CONFIG, wp_json_encode( $config ) );
+                update_post_meta( $post_id, Constants::META_THEME_CONFIG, wp_json_encode( $config, JSON_UNESCAPED_UNICODE ) );
             }
         }
     }

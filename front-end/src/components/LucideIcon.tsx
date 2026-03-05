@@ -77,8 +77,8 @@ export default memo(function LucideIcon({ name, className = 'w-6 h-6', color, st
 	}, [slug]);
 
 	if (!svg) {
-		// Placeholder while loading
-		return <span className={className} />;
+		// Placeholder while loading — inline-block so w/h classes reserve space.
+		return <span className={`${className} inline-block`} />;
 	}
 
 	// Inject className, color, and strokeWidth into the SVG
