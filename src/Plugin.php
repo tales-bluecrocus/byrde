@@ -2,8 +2,10 @@
 
 namespace Byrde;
 
+use Byrde\Admin\McpInfo;
 use Byrde\Admin\Onboarding;
 use Byrde\Admin\PageEditor;
+use Byrde\API\Abilities;
 use Byrde\API\ContactForm;
 use Byrde\API\ContentEndpoints;
 use Byrde\Assets\AssetManager;
@@ -59,6 +61,9 @@ class Plugin {
         ( new ContentEndpoints() )->register();
         ( new ContactForm( $this->settings ) )->register();
 
+        // Abilities API (WordPress MCP integration)
+        ( new Abilities( $this->settings ) )->register();
+
         // Content features
         ( new SEO() )->register();
         ( new Shortcodes( $this->settings ) )->register();
@@ -66,6 +71,7 @@ class Plugin {
 
         // Admin
         ( new PageEditor() )->register();
+        ( new McpInfo() )->register();
 
         $this->onboarding = new Onboarding( $this->settings );
         $this->onboarding->register();

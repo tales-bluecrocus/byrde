@@ -25,7 +25,7 @@ PHP backend uses PSR-4 autoloading via Composer with `Byrde\` namespace. All cla
   - `src/Settings/` — Manager (settings CRUD with deep merge, sanitization), Cache (12 hosting/CDN purge layers)
   - `src/Security/` — Cleanup (XML-RPC disable), Validators (theme config + content + image), RateLimiter (transient-based), CookieConsent (GDPR modal)
   - `src/Content/` — LandingCPT, TemplateLoader (2-layer asset isolation), SEO (meta + JSON-LD), Shortcodes (6 dynamic), LegalPages (default legal content)
-  - `src/API/` — ContentEndpoints (CRUD + window injection), ContactForm (Postmark email + `byrde_lead` CPT + attribution)
+  - `src/API/` — ContentEndpoints (CRUD + window injection), ContactForm (Postmark email + `byrde_lead` CPT + attribution), Abilities (WordPress Abilities API for MCP integration)
   - `src/Admin/` — SettingsPage, PageEditor (full-screen iframe editor), Onboarding (setup wizard)
   - `src/Migration/` — ThemeMigration (page→CPT), ColorMigration (v2→v3→v4 schema)
 - `front-end/src/components/` — React components (one per section)
@@ -38,6 +38,8 @@ PHP backend uses PSR-4 autoloading via Composer with `Byrde\` namespace. All cla
 - `front-end/src/utils/` — Color utilities (hex/rgb/hsl conversions, shade generation, WCAG contrast, brand palette), headline rendering (`[pr]`/`[ac]` shortcodes)
 - `templates/` — Standalone HTML templates (landing = React mount, legal = server-rendered)
 - `docs/` — Additional documentation (ads tracking setup guide)
+- `.claude/agents/` — 6 specialized Claude Code agents (backend, frontend, devops, reviewer, marketing, design)
+- `.agents/skills/` — 18 agent skills (WordPress, React, shadcn, analytics, PPC, debugging, design, MCP)
 - `.config/` — Release/build scripts
 - `.github/workflows/` — GitHub Actions (release automation)
 
@@ -148,6 +150,26 @@ composer dump-autoload          # Regenerate PSR-4 autoload after adding classes
 
 Tag push triggers GitHub Actions → builds frontend → creates release ZIP → WordPress auto-detects update via `Plugin::setup_update_checker()`.
 
+## Claude Code Agents
+
+6 specialized agents in `.claude/agents/`:
+
+| Agent | Scope | When to Use |
+|-------|-------|-------------|
+| `@backend` | PHP, REST API, WordPress | New/edit PHP classes, endpoints, validation, settings, CPT, migrations, cache, rate limiting |
+| `@frontend` | React 19, TypeScript, Vite | Components, hooks, contexts, color system, shadcn/ui, analytics hooks, ThemeEditor |
+| `@devops` | Build, release, CI/CD | GitHub Actions, Vite configs, version bumps, ZIP packaging, Composer, auto-updates |
+| `@reviewer` | Code review, security | PR reviews, security audit (OWASP), WCAG accessibility, performance, TypeScript quality |
+| `@marketing` | SEO, analytics, PPC | GA4/GTM/Meta Pixel setup, conversion tracking, UTM attribution, JSON-LD, landing page strategy |
+| `@design` | UI/UX, design system | Visual quality, responsive design, color system, WCAG contrast, shadcn patterns, CLS/LCP |
+
+### Installed Skills (18)
+
+**Frontend/Design:** frontend-design, web-design-guidelines, web-design-reviewer, shadcn-ui, vercel-react-best-practices
+**WordPress:** wordpress-pro, wp-rest-api, wp-performance, wp-wpcli-and-ops, wp-interactivity-api, wp-abilities-api, wp-block-themes
+**Marketing:** analytics-tracking, paid-ads
+**Tooling:** systematic-debugging, continuous-learning-v2, mcp-builder
+
 ## Important Rules
 
 - **CPT only** — Landing pages use `byrde_landing` CPT. All hooks guard with `is_singular( Constants::CPT_LANDING )`.
@@ -164,3 +186,4 @@ Tag push triggers GitHub Actions → builds frontend → creates release ZIP →
 - **Contact form** — Postmark is primary email transport. Falls back to `wp_mail()`. Leads stored as `byrde_lead` CPT with full attribution metadata.
 - **Cache purging** — `Settings\Cache` auto-purges 12 cache layers (LiteSpeed, WP Rocket, Cloudflare, WP Engine, Kinsta, etc.) on settings/content save.
 - **Color migrations** — `ColorMigration` handles v2→v3→v4 schema upgrades. Check `byrde_color_schema_version` option.
+- **Abilities API** — `Byrde\API\Abilities` registers 7 abilities for WordPress MCP Adapter integration. Only activates when `wp_register_ability()` exists (WP 6.9+ or Composer package). Abilities: `byrde/get-settings`, `byrde/update-settings`, `byrde/list-pages`, `byrde/get-page`, `byrde/update-page-theme`, `byrde/update-page-content`, `byrde/save-page`. All writes use existing Validators for sanitization. Content updates do partial merge with existing data.

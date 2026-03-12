@@ -15,6 +15,7 @@ A WordPress plugin for building headless PPC landing pages. WordPress handles th
 - **SEO Optimized** — JSON-LD structured data (FAQ, Breadcrumb), Open Graph, Twitter Cards, meta tags, custom title
 - **Analytics Ready** — GA4, GTM, Meta Pixel, Google Ads with UTM tracking and scroll/section/form event tracking via `dataLayer`
 - **Auto-Updates** — Push a git tag, WordPress detects the update automatically via GitHub Releases
+- **AI Agent Ready (MCP)** — WordPress Abilities API integration exposes 7 abilities for AI agents (Claude Desktop, Cursor, etc.) via the official MCP Adapter plugin
 - **Multisite Compatible** — Works with WordPress multisite subdirectory installs
 - **Legal Pages** — Auto-generated Privacy Policy, Terms & Conditions, and Cookie Settings pages with dynamic shortcodes
 
@@ -110,7 +111,7 @@ byrde/
 │   ├── Settings/                 # Theme settings CRUD + Cache (12 hosting/CDN purge layers)
 │   ├── Security/                 # Cleanup (XML-RPC), Validators, RateLimiter, CookieConsent
 │   ├── Content/                  # CPT, TemplateLoader, SEO, Shortcodes, LegalPages
-│   ├── API/                      # REST endpoints, ContactForm (Postmark + lead storage)
+│   ├── API/                      # REST endpoints, ContactForm, Abilities (MCP)
 │   ├── Admin/                    # SettingsPage, PageEditor, Onboarding
 │   └── Migration/                # Theme→Plugin migration, color schema migrations (v2→v4)
 ├── front-end/                    # React application
@@ -136,6 +137,13 @@ byrde/
 │   ├── template-landing.php      # Standalone HTML for landing pages (React mount)
 │   └── template-legal.php        # Server-rendered legal pages (no React)
 ├── docs/                         # Additional documentation
+├── .claude/agents/               # Claude Code specialized agents
+│   ├── backend.md                # @backend — PHP, REST API, WordPress
+│   ├── frontend.md               # @frontend — React, TypeScript, Vite, shadcn
+│   ├── devops.md                 # @devops — Build, release, CI/CD
+│   ├── reviewer.md               # @reviewer — Code review, security, a11y
+│   ├── marketing.md              # @marketing — SEO, analytics, PPC tracking
+│   └── design.md                 # @design — UI/UX, design system, WCAG
 ├── .config/                      # Release & build scripts
 │   ├── bump-version.sh           # Auto-increment version (patch/minor/major)
 │   ├── create-release.sh         # Create a tagged release
@@ -275,6 +283,50 @@ No tokens needed — the repository is public.
 - Honeypot field on contact form
 - XML-RPC disabled by default (`byrde_disable_xmlrpc` filter to override)
 - Asset isolation on landing pages (two-layer: dequeue + tag filter)
+
+## Claude Code Agents
+
+The project includes 6 specialized Claude Code agents in `.claude/agents/`:
+
+| Agent | Focus | Use For |
+|-------|-------|---------|
+| `@backend` | PHP, REST API, WordPress | Classes, endpoints, validation, settings, CPT, migrations |
+| `@frontend` | React, TypeScript, Vite | Components, hooks, contexts, color system, shadcn/ui |
+| `@devops` | Build, release, CI/CD | GitHub Actions, Vite config, versioning, ZIP packaging |
+| `@reviewer` | Code review, security | PR review, WCAG audit, performance check, code quality |
+| `@marketing` | SEO, analytics, PPC | GA4/GTM tracking, attribution, JSON-LD, conversion setup |
+| `@design` | UI/UX, design system | Visual quality, responsive, color system, accessibility |
+
+18 agent skills are also installed (`.agents/skills/`) covering WordPress, React, shadcn/ui, analytics, PPC, debugging, design review, and MCP.
+
+## AI Agent Integration (MCP)
+
+Byrde registers abilities via the WordPress Abilities API (WP 6.9+), which the official [WordPress MCP Adapter](https://github.com/developer-jeremylopez/wordpress-mcp-adapter) plugin exposes as MCP tools for AI agents like Claude Desktop, Cursor, and others.
+
+### Setup
+
+1. Install and activate the **WordPress MCP Adapter** plugin
+2. Byrde abilities are registered automatically — no extra configuration needed
+
+### Available Abilities
+
+| Ability | Description | Permission |
+|---------|-------------|------------|
+| `byrde/get-settings` | Read all plugin settings | Public |
+| `byrde/update-settings` | Update plugin settings (partial merge) | `manage_options` |
+| `byrde/list-pages` | List all landing pages with status | `edit_posts` |
+| `byrde/get-page` | Get full page data (theme config + content) | `edit_posts` |
+| `byrde/update-page-theme` | Update page color/palette config | `edit_posts` |
+| `byrde/update-page-content` | Update section content (partial merge) | `edit_posts` |
+| `byrde/save-page` | Atomic save of theme + content | `edit_posts` |
+
+Content updates support partial merges — you can update a single section without overwriting others.
+
+### Requirements
+
+- WordPress 6.9+ (native Abilities API) **or** the `developer-jeremylopez/wordpress-abilities-api` Composer package
+- WordPress MCP Adapter plugin for exposing abilities as MCP tools
+- Both are optional — Byrde works normally without them
 
 ## Cache Compatibility
 
