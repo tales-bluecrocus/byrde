@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "skills": {
+    "analytics-tracking": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "1ad3893d31e5df78cb4b4e16801f49acbdf82daed5f775748859ca7dc638d6d0"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    },
+    "mcp-builder": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "fc68038c900eb801f73ff96130c9f9dba533cc94212ed8435833242f196dedcf"
+    },
+    "paid-ads": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "74be53d9e279bafaf1f53e2612cbba0d9e4750df4116496732d877782f0c3a48"
+    },
+    "shadcn-ui": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "computedHash": "dadbca54d35a33fe73e40018611af2179689305bf6da812ab2643987fefd9da3"
+    },
+    "systematic-debugging": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "computedHash": "72e9ab72627e4fd8ed26a582e82309a98ecdc4f6e1c99418430ac05682c9e91d"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "afeca00ac2f492d88fdd010e73d91719a5b57c564bb4a73325b0bd77e11323ab"
+    },
+    "web-design-reviewer": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "10c6fad8b4f01dbeae969009d81d6c306c8a96d56077cad9bfe2a73a38f5dcbe"
+    },
+    "wordpress-pro": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "5c1c5d5704d071543469604773df0f56df33b729221c42899f92fee1f846ea15"
+    },
+    "wp-abilities-api": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "github",
+      "computedHash": "2f5b235bd0484b9cea7b2efe7e96bad1f181238ae1a3e45da1ba04c9ed7213dd"
+    },
+    "wp-block-themes": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "github",
+      "computedHash": "ec31dc2e2a224299225fed1be6f6a94085b3fbfdcf57f22d673949063abf24bc"
+    },
+    "wp-interactivity-api": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "github",
+      "computedHash": "50ffcda715b63dfb0f9ca2a2543b9a070fe68f7da89b321295902426e918966c"
+    },
+    "wp-performance": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "github",
+      "computedHash": "580d879ffecd41835e297cbf222443bff6bebf7aaa0efb46852d743249330f9b"
+    },
+    "wp-rest-api": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "github",
+      "computedHash": "07d98b54fb41b6dccb0bae9f1a5b0d786776e9438ff5eba17d9dec7db89e5104"
+    },
+    "wp-wpcli-and-ops": {
+      "source": "wordpress/agent-skills",
+      "sourceType": "github",
+      "computedHash": "b04471067f1577112c37870ee564cd06f0787487dc764edf4229f73e3b5981ca"
+    }
+  }
+}
