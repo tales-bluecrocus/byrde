@@ -421,12 +421,31 @@ interface ContentContextType {
 
 const ContentContext = createContext<ContentContextType | null>(null);
 
+/**
+ * Deep merge stored content with defaults per section.
+ * Ensures partial section data (e.g. hero with only ctaLink) still has
+ * all default fields like headline, subheadline, etc.
+ */
+function mergeWithDefaults(
+  stored: Record<string, unknown>,
+): Record<ContentSectionId, SectionContent> {
+  const result = { ...DEFAULT_CONTENT };
+  for (const key of Object.keys(stored) as ContentSectionId[]) {
+    if (key in DEFAULT_CONTENT && stored[key] && typeof stored[key] === 'object') {
+      result[key] = { ...DEFAULT_CONTENT[key], ...stored[key] } as SectionContent;
+    } else if (key in DEFAULT_CONTENT) {
+      result[key] = stored[key] as SectionContent;
+    }
+  }
+  return result;
+}
+
 // Load initial content from PHP injection or defaults
 function loadContent(): Record<ContentSectionId, SectionContent> {
   // Check for PHP-injected content (public pages)
   if (typeof window !== 'undefined' && window.byrdeContent) {
     const migrated = migrateContent(window.byrdeContent as Record<string, unknown>);
-    return { ...DEFAULT_CONTENT, ...migrated } as Record<ContentSectionId, SectionContent>;
+    return mergeWithDefaults(migrated);
   }
   return { ...DEFAULT_CONTENT };
 }
@@ -456,7 +475,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         if (data.success) {
           if (data.content) {
             const migrated = migrateContent(data.content as Record<string, unknown>);
-            setSectionContent(prev => ({ ...prev, ...migrated } as Record<ContentSectionId, SectionContent>));
+            setSectionContent(() => mergeWithDefaults(migrated));
           }
           // content: null means new page with no saved content — keep defaults
         } else {

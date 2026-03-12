@@ -27,6 +27,33 @@ class Abilities {
 	}
 
 	/**
+	 * Recursively merge two arrays (deep merge).
+	 *
+	 * Values from $override replace values in $base. Numeric arrays
+	 * in $override fully replace those in $base (not appended).
+	 *
+	 * @param array $base    Base array.
+	 * @param array $override Override array (partial).
+	 * @return array Merged array.
+	 */
+	private static function deep_merge( array $base, array $override ): array {
+		foreach ( $override as $key => $value ) {
+			if (
+				is_array( $value )
+				&& isset( $base[ $key ] )
+				&& is_array( $base[ $key ] )
+				&& ! wp_is_numeric_array( $value )
+				&& ! wp_is_numeric_array( $base[ $key ] )
+			) {
+				$base[ $key ] = self::deep_merge( $base[ $key ], $value );
+			} else {
+				$base[ $key ] = $value;
+			}
+		}
+		return $base;
+	}
+
+	/**
 	 * Register hooks.
 	 */
 	public function register(): void {
@@ -74,7 +101,7 @@ class Abilities {
 			'category'    => 'byrde',
 			'input_schema' => [
 				'type'       => 'object',
-				'properties' => new \stdClass(),
+				'properties' => [],
 			],
 			'output_schema' => [
 				'type'       => 'object',
@@ -85,8 +112,13 @@ class Abilities {
 					],
 				],
 			],
-			'execute_callback'    => function () {
-				return [ 'settings' => $this->settings->get_all() ];
+			'execute_callback'    => function ( $input = [] ) {
+				$all = $this->settings->get_all();
+				// Ensure array (Manager may return stdClass in some cases).
+				if ( $all instanceof \stdClass || is_object( $all ) ) {
+					$all = (array) $all;
+				}
+				return [ 'settings' => $all ];
 			},
 			'permission_callback' => '__return_true',
 			'meta' => [
@@ -320,12 +352,18 @@ class Abilities {
 					return new \WP_Error( 'empty_config', 'No config data provided.' );
 				}
 
-				$errors = Validators::validate_theme_config( $config );
+				// Deep merge with existing config so partial updates work.
+				$existing_raw = get_post_meta( $page_id, Constants::META_THEME_CONFIG, true );
+				$existing     = $existing_raw ? json_decode( $existing_raw, true ) : [];
+				$existing     = is_array( $existing ) ? $existing : [];
+				$merged       = self::deep_merge( $existing, $config );
+
+				$errors = Validators::validate_theme_config( $merged );
 				if ( ! empty( $errors ) ) {
 					return new \WP_Error( 'validation_failed', implode( ', ', $errors ) );
 				}
 
-				$sanitized = Validators::sanitize_theme_config( $config );
+				$sanitized = Validators::sanitize_theme_config( $merged );
 				$json      = wp_json_encode( $sanitized, JSON_UNESCAPED_UNICODE );
 
 				update_post_meta( $page_id, Constants::META_THEME_CONFIG, $json );
@@ -394,11 +432,13 @@ class Abilities {
 					return new \WP_Error( 'validation_failed', implode( ', ', $errors ) );
 				}
 
-				// Merge with existing content so partial updates work.
+				// Deep merge with existing content so partial updates work.
+				// This ensures sending {"hero": {"ctaLink": "..."}} only updates
+				// that field without wiping out headline, subheadline, etc.
 				$existing  = get_post_meta( $page_id, Constants::META_CONTENT, true );
 				$existing  = is_array( $existing ) ? $existing : [];
 				$sanitized = Validators::sanitize_content( $content );
-				$merged    = array_merge( $existing, $sanitized );
+				$merged    = self::deep_merge( $existing, $sanitized );
 
 				update_post_meta( $page_id, Constants::META_CONTENT, $merged );
 				wp_cache_delete( $page_id, 'post_meta' );
@@ -468,16 +508,26 @@ class Abilities {
 					return new \WP_Error( 'missing_data', 'Both config and content are required.' );
 				}
 
-				$theme_errors   = Validators::validate_theme_config( $config );
-				$content_errors = Validators::validate_content( $content );
+				// Deep merge with existing data so partial updates work.
+				$existing_config_raw = get_post_meta( $page_id, Constants::META_THEME_CONFIG, true );
+				$existing_config     = $existing_config_raw ? json_decode( $existing_config_raw, true ) : [];
+				$existing_config     = is_array( $existing_config ) ? $existing_config : [];
+				$merged_config       = self::deep_merge( $existing_config, $config );
+
+				$existing_content = get_post_meta( $page_id, Constants::META_CONTENT, true );
+				$existing_content = is_array( $existing_content ) ? $existing_content : [];
+				$merged_content   = self::deep_merge( $existing_content, $content );
+
+				$theme_errors   = Validators::validate_theme_config( $merged_config );
+				$content_errors = Validators::validate_content( $merged_content );
 				$all_errors     = array_merge( $theme_errors, $content_errors );
 
 				if ( ! empty( $all_errors ) ) {
 					return new \WP_Error( 'validation_failed', implode( ', ', $all_errors ) );
 				}
 
-				$sanitized_config  = Validators::sanitize_theme_config( $config );
-				$sanitized_content = Validators::sanitize_content( $content );
+				$sanitized_config  = Validators::sanitize_theme_config( $merged_config );
+				$sanitized_content = Validators::sanitize_content( $merged_content );
 
 				update_post_meta( $page_id, Constants::META_THEME_CONFIG, wp_json_encode( $sanitized_config, JSON_UNESCAPED_UNICODE ) );
 				update_post_meta( $page_id, Constants::META_CONTENT, $sanitized_content );
