@@ -17,6 +17,9 @@ use WP_REST_Request;
  */
 class Manager {
 
+    /** @var array|null Cached result of get_all() for single-request use. */
+    private ?array $get_cache = null;
+
     /**
      * Register REST API endpoints for theme settings.
      */
@@ -269,7 +272,12 @@ class Manager {
         $sanitized = $this->sanitize( $settings );
         $merged    = $this->array_merge_recursive_distinct( $existing, $sanitized );
 
-        return update_option( Constants::OPTION_THEME_SETTINGS, $merged );
+        $result = update_option( Constants::OPTION_THEME_SETTINGS, $merged );
+
+        // Invalidate the get() cache so subsequent reads in this request see fresh data.
+        $this->get_cache = null;
+
+        return $result;
     }
 
     /**
@@ -552,28 +560,26 @@ class Manager {
      * @return mixed Setting value.
      */
     public function get( string $key, $default = '' ) {
-        static $cache = null;
-
-        if ( null === $cache ) {
-            $cache = $this->get_all();
+        if ( null === $this->get_cache ) {
+            $this->get_cache = $this->get_all();
 
             // Add contact form settings (server-only, not in frontend)
-            $settings                        = $this->get_theme_settings();
-            $cache['postmark_api_token']      = $settings['contact_form']['postmark_api_token'] ?? '';
-            $cache['contact_form_to_email']   = $settings['contact_form']['to_email'] ?? '';
-            $cache['contact_form_from_email'] = $settings['contact_form']['from_email'] ?? '';
-            $cache['contact_form_subject']    = $settings['contact_form']['subject'] ?? 'New Lead from Ads';
-            $cache['contact_form_cc_email']   = $settings['contact_form']['cc_email'] ?? '';
-            $cache['contact_form_bcc_email']  = $settings['contact_form']['bcc_email'] ?? '';
+            $settings                                = $this->get_theme_settings();
+            $this->get_cache['postmark_api_token']      = $settings['contact_form']['postmark_api_token'] ?? '';
+            $this->get_cache['contact_form_to_email']   = $settings['contact_form']['to_email'] ?? '';
+            $this->get_cache['contact_form_from_email'] = $settings['contact_form']['from_email'] ?? '';
+            $this->get_cache['contact_form_subject']    = $settings['contact_form']['subject'] ?? 'New Lead from Ads';
+            $this->get_cache['contact_form_cc_email']   = $settings['contact_form']['cc_email'] ?? '';
+            $this->get_cache['contact_form_bcc_email']  = $settings['contact_form']['bcc_email'] ?? '';
         }
 
-        $value = $cache[ $key ] ?? null;
+        $value = $this->get_cache[ $key ] ?? null;
 
         if ( null === $value || false === $value ) {
             return $default;
         }
 
-        return $value ?: $default;
+        return $value;
     }
 
     /**

@@ -37,6 +37,14 @@ class Cache {
      * @param int $page_id Specific page to purge (0 = purge all).
      */
     public function purge( int $page_id = 0 ): void {
+        // Re-entry guard: purge() calls update_option() which fires updated_option,
+        // which could call on_settings_save() → purge() again.
+        static $purging = false;
+        if ( $purging ) {
+            return;
+        }
+        $purging = true;
+
         // --- WordPress core ---
         if ( $page_id ) {
             clean_post_cache( $page_id );
@@ -120,6 +128,8 @@ class Cache {
 
         // --- Bump cache version for dynamic asset versioning ---
         update_option( 'byrde_cache_version', (string) time(), false );
+
+        $purging = false;
     }
 
     /**

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 // Badge theme options (only light/dark for brand consistency)
@@ -148,19 +148,19 @@ export function HeaderConfigProvider({ children }: { children: ReactNode }) {
     setTopbarConfig(config);
   }, []);
 
+  const value = useMemo(() => ({
+    headerConfig,
+    topbarConfig,
+    updateHeaderConfig,
+    updateHeaderStyle,
+    updateTopbarConfig,
+    resetHeaderConfig,
+    replaceHeaderConfig,
+    replaceTopbarConfig,
+  }), [headerConfig, topbarConfig, updateHeaderConfig, updateHeaderStyle, updateTopbarConfig, resetHeaderConfig, replaceHeaderConfig, replaceTopbarConfig]);
+
   return (
-    <HeaderConfigContext.Provider
-      value={{
-        headerConfig,
-        topbarConfig,
-        updateHeaderConfig,
-        updateHeaderStyle,
-        updateTopbarConfig,
-        resetHeaderConfig,
-        replaceHeaderConfig,
-        replaceTopbarConfig,
-      }}
-    >
+    <HeaderConfigContext.Provider value={value}>
       {children}
     </HeaderConfigContext.Provider>
   );

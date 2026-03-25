@@ -25,7 +25,17 @@ class ColorMigration {
      * Idempotent -- checks a version flag before executing.
      */
     public function maybe_migrate_colors(): void {
+        // Skip the DB lookup on every admin_init once migration is already complete.
+        static $checked = false;
+        if ( $checked ) {
+            return;
+        }
+        $checked = true;
+
         $current_version = (int) get_option( 'byrde_color_schema_version', 1 );
+        if ( $current_version >= 4 ) {
+            return;
+        }
 
         if ( $current_version < 3 ) {
             $this->migrate_global_brand_colors_v3();

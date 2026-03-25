@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 
 interface SidebarContextType {
   isOpen: boolean;
@@ -22,22 +22,24 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
-  const toggle = () => setIsOpen(prev => !prev);
+  const toggle = useCallback(() => setIsOpen(prev => !prev), []);
 
   // Calculate total width based on what's open
   const totalWidth = isOpen ? (isDrawerOpen ? SIDEBAR_WIDTH + DRAWER_WIDTH : SIDEBAR_WIDTH) : 0;
 
+  const value = useMemo(() => ({
+    isOpen,
+    setIsOpen,
+    toggle,
+    sidebarWidth: SIDEBAR_WIDTH,
+    isDrawerOpen,
+    setDrawerOpen,
+    drawerWidth: DRAWER_WIDTH,
+    totalWidth,
+  }), [isOpen, isDrawerOpen, totalWidth, toggle]);
+
   return (
-    <SidebarContext.Provider value={{
-      isOpen,
-      setIsOpen,
-      toggle,
-      sidebarWidth: SIDEBAR_WIDTH,
-      isDrawerOpen,
-      setDrawerOpen,
-      drawerWidth: DRAWER_WIDTH,
-      totalWidth,
-    }}>
+    <SidebarContext.Provider value={value}>
       {children}
     </SidebarContext.Provider>
   );

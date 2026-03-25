@@ -30,7 +30,16 @@ class RateLimiter {
             return false;
         }
 
-        set_transient( $transient_key, $requests + 1, $time_window );
+        // Increment without resetting TTL — prevents slow-drip bypass.
+        // WordPress transients don't support atomic increment, so we update
+        // the underlying option directly to preserve the original expiry.
+        global $wpdb;
+        $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->options} SET option_value = option_value + 1 WHERE option_name = %s",
+            '_transient_' . $transient_key
+        ) );
+        wp_cache_delete( $transient_key, 'transient' );
+
         return true;
     }
 

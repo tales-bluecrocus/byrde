@@ -385,7 +385,14 @@ class ContactForm {
             return false;
         }
 
-        set_transient( $key, $requests + 1, $window );
+        // Increment without resetting TTL — prevents slow-drip bypass.
+        global $wpdb;
+        $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->options} SET option_value = option_value + 1 WHERE option_name = %s",
+            '_transient_' . $key
+        ) );
+        wp_cache_delete( $key, 'transient' );
+
         return true;
     }
 

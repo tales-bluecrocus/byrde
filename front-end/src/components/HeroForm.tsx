@@ -109,6 +109,7 @@ export default function HeroForm({ themeStyles }: HeroFormProps) {
 	const [errors, setErrors] = useState<FormErrors>({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
+	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
@@ -139,6 +140,7 @@ export default function HeroForm({ themeStyles }: HeroFormProps) {
 			return;
 		}
 		setIsSubmitting(true);
+		setSubmitError(null);
 		try {
 			const [response] = await Promise.all([
 				fetch(`${settings.apiUrl}/contact`, {
@@ -161,6 +163,7 @@ export default function HeroForm({ themeStyles }: HeroFormProps) {
 			setTimeout(() => setIsSuccess(false), 5000);
 		} catch (error) {
 			trackFormError('hero_contact_form', 'submission_error');
+			setSubmitError('Something went wrong. Please try again or call us directly.');
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -273,6 +276,11 @@ export default function HeroForm({ themeStyles }: HeroFormProps) {
 									content.formSubmitText || 'Get My Free Quote'
 								)}
 							</button>
+
+							{/* Submit Error */}
+							{submitError && (
+								<p className="text-center text-sm text-red-500 font-medium">{submitError}</p>
+							)}
 
 							{/* Privacy */}
 							<p className="text-center text-xs opacity-60" style={{ color: themeStyles.formTextSecondary }}>

@@ -3,6 +3,7 @@
 namespace Byrde\API;
 
 use Byrde\Core\Constants;
+use Byrde\Security\RateLimiter;
 use Byrde\Security\Validators;
 use Byrde\Settings\Manager;
 
@@ -156,6 +157,10 @@ class Abilities {
 				],
 			],
 			'execute_callback' => function ( array $input ) {
+				if ( ! RateLimiter::check( 'abilities_settings', 5, 60 ) ) {
+					return new \WP_Error( 'rate_limited', 'Too many requests. Please wait before trying again.' );
+				}
+
 				$settings = $input['settings'] ?? [];
 
 				if ( empty( $settings ) ) {
@@ -289,6 +294,10 @@ class Abilities {
 					return new \WP_Error( 'not_found', 'Landing page not found.' );
 				}
 
+				if ( ! current_user_can( 'edit_post', $page_id ) ) {
+					return new \WP_Error( 'forbidden', 'You do not have permission to view this page.' );
+				}
+
 				$config_raw = get_post_meta( $page_id, Constants::META_THEME_CONFIG, true );
 				$config     = $config_raw ? json_decode( $config_raw, true ) : null;
 				$content    = get_post_meta( $page_id, Constants::META_CONTENT, true );
@@ -340,12 +349,20 @@ class Abilities {
 				],
 			],
 			'execute_callback' => function ( array $input ) {
+				if ( ! RateLimiter::check( 'abilities_save', 10, 60 ) ) {
+					return new \WP_Error( 'rate_limited', 'Too many requests. Please wait before trying again.' );
+				}
+
 				$page_id = (int) ( $input['page_id'] ?? 0 );
 				$config  = $input['config'] ?? [];
 
 				$post = get_post( $page_id );
 				if ( ! $post || $post->post_type !== Constants::CPT_LANDING ) {
 					return new \WP_Error( 'not_found', 'Landing page not found.' );
+				}
+
+				if ( ! current_user_can( 'edit_post', $page_id ) ) {
+					return new \WP_Error( 'forbidden', 'You do not have permission to edit this page.' );
 				}
 
 				if ( empty( $config ) ) {
@@ -415,12 +432,20 @@ class Abilities {
 				],
 			],
 			'execute_callback' => function ( array $input ) {
+				if ( ! RateLimiter::check( 'abilities_save', 10, 60 ) ) {
+					return new \WP_Error( 'rate_limited', 'Too many requests. Please wait before trying again.' );
+				}
+
 				$page_id = (int) ( $input['page_id'] ?? 0 );
 				$content = $input['content'] ?? [];
 
 				$post = get_post( $page_id );
 				if ( ! $post || $post->post_type !== Constants::CPT_LANDING ) {
 					return new \WP_Error( 'not_found', 'Landing page not found.' );
+				}
+
+				if ( ! current_user_can( 'edit_post', $page_id ) ) {
+					return new \WP_Error( 'forbidden', 'You do not have permission to edit this page.' );
 				}
 
 				if ( empty( $content ) ) {
@@ -495,6 +520,10 @@ class Abilities {
 				],
 			],
 			'execute_callback' => function ( array $input ) {
+				if ( ! RateLimiter::check( 'abilities_save', 10, 60 ) ) {
+					return new \WP_Error( 'rate_limited', 'Too many requests. Please wait before trying again.' );
+				}
+
 				$page_id = (int) ( $input['page_id'] ?? 0 );
 				$config  = $input['config'] ?? [];
 				$content = $input['content'] ?? [];
@@ -502,6 +531,10 @@ class Abilities {
 				$post = get_post( $page_id );
 				if ( ! $post || $post->post_type !== Constants::CPT_LANDING ) {
 					return new \WP_Error( 'not_found', 'Landing page not found.' );
+				}
+
+				if ( ! current_user_can( 'edit_post', $page_id ) ) {
+					return new \WP_Error( 'forbidden', 'You do not have permission to edit this page.' );
 				}
 
 				if ( empty( $config ) || empty( $content ) ) {

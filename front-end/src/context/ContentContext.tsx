@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { SectionId } from './SectionThemeContext';
 import { migrateHeadline } from '../utils/renderHeadline';
@@ -458,10 +458,13 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     const wpAdmin = window.byrdeAdmin;
     if (!wpAdmin?.pageId || !wpAdmin?.apiUrl) return;
 
+    const controller = new AbortController();
+
     const fetchContent = async () => {
       try {
         const response = await fetch(`${wpAdmin.apiUrl}/pages/${wpAdmin.pageId}/content`, {
           headers: { 'X-WP-Nonce': wpAdmin.nonce },
+          signal: controller.signal,
         });
 
         // Check response status BEFORE parsing JSON
@@ -482,11 +485,13 @@ export function ContentProvider({ children }: { children: ReactNode }) {
           throw new Error('Invalid response format from server');
         }
       } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
         console.error('[ContentContext] Failed to fetch content:', error);
       }
     };
 
     fetchContent();
+    return () => controller.abort();
   }, []);
 
   const updateSectionContent = useCallback(<T extends ContentSectionId>(
@@ -509,24 +514,28 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  // Use ref so getContent is stable and doesn't cause re-renders of all consumers
+  const contentRef = useRef(sectionContent);
+  contentRef.current = sectionContent;
+
   const getContent = useCallback(<T extends ContentSectionId>(sectionId: T): SectionContentMap[T] => {
-    return (sectionContent[sectionId] || DEFAULT_CONTENT[sectionId]) as SectionContentMap[T];
-  }, [sectionContent]);
+    return (contentRef.current[sectionId] || DEFAULT_CONTENT[sectionId]) as SectionContentMap[T];
+  }, []);
 
   const replaceAllContent = useCallback((content: Record<ContentSectionId, SectionContent>) => {
     setSectionContent(content);
   }, []);
 
+  const value = useMemo(() => ({
+    sectionContent,
+    updateSectionContent,
+    resetSectionContent,
+    getContent,
+    replaceAllContent,
+  }), [sectionContent, updateSectionContent, resetSectionContent, getContent, replaceAllContent]);
+
   return (
-    <ContentContext.Provider
-      value={{
-        sectionContent,
-        updateSectionContent,
-        resetSectionContent,
-        getContent,
-        replaceAllContent,
-      }}
-    >
+    <ContentContext.Provider value={value}>
       {children}
     </ContentContext.Provider>
   );

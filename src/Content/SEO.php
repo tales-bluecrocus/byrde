@@ -189,10 +189,10 @@ class SEO {
                         if ( ! empty( $faq['question'] ) && ! empty( $faq['answer'] ) ) {
                             $faq_items[] = [
                                 '@type'          => 'Question',
-                                'name'           => $faq['question'],
+                                'name'           => wp_strip_all_tags( $faq['question'] ),
                                 'acceptedAnswer' => [
                                     '@type' => 'Answer',
-                                    'text'  => $faq['answer'],
+                                    'text'  => wp_strip_all_tags( $faq['answer'] ),
                                 ],
                             ];
                         }

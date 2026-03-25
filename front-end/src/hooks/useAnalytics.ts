@@ -67,12 +67,14 @@ export function useAdAttribution(): {
 // SCROLL DEPTH TRACKING
 // ============================================
 
+const DEFAULT_SCROLL_THRESHOLDS = [25, 50, 75, 90, 100];
+
 /**
  * Hook to track scroll depth
  * Automatically tracks when user scrolls to 25%, 50%, 75%, 90%, 100%
  */
 export function useScrollDepthTracking(
-  thresholds: number[] = [25, 50, 75, 90, 100]
+  thresholds: number[] = DEFAULT_SCROLL_THRESHOLDS
 ): void {
   const trackerRef = useRef<ScrollDepthTracker | null>(null);
 

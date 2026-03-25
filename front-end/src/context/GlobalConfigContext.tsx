@@ -263,22 +263,22 @@ export function GlobalConfigProvider({ children }: { children: ReactNode }) {
     setGlobalConfig(config);
   }, []);
 
+  const value = useMemo(() => ({
+    globalConfig,
+    palette,
+    updateGlobalConfig,
+    updateBrand,
+    updateLogo,
+    updateFooter,
+    updateTrustBadge,
+    updateFormConfig,
+    updateSeo,
+    resetGlobalConfig,
+    replaceGlobalConfig,
+  }), [globalConfig, palette, updateGlobalConfig, updateBrand, updateLogo, updateFooter, updateTrustBadge, updateFormConfig, updateSeo, resetGlobalConfig, replaceGlobalConfig]);
+
   return (
-    <GlobalConfigContext.Provider
-      value={{
-        globalConfig,
-        palette,
-        updateGlobalConfig,
-        updateBrand,
-        updateLogo,
-        updateFooter,
-        updateTrustBadge,
-        updateFormConfig,
-        updateSeo,
-        resetGlobalConfig,
-        replaceGlobalConfig,
-      }}
-    >
+    <GlobalConfigContext.Provider value={value}>
       {children}
     </GlobalConfigContext.Provider>
   );

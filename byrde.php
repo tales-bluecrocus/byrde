@@ -26,9 +26,13 @@ define( 'BYRDE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 // Suppress PHP 8.x deprecation warnings from WP core passing null to
 // strpos() / str_replace() in wp_is_stream() and wp_normalize_path().
 // Targets only wp-includes/functions.php so plugin/theme deprecations still show.
-set_error_handler( function ( $errno, $errstr, $errfile ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+// Chains with any previously registered error handler (Sentry, New Relic, etc.).
+$byrde_prev_error_handler = set_error_handler( function ( $errno, $errstr, $errfile, $errline ) use ( &$byrde_prev_error_handler ) {
 	if ( str_contains( $errfile, 'wp-includes' . DIRECTORY_SEPARATOR . 'functions.php' ) ) {
 		return true;
+	}
+	if ( $byrde_prev_error_handler ) {
+		return call_user_func( $byrde_prev_error_handler, $errno, $errstr, $errfile, $errline );
 	}
 	return false;
 }, E_DEPRECATED );

@@ -10,6 +10,10 @@
 
 import { useState, useEffect, memo } from 'react';
 
+// Pin to a specific version to prevent supply-chain attacks via @latest hijacking.
+// Update this when upgrading lucide-react in package.json.
+const LUCIDE_CDN_VERSION = '0.563.0';
+
 // Lucide renamed some icons — map old PascalCase names to current kebab-case slugs.
 const ICON_ALIASES: Record<string, string> = {
 	'CheckCircle': 'circle-check',
@@ -35,15 +39,22 @@ async function fetchIcon(name: string): Promise<string> {
 
 	if (pendingFetches.has(slug)) return pendingFetches.get(slug)!;
 
-	const promise = fetch(`https://unpkg.com/lucide-static@latest/icons/${slug}.svg`)
+	const promise = fetch(`https://unpkg.com/lucide-static@${LUCIDE_CDN_VERSION}/icons/${slug}.svg`)
 		.then((res) => {
 			if (!res.ok) throw new Error(`Icon "${name}" not found`);
 			return res.text();
 		})
-		.then((svg) => {
-			svgCache.set(slug, svg);
+		.then((raw) => {
+			// Sanitize: only accept content that contains a valid SVG element.
+			// Strip any <script> tags and event handler attributes to prevent XSS.
+			if (!raw.includes('<svg')) return '';
+			const sanitized = raw
+				.replace(/<script[\s\S]*?<\/script>/gi, '')
+				.replace(/\bon\w+\s*=\s*"[^"]*"/gi, '')
+				.replace(/\bon\w+\s*=\s*'[^']*'/gi, '');
+			svgCache.set(slug, sanitized);
 			pendingFetches.delete(slug);
-			return svg;
+			return sanitized;
 		})
 		.catch(() => {
 			pendingFetches.delete(slug);
@@ -66,14 +77,16 @@ export default memo(function LucideIcon({ name, className = 'w-6 h-6', color, st
 	const [svg, setSvg] = useState(() => svgCache.get(slug) || '');
 
 	useEffect(() => {
+		let cancelled = false;
 		if (svgCache.has(slug)) {
 			setSvg(svgCache.get(slug)!);
 		} else {
 			setSvg('');
 			fetchIcon(name).then((s) => {
-				if (s) setSvg(s);
+				if (!cancelled && s) setSvg(s);
 			});
 		}
+		return () => { cancelled = true; };
 	}, [slug]);
 
 	if (!svg) {

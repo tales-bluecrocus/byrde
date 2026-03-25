@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 // Section theme configuration (simplified: mode + form + layout + bg)
@@ -258,22 +258,22 @@ export function SectionThemeProvider({ children }: { children: ReactNode }) {
     setSectionOrder(order);
   }, []);
 
+  const value = useMemo(() => ({
+    sectionThemes,
+    sectionVisibility,
+    sectionOrder,
+    updateSectionTheme,
+    resetSectionTheme,
+    resetAllSectionThemes,
+    getResolvedTheme,
+    setSectionVisibility,
+    isSectionVisible,
+    setSectionOrder,
+    importSectionData,
+  }), [sectionThemes, sectionVisibility, sectionOrder, updateSectionTheme, resetSectionTheme, resetAllSectionThemes, getResolvedTheme, setSectionVisibility, isSectionVisible, setSectionOrder, importSectionData]);
+
   return (
-    <SectionThemeContext.Provider
-      value={{
-        sectionThemes,
-        sectionVisibility,
-        sectionOrder,
-        updateSectionTheme,
-        resetSectionTheme,
-        resetAllSectionThemes,
-        getResolvedTheme,
-        setSectionVisibility,
-        isSectionVisible,
-        setSectionOrder,
-        importSectionData,
-      }}
-    >
+    <SectionThemeContext.Provider value={value}>
       {children}
     </SectionThemeContext.Provider>
   );

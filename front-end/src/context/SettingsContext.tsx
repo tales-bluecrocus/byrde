@@ -5,7 +5,7 @@
  * so edits in the Theme Editor update all components in real time.
  */
 
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { ThemeSettings } from '../hooks/useSettings';
 import { DEFAULT_SETTINGS } from '../hooks/useSettings';
@@ -36,8 +36,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setSettings(newSettings);
   }, []);
 
+  const value = useMemo(() => ({ settings, updateSettings, replaceSettings }), [settings, updateSettings, replaceSettings]);
+
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings, replaceSettings }}>
+    <SettingsContext.Provider value={value}>
       {children}
     </SettingsContext.Provider>
   );
