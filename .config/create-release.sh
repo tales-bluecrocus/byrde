@@ -60,6 +60,18 @@ if git rev-parse "$TAG" >/dev/null 2>&1; then
     exit 1
 fi
 
+# Check if CHANGELOG.md mentions this version
+if [ -f "CHANGELOG.md" ]; then
+    if ! grep -q "\[$VERSION\]" CHANGELOG.md; then
+        echo -e "${RED}Erro: CHANGELOG.md não contém uma entrada para a versão $VERSION${NC}"
+        echo -e "Adicione uma seção como:"
+        echo -e "  ${YELLOW}## [$VERSION] - $(date +%Y-%m-%d)${NC}"
+        echo -e "antes de criar a release."
+        exit 1
+    fi
+    echo -e "${GREEN}CHANGELOG.md contém entrada para $VERSION${NC}\n"
+fi
+
 # Get current version from byrde.php
 CURRENT_VERSION=$(grep -m 1 "Version:" byrde.php | sed 's/.*Version: *//' | tr -d '\r')
 echo -e "${BLUE}Versão atual: $CURRENT_VERSION${NC}"
